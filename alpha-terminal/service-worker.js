@@ -2,30 +2,35 @@
 // cache-first pour JS/CSS/JSON/images (offline + rapide). Aucun cache pour les API calls.
 const CACHE = 'alpha-terminal-v87';
 
+// Scope path (e.g. "/alpha-terminal/" en sous-déploiement, "/" en racine).
+// Permet de fonctionner sous n'importe quel sous-chemin sans casser le precache.
+const SCOPE = new URL('./', self.location).pathname;
+const SCOPED = (p) => SCOPE + p.replace(/^\//, '');
+
 // Liste des assets pré-cachés au install pour fonctionner 100% offline.
 // Inclut HTML pages SEO + JS modules core + datasets JSON.
 const PRECACHE_URLS = [
   // Core
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/styles.css',
-  '/icons/logo.png',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png',
+  SCOPE,
+  SCOPED('index.html'),
+  SCOPED('manifest.json'),
+  SCOPED('styles.css'),
+  SCOPED('icons/logo.png'),
+  SCOPED('icons/icon-192.png'),
+  SCOPED('icons/icon-512.png'),
   // Pages commerciales critiques (FR + EN) — offline navigation possible
-  '/pricing.html',
-  '/pricing-en.html',
-  '/features.html',
-  '/features-en.html',
-  '/blog.html',
-  '/blog-en.html',
-  '/pour-qui.html',
-  '/who-is-it-for.html',
-  '/privacy-proof.html',
-  '/privacy-proof-en.html',
-  '/newsletter.html',
-  '/newsletter-en.html'
+  SCOPED('pricing.html'),
+  SCOPED('pricing-en.html'),
+  SCOPED('features.html'),
+  SCOPED('features-en.html'),
+  SCOPED('blog.html'),
+  SCOPED('blog-en.html'),
+  SCOPED('pour-qui.html'),
+  SCOPED('who-is-it-for.html'),
+  SCOPED('privacy-proof.html'),
+  SCOPED('privacy-proof-en.html'),
+  SCOPED('newsletter.html'),
+  SCOPED('newsletter-en.html')
 ];
 
 self.addEventListener('install', (e) => {
@@ -68,7 +73,7 @@ self.addEventListener('fetch', (e) => {
 
   // 3a. NETWORK-FIRST pour HTML / navigation : toujours servir la version fraîche.
   //     Évite les bugs de "vieux index.html servi" après une mise à jour.
-  const isHTML = /\.html$/i.test(url.pathname) || url.pathname === '/' || e.request.mode === 'navigate';
+  const isHTML = /\.html$/i.test(url.pathname) || url.pathname === SCOPE || e.request.mode === 'navigate';
   if (isHTML && e.request.method === 'GET') {
     e.respondWith(
       fetch(e.request).then(r => {
@@ -77,7 +82,7 @@ self.addEventListener('fetch', (e) => {
           caches.open(CACHE).then(c => c.put(e.request, clone));
         }
         return r;
-      }).catch(() => caches.match(e.request).then(c => c || caches.match('/index.html') || new Response('Offline', { status: 503 })))
+      }).catch(() => caches.match(e.request).then(c => c || caches.match(SCOPED('index.html')) || new Response('Offline', { status: 503 })))
     );
     return;
   }
@@ -105,7 +110,7 @@ self.addEventListener('fetch', (e) => {
           return r;
         }).catch(() => {
           // Si offline et pas en cache : fallback à index.html pour les nav (SPA)
-          if (e.request.mode === 'navigate') return caches.match('/index.html');
+          if (e.request.mode === 'navigate') return caches.match(SCOPED('index.html'));
           return new Response('', { status: 503 });
         });
       })
@@ -121,6 +126,6 @@ self.addEventListener('fetch', (e) => {
         caches.open(CACHE).then(c => c.put(e.request, clone));
       }
       return r;
-    }).catch(() => caches.match(e.request).then(r => r || (e.request.mode === 'navigate' ? caches.match('/index.html') : new Response('', { status: 503 }))))
+    }).catch(() => caches.match(e.request).then(r => r || (e.request.mode === 'navigate' ? caches.match(SCOPED('index.html')) : new Response('', { status: 503 }))))
   );
 });
