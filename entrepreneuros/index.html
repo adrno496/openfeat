@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EntrepreneurOS — Le système d'exploitation IA des entrepreneurs solos</title>
+  <meta name="description" content="21 modules IA pour piloter ton business solo : business plan, factures, contrats, posts sociaux, prévisionnel, analyse PDF, contenu… 3 modes IA (Claude/GPT, web, local). 100% local, données chiffrées." />
+  <link rel="icon" href="icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-0: #080807;
+      --bg-1: #0f0f0d;
+      --bg-2: #161614;
+      --bg-3: #1e1e1b;
+      --border: rgba(255,255,255,0.08);
+      --border-md: rgba(255,255,255,0.14);
+      --text-0: #f0ede8;
+      --text-1: #b8b5b0;
+      --text-2: #7a7872;
+      --accent: #e8d5a3;
+      --accent-dim: rgba(232,213,163,0.15);
+      --green: #7ec89a;
+      --font-display: 'Syne', system-ui, sans-serif;
+      --font-body: 'DM Sans', system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-0);
+      color: var(--text-1);
+      font-size: 16px; line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--text-0); }
+    .container { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 22px;
+      background: var(--bg-2);
+      color: var(--text-0);
+      border: 1px solid var(--border-md);
+      border-radius: 10px;
+      font-family: inherit; font-weight: 600; font-size: 14px;
+      cursor: pointer; transition: all 0.15s;
+      text-decoration: none;
+    }
+    .btn:hover { background: var(--bg-3); border-color: var(--accent); transform: translateY(-1px); }
+    .btn-primary {
+      background: var(--accent);
+      color: #15140f;
+      border-color: var(--accent);
+    }
+    .btn-primary:hover { background: #f4dfb0; color: #15140f; }
+    .btn-ghost { background: transparent; }
+
+    /* ===== Nav ===== */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(8,8,7,0.85);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .nav-brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 800; color: var(--text-0); font-size: 16px; }
+    .nav-brand img { width: 28px; height: 28px; border-radius: 6px; }
+    .nav-links { display: flex; gap: 28px; }
+    .nav-links a { color: var(--text-1); font-size: 14px; font-weight: 500; }
+    .nav-links a:hover { color: var(--text-0); }
+    @media (max-width: 720px) { .nav-links { display: none; } }
+
+    /* ===== Hero ===== */
+    .hero {
+      padding: 100px 0 80px;
+      background:
+        radial-gradient(ellipse at top, var(--accent-dim), transparent 60%),
+        var(--bg-0);
+      text-align: center;
+    }
+    .hero-eyebrow {
+      display: inline-block;
+      padding: 6px 14px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      border-radius: 999px;
+      font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
+      margin-bottom: 26px;
+    }
+    .hero h1 {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: clamp(40px, 7vw, 72px);
+      line-height: 1.05;
+      color: var(--text-0);
+      letter-spacing: -0.025em;
+      margin-bottom: 22px;
+    }
+    .hero h1 .grad {
+      background: linear-gradient(135deg, var(--accent), #f4dfb0);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-sub {
+      font-size: 19px; color: var(--text-1);
+      max-width: 680px; margin: 0 auto 36px;
+    }
+    .hero-cta { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 50px; }
+    .hero-meta { display: flex; gap: 28px; justify-content: center; flex-wrap: wrap; color: var(--text-2); font-size: 13px; }
+    .hero-meta span::before { content: '•'; color: var(--accent); margin-right: 8px; }
+
+    /* Mockup */
+    .hero-mockup {
+      max-width: 980px; margin: 60px auto 0;
+      border: 1px solid var(--border-md);
+      border-radius: 16px;
+      background: var(--bg-1);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 60px var(--accent-dim);
+      overflow: hidden;
+    }
+    .mockup-bar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 16px;
+      background: var(--bg-2);
+      border-bottom: 1px solid var(--border);
+    }
+    .mockup-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--bg-3); }
+    .mockup-dot.r { background: #ff5f56; }
+    .mockup-dot.y { background: #ffbd2e; }
+    .mockup-dot.g { background: #27c93f; }
+    .mockup-body {
+      display: grid; grid-template-columns: 200px 1fr;
+      min-height: 460px;
+    }
+    .mockup-side {
+      background: var(--bg-1); border-right: 1px solid var(--border);
+      padding: 20px 14px; font-size: 12px; color: var(--text-2);
+    }
+    .mockup-side-item { padding: 8px 10px; border-radius: 6px; margin-bottom: 2px; }
+    .mockup-side-item.active { background: var(--accent-dim); color: var(--accent); }
+    .mockup-content { padding: 30px; }
+    .mockup-title { font-family: var(--font-display); font-weight: 800; font-size: 28px; color: var(--text-0); margin-bottom: 8px; }
+    .mockup-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 20px; }
+    .mockup-stat { background: var(--bg-2); padding: 16px; border-radius: 8px; border: 1px solid var(--border); }
+    .mockup-stat-num { font-family: var(--font-display); font-size: 24px; font-weight: 700; color: var(--text-0); }
+    .mockup-stat-lab { font-size: 10px; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+    @media (max-width: 720px) {
+      .mockup-body { grid-template-columns: 1fr; }
+      .mockup-side { display: none; }
+    }
+
+    /* ===== Sections ===== */
+    section { padding: 90px 0; }
+    .section-eyebrow {
+      text-align: center;
+      color: var(--accent); font-size: 12px; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 14px;
+    }
+    .section-title {
+      text-align: center;
+      font-family: var(--font-display);
+      font-weight: 800; font-size: clamp(32px, 5vw, 48px);
+      color: var(--text-0); line-height: 1.1; letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .section-sub {
+      text-align: center; color: var(--text-1);
+      font-size: 17px; max-width: 640px; margin: 0 auto 56px;
+    }
+
+    /* ===== 3 Modes ===== */
+    .modes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    @media (max-width: 900px) { .modes-grid { grid-template-columns: 1fr; } }
+    .mode-card {
+      background: var(--bg-1);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px;
+      transition: all 0.2s;
+    }
+    .mode-card:hover { border-color: var(--border-md); transform: translateY(-3px); }
+    .mode-icon {
+      font-size: 30px; margin-bottom: 14px;
+      width: 52px; height: 52px;
+      background: var(--accent-dim); color: var(--accent);
+      border-radius: 12px;
+      display: grid; place-items: center;
+    }
+    .mode-card h3 { font-family: var(--font-display); font-weight: 700; color: var(--text-0); font-size: 19px; margin-bottom: 10px; }
+    .mode-card p { font-size: 14px; }
+
+    /* ===== Modules grid ===== */
+    .modules-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    @media (max-width: 1100px) { .modules-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 720px) { .modules-grid { grid-template-columns: repeat(2, 1fr); } }
+    .module-card {
+      background: var(--bg-1);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      transition: all 0.2s;
+    }
+    .module-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .module-card .ico { font-size: 22px; margin-bottom: 12px; }
+    .module-card h4 { font-family: var(--font-display); font-weight: 700; color: var(--text-0); font-size: 14px; margin-bottom: 4px; }
+    .module-card p { font-size: 12px; color: var(--text-2); line-height: 1.45; }
+
+    /* ===== Features alternées ===== */
+    .feature-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 60px;
+      align-items: center; margin-bottom: 100px;
+    }
+    .feature-row:last-child { margin-bottom: 0; }
+    .feature-row.reverse { direction: rtl; }
+    .feature-row.reverse > * { direction: ltr; }
+    @media (max-width: 900px) {
+      .feature-row, .feature-row.reverse { grid-template-columns: 1fr; direction: ltr; gap: 30px; }
+    }
+    .feature-text h2 {
+      font-family: var(--font-display); font-weight: 800; font-size: 32px;
+      color: var(--text-0); line-height: 1.15; letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .feature-text p { font-size: 16px; color: var(--text-1); margin-bottom: 14px; }
+    .feature-text ul { list-style: none; padding: 0; margin-top: 18px; }
+    .feature-text li { padding-left: 24px; position: relative; margin-bottom: 8px; color: var(--text-1); font-size: 14px; }
+    .feature-text li::before { content: '✓'; position: absolute; left: 0; top: 0; color: var(--green); font-weight: 700; }
+    .feature-visual {
+      background: var(--bg-1);
+      border: 1px solid var(--border-md);
+      border-radius: 14px;
+      padding: 28px;
+      min-height: 280px;
+    }
+
+    /* ===== Pricing ===== */
+    .pricing-card {
+      max-width: 480px; margin: 0 auto;
+      background: linear-gradient(180deg, var(--bg-1), var(--bg-2));
+      border: 1px solid var(--accent-dim);
+      border-radius: 18px;
+      padding: 40px;
+      text-align: center;
+      box-shadow: 0 0 40px var(--accent-dim);
+    }
+    .pricing-tag {
+      display: inline-block; padding: 4px 12px;
+      background: var(--accent); color: #15140f;
+      border-radius: 999px; font-size: 11px; font-weight: 700;
+      letter-spacing: 0.06em; margin-bottom: 18px;
+    }
+    .pricing-price {
+      font-family: var(--font-display);
+      font-size: 60px; font-weight: 800;
+      color: var(--text-0); line-height: 1; letter-spacing: -0.03em;
+      margin: 12px 0;
+    }
+    .pricing-price small { font-size: 18px; color: var(--text-2); font-weight: 500; }
+    .pricing-list { text-align: left; margin: 26px 0; list-style: none; padding: 0; }
+    .pricing-list li {
+      padding: 9px 0; padding-left: 28px; position: relative;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-1); font-size: 14px;
+    }
+    .pricing-list li::before { content: '✓'; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
+    .pricing-list li:last-child { border-bottom: none; }
+
+    /* ===== FAQ ===== */
+    .faq { max-width: 760px; margin: 0 auto; }
+    .faq-item {
+      background: var(--bg-1);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      padding: 18px 22px;
+    }
+    .faq-item summary {
+      cursor: pointer;
+      font-family: var(--font-display); font-weight: 700;
+      color: var(--text-0); font-size: 15px;
+      list-style: none;
+    }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item summary::after { content: '+'; float: right; color: var(--accent); transition: transform 0.2s; }
+    .faq-item[open] summary::after { content: '−'; }
+    .faq-item p { margin-top: 14px; font-size: 14px; color: var(--text-1); }
+
+    /* ===== Footer ===== */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 50px 0 40px;
+      color: var(--text-2);
+      font-size: 13px;
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px;
+      margin-bottom: 36px;
+    }
+    @media (max-width: 720px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+    .footer h5 {
+      font-family: var(--font-display); font-weight: 700;
+      color: var(--text-0); font-size: 12px;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      margin-bottom: 14px;
+    }
+    .footer ul { list-style: none; padding: 0; }
+    .footer li { margin-bottom: 8px; }
+    .footer li a { color: var(--text-2); }
+    .footer li a:hover { color: var(--accent); }
+    .footer-bottom { padding-top: 24px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  </style>
+</head>
+<body>
+
+  <!-- ===== Nav ===== -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="#top" class="nav-brand">
+        <img src="icon.png" alt="" />
+        <span>EntrepreneurOS</span>
+      </a>
+      <div class="nav-links">
+        <a href="#modules">Modules</a>
+        <a href="#features">Fonctionnalités</a>
+        <a href="#pricing">Prix</a>
+        <a href="#faq">FAQ</a>
+      </div>
+      <a href="#download" class="btn btn-primary">Télécharger</a>
+    </div>
+  </nav>
+
+  <!-- ===== Hero ===== -->
+  <header class="hero" id="top">
+    <div class="container">
+      <span class="hero-eyebrow">Application desktop · Mac & Windows</span>
+      <h1>Le système d'exploitation IA<br/>des <span class="grad">entrepreneurs solos.</span></h1>
+      <p class="hero-sub">21 modules pour générer business plan, factures, contrats, posts sociaux, prévisionnel, analyse PDF, contenu… Le tout en local, avec ta clé API ou ta session web.</p>
+      <div class="hero-cta">
+        <a href="#download" class="btn btn-primary">⬇ Télécharger gratuitement</a>
+        <a href="#modules" class="btn btn-ghost">Voir les modules</a>
+      </div>
+      <div class="hero-meta">
+        <span>100% local & chiffré</span>
+        <span>3 modes IA au choix</span>
+        <span>Multi-devise · multi-langue</span>
+      </div>
+
+      <!-- Mockup -->
+      <div class="hero-mockup">
+        <div class="mockup-bar">
+          <div class="mockup-dot r"></div>
+          <div class="mockup-dot y"></div>
+          <div class="mockup-dot g"></div>
+        </div>
+        <div class="mockup-body">
+          <div class="mockup-side">
+            <div class="mockup-side-item active">⌂ Dashboard</div>
+            <div class="mockup-side-item">📊 Business Plan</div>
+            <div class="mockup-side-item">🧾 Facture PDF</div>
+            <div class="mockup-side-item">📝 Proposition</div>
+            <div class="mockup-side-item">📱 Posts sociaux</div>
+            <div class="mockup-side-item">🔭 Analyse dossier</div>
+            <div class="mockup-side-item">📰 Newsletter</div>
+            <div class="mockup-side-item">⚖️ Documents légaux</div>
+          </div>
+          <div class="mockup-content">
+            <div class="mockup-title">Bonjour, Marie 👋</div>
+            <div style="color: var(--text-2); font-size: 13px;">Acme · Coaching B2B</div>
+            <div class="mockup-stats">
+              <div class="mockup-stat"><div class="mockup-stat-num">42</div><div class="mockup-stat-lab">documents au total</div></div>
+              <div class="mockup-stat"><div class="mockup-stat-num">7</div><div class="mockup-stat-lab">cette semaine</div></div>
+              <div class="mockup-stat"><div class="mockup-stat-num">📊</div><div class="mockup-stat-lab">module favori</div></div>
+            </div>
+            <div style="margin-top: 26px; padding: 14px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 8px; font-size: 12px;">
+              <span style="color: var(--accent); font-weight: 700;">📁 Vue projet — Mes-Clients/</span><br/>
+              <span style="color: var(--text-2);">147 fichiers · 12 contrats · 23 factures · 8 plans marketing</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== 3 modes IA ===== -->
+  <section id="features">
+    <div class="container">
+      <div class="section-eyebrow">3 modes IA au choix</div>
+      <h2 class="section-title">Tu choisis comment l'IA fonctionne.</h2>
+      <p class="section-sub">Pas un seul provider imposé. Pas de SaaS qui revend tes données. Tu décides.</p>
+      <div class="modes-grid">
+        <div class="mode-card">
+          <div class="mode-icon">🔑</div>
+          <h3>Clé API</h3>
+          <p>Connecte ta clé Anthropic (Claude 4.7) ou OpenAI (GPT-4o). Streaming token-par-token, prompt caching natif, qualité maximale. Coût direct ~0,5 à 5 ¢ par génération.</p>
+        </div>
+        <div class="mode-card">
+          <div class="mode-icon">🌐</div>
+          <h3>Web direct</h3>
+          <p>Pas de clé API ? Connecte ta session claude.ai ou chatgpt.com. EntrepreneurOS pilote la fenêtre web pour toi. Gratuit dans la limite de ton plan web.</p>
+        </div>
+        <div class="mode-card">
+          <div class="mode-icon">🖥</div>
+          <h3>100% local</h3>
+          <p>Avec Ollama installé, tourne sur Llama, Mistral, Qwen — sans internet, sans envoyer une ligne à un tiers. Idéal contrats confidentiels.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Modules ===== -->
+  <section id="modules" style="background: var(--bg-1);">
+    <div class="container">
+      <div class="section-eyebrow">21 modules</div>
+      <h2 class="section-title">Tous les documents qu'un entrepreneur génère.</h2>
+      <p class="section-sub">De la facture au business plan, du post LinkedIn à l'analyse de contrat. Adaptés à ton modèle (SaaS, service, e-com, restau, coach, freelance, artisan…).</p>
+      <div class="modules-grid">
+        <div class="module-card"><div class="ico">📊</div><h4>Business Plan</h4><p>Plan structuré prêt investisseur</p></div>
+        <div class="module-card"><div class="ico">🧾</div><h4>Facture PDF</h4><p>Multi-lignes, multi-devise, multi-pays</p></div>
+        <div class="module-card"><div class="ico">📝</div><h4>Proposition</h4><p>Commerciale gagnante, format au choix</p></div>
+        <div class="module-card"><div class="ico">⚖️</div><h4>Documents légaux</h4><p>CGV, mentions, RGPD, NDA, contrat</p></div>
+        <div class="module-card"><div class="ico">📈</div><h4>Prévisionnel 3 ans</h4><p>SaaS, e-com, honoraires, restau, mix</p></div>
+        <div class="module-card"><div class="ico">📋</div><h4>Procédure SOP</h4><p>Doc opérationnelle exécutable</p></div>
+        <div class="module-card"><div class="ico">📱</div><h4>Posts sociaux</h4><p>LinkedIn, IG, TikTok, FB, X, Threads</p></div>
+        <div class="module-card"><div class="ico">🗓️</div><h4>Planning contenu</h4><p>Calendrier éditorial + export iCal</p></div>
+        <div class="module-card"><div class="ico">📰</div><h4>Newsletter</h4><p>Sujet + corps + déclinaison sociale</p></div>
+        <div class="module-card"><div class="ico">✉️</div><h4>Email Campaign</h4><p>3-10 emails, 6 objectifs au choix</p></div>
+        <div class="module-card"><div class="ico">🎯</div><h4>Cold Email</h4><p>Email, LinkedIn DM, script appel</p></div>
+        <div class="module-card"><div class="ico">🎨</div><h4>Brief visuel Canva</h4><p>Specs + prompt Magic Studio</p></div>
+        <div class="module-card"><div class="ico">🔭</div><h4>Analyse de dossier</h4><p>Audit stratégique du projet complet</p></div>
+        <div class="module-card"><div class="ico">🔬</div><h4>Audit RS</h4><p>Diagnostic + plan d'action 30j</p></div>
+        <div class="module-card"><div class="ico">🛰️</div><h4>Recherche & veille</h4><p>Note structurée sur un sujet</p></div>
+        <div class="module-card"><div class="ico">🔍</div><h4>Analyse PDF</h4><p>Contrats, factures, devis, rapports</p></div>
+        <div class="module-card"><div class="ico">🔀</div><h4>Comparer 2 PDF</h4><p>Diff de versions juridiques</p></div>
+        <div class="module-card"><div class="ico">🚀</div><h4>Plan Go-to-Market</h4><p>Adapté à ton modèle d'entreprise</p></div>
+        <div class="module-card"><div class="ico">🎤</div><h4>Résumé réunion</h4><p>+ transcription Whisper intégrée</p></div>
+        <div class="module-card"><div class="ico">📁</div><h4>Organisation fichiers</h4><p>Plan + nommage + migration</p></div>
+        <div class="module-card"><div class="ico">☁️</div><h4>Organisation Drive</h4><p>+ Apps Script automatisations</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Features alternées ===== -->
+  <section>
+    <div class="container">
+      <div class="feature-row">
+        <div class="feature-text">
+          <div class="section-eyebrow" style="text-align: left;">Vue projet</div>
+          <h2>Pointe un dossier. L'IA voit tout ton projet.</h2>
+          <p>Connecte un dossier client (Mac, iCloud, Drive synchronisé) à ton profil. EntrepreneurOS l'indexe, classe par catégories métier, détecte les documents clés et enrichit automatiquement chaque génération avec ce contexte.</p>
+          <ul>
+            <li>Détection auto : 📄 Contrats, 🧾 Factures, ⚖️ Juridique, 💰 Finance, 📢 Marketing</li>
+            <li>Module dédié : Audit stratégique du dossier en 5 angles</li>
+            <li>Lecture profonde des PDF / Markdown / texte</li>
+          </ul>
+        </div>
+        <div class="feature-visual">
+          <div style="font-family: var(--font-display); font-size: 18px; color: var(--text-0); margin-bottom: 4px;">📁 Mes-Clients</div>
+          <div style="color: var(--text-2); font-size: 11px; margin-bottom: 18px;">/Users/marie/Documents/Clients</div>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 18px;">
+            <div style="background: var(--bg-2); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border);"><div style="font-family: var(--font-display); font-size: 18px; color: var(--text-0); font-weight: 700;">147</div><div style="font-size: 10px; color: var(--text-2); text-transform: uppercase;">fichiers</div></div>
+            <div style="background: var(--bg-2); padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border);"><div style="font-family: var(--font-display); font-size: 18px; color: var(--text-0); font-weight: 700;">2.4 GB</div><div style="font-size: 10px; color: var(--text-2); text-transform: uppercase;">volume</div></div>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+            <span style="background: var(--bg-2); border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; font-size: 11px;"><strong style="color: var(--accent);">12</strong> 📄 Contrats</span>
+            <span style="background: var(--bg-2); border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; font-size: 11px;"><strong style="color: var(--accent);">23</strong> 🧾 Factures</span>
+            <span style="background: var(--bg-2); border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; font-size: 11px;"><strong style="color: var(--accent);">8</strong> 📢 Marketing</span>
+            <span style="background: var(--bg-2); border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; font-size: 11px;"><strong style="color: var(--accent);">15</strong> 💰 Finance</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-row reverse">
+        <div class="feature-text">
+          <div class="section-eyebrow" style="text-align: left;">Adaptation modèle</div>
+          <h2>Pas conçu pour les startups SaaS uniquement.</h2>
+          <p>13 modèles d'entreprise reconnus : SaaS, service B2B/B2C, e-commerce, commerce physique, restauration, artisanat, coaching, créateur de contenu, agence, marketplace, profession libérale, freelance.</p>
+          <p>Le prévisionnel financier d'un restaurant n'a rien à voir avec celui d'un SaaS. Le GTM d'un coach indépendant n'est pas celui d'une agence. EntrepreneurOS le sait.</p>
+          <ul>
+            <li>Vocabulaire et benchmarks adaptés au secteur</li>
+            <li>Forecast en MRR/ARR ou panier moyen × volume selon le modèle</li>
+            <li>Mentions légales par pays (FR, BE, CH, CA, MA, UE intracom)</li>
+          </ul>
+        </div>
+        <div class="feature-visual">
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 8px;"><span style="font-size: 18px;">💼</span><span style="color: var(--text-1); font-size: 13px;">SaaS / produit logiciel récurrent</span></div>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--accent-dim); border: 1px solid var(--accent); border-radius: 8px;"><span style="font-size: 18px;">🍽️</span><span style="color: var(--text-0); font-size: 13px; font-weight: 600;">Restauration / food</span></div>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 8px;"><span style="font-size: 18px;">🛍️</span><span style="color: var(--text-1); font-size: 13px;">E-commerce / vente en ligne</span></div>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 8px;"><span style="font-size: 18px;">🎨</span><span style="color: var(--text-1); font-size: 13px;">Création de contenu / médias</span></div>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 8px;"><span style="font-size: 18px;">🤝</span><span style="color: var(--text-1); font-size: 13px;">Coaching / formation</span></div>
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--bg-2); border: 1px solid var(--border); border-radius: 8px;"><span style="font-size: 18px;">🔨</span><span style="color: var(--text-1); font-size: 13px;">Artisanat / fabrication</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-row">
+        <div class="feature-text">
+          <div class="section-eyebrow" style="text-align: left;">Privacy-first</div>
+          <h2>Tes données restent chez toi.</h2>
+          <p>EntrepreneurOS est une app desktop, pas un SaaS. Tout est stocké localement dans <code style="background: var(--bg-2); padding: 2px 6px; border-radius: 4px;">~/Library/Application Support/EntrepreneurOS</code>. Les clés API sont chiffrées AES-256-GCM avec une clé dérivée de ta machine.</p>
+          <ul>
+            <li>Aucune télémétrie, aucun tracking</li>
+            <li>Tes documents générés ne quittent jamais ta machine</li>
+            <li>Mode offline complet avec Ollama si tu veux du 100% local</li>
+            <li>Code source ouvert sous licence MIT</li>
+          </ul>
+        </div>
+        <div class="feature-visual">
+          <div style="text-align: center; padding: 20px 0;">
+            <div style="font-size: 60px; margin-bottom: 14px;">🔒</div>
+            <div style="font-family: var(--font-display); color: var(--text-0); font-size: 16px; margin-bottom: 6px;">AES-256-GCM</div>
+            <div style="color: var(--text-2); font-size: 12px; margin-bottom: 26px;">Clé dérivée hostname + user</div>
+            <div style="background: var(--bg-2); padding: 12px; border-radius: 6px; border: 1px solid var(--border); text-align: left; font-family: monospace; font-size: 11px; color: var(--text-2);">
+              ANTHROPIC_API_KEY = ••••••3a4b<br/>
+              OPENAI_API_KEY = ••••••9c2f<br/>
+              RESEND_API_KEY = (non définie)
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Pricing ===== -->
+  <section id="pricing" style="background: var(--bg-1);">
+    <div class="container">
+      <div class="section-eyebrow">Prix</div>
+      <h2 class="section-title">Une seule formule. Gratuite.</h2>
+      <p class="section-sub">L'app est open source. Tu paies uniquement ton usage IA (clé API), que tu contrôles directement.</p>
+      <div class="pricing-card">
+        <span class="pricing-tag">OPEN SOURCE</span>
+        <div class="pricing-price">0 €<small> / pour toujours</small></div>
+        <p style="color: var(--text-2); font-size: 13px;">Tu choisis ton mode IA. Tu paies seulement la consommation auprès du provider IA si tu utilises une clé API.</p>
+        <ul class="pricing-list">
+          <li>21 modules complets</li>
+          <li>3 modes IA (API, Web, Local)</li>
+          <li>Streaming + prompt caching</li>
+          <li>Multi-langue, multi-devise, multi-pays</li>
+          <li>Vue projet & analyse de dossier</li>
+          <li>Transcription audio (Whisper)</li>
+          <li>Export PDF, DOCX, CSV, iCal</li>
+          <li>Envoi email (avec Resend)</li>
+          <li>Mises à jour gratuites</li>
+        </ul>
+        <a href="#download" class="btn btn-primary" style="width: 100%; justify-content: center;">⬇ Télécharger maintenant</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FAQ ===== -->
+  <section id="faq">
+    <div class="container">
+      <div class="section-eyebrow">FAQ</div>
+      <h2 class="section-title">Questions fréquentes</h2>
+      <div class="faq" style="margin-top: 40px;">
+        <details class="faq-item" open>
+          <summary>L'app est vraiment gratuite ?</summary>
+          <p>Oui, totalement. Le code est open source sous licence MIT. Si tu utilises le mode "Clé API", tu paies directement ton provider (Anthropic ou OpenAI) — généralement quelques centimes par génération. Le mode "Web" passe par ton compte gratuit claude.ai/chatgpt.com. Le mode "Local" via Ollama est 100% gratuit.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Quelle différence entre les 3 modes IA ?</summary>
+          <p><strong>Clé API</strong> : streaming live, qualité max, ~0,5-5 centimes par génération. Le plus fiable.<br/><strong>Web direct</strong> : utilise ton plan gratuit/payant existant sur claude.ai ou chatgpt.com. Plus lent (scrape DOM), peut casser quand le site change.<br/><strong>Local (Ollama)</strong> : 100% offline, gratuit, mais qualité moindre (modèle 3-7B vs Claude 4.7).</p>
+        </details>
+        <details class="faq-item">
+          <summary>Mes données sont-elles envoyées quelque part ?</summary>
+          <p>Aucune télémétrie. Tes documents générés et ton profil restent dans <code>~/Library/Application Support/EntrepreneurOS</code> (Mac) ou <code>%APPDATA%\\EntrepreneurOS</code> (Windows). Les clés API sont chiffrées AES-256-GCM. Si tu utilises une clé API, le contenu de tes prompts transite vers Anthropic/OpenAI — c'est inévitable. En mode local (Ollama), rien ne sort de ta machine.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Ça marche pour mon type d'activité ?</summary>
+          <p>L'app supporte 13 modèles d'entreprise : SaaS, service B2B, service B2C, e-commerce, commerce physique, restauration, artisanat, coaching/formation, création de contenu, agence, marketplace, profession libérale, freelance. Choisis ton modèle dans Paramètres → Profil et tous les outputs s'adaptent.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Mac uniquement ?</summary>
+          <p>Non. L'app fonctionne sur macOS (.dmg) et Windows (.exe). Builds Linux (.AppImage) disponibles aussi. Apple Silicon et Intel supportés.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Je peux personnaliser les prompts générés ?</summary>
+          <p>Tu peux affiner après coup avec la zone "Affiner ce document" en bas de chaque sortie : tape une instruction comme "raccourcis l'exec summary" ou "ajoute une section sur les risques juridiques", et l'IA régénère. L'historique des affinages est conservé.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Les factures sont conformes à la loi ?</summary>
+          <p>L'app génère un récapitulatif + une checklist des mentions légales obligatoires pour le pays concerné (France, Belgique, Suisse, Canada, Maroc, UE intracom). Pour le PDF final légal, fais valider par ton expert-comptable — c'est un assistant, pas un substitut.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Download / CTA ===== -->
+  <section id="download" style="background: linear-gradient(135deg, var(--bg-1), var(--bg-2)); text-align: center;">
+    <div class="container">
+      <h2 class="section-title">Prêt à reprendre le contrôle de ton stack IA ?</h2>
+      <p class="section-sub">Téléchargement direct, pas de compte, pas d'inscription.</p>
+      <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 30px;">
+        <a href="#" class="btn btn-primary">⬇ macOS (.dmg) — Apple Silicon & Intel</a>
+        <a href="#" class="btn">⬇ Windows (.exe) — 64 bits</a>
+        <a href="#" class="btn">⬇ Linux (.AppImage)</a>
+      </div>
+      <p style="margin-top: 20px; color: var(--text-2); font-size: 13px;">~150 MB · v2.0.0 · Open source MIT</p>
+    </div>
+  </section>
+
+  <!-- ===== Footer ===== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="nav-brand" style="margin-bottom: 14px;">
+            <img src="icon.png" alt="" />
+            <span>EntrepreneurOS</span>
+          </div>
+          <p>Le système d'exploitation IA des entrepreneurs solos. 21 modules, 3 modes IA, 100% local, open source.</p>
+        </div>
+        <div>
+          <h5>Produit</h5>
+          <ul>
+            <li><a href="#modules">Modules</a></li>
+            <li><a href="#features">Fonctionnalités</a></li>
+            <li><a href="#pricing">Prix</a></li>
+            <li><a href="#download">Télécharger</a></li>
+          </ul>
+        </div>
+        <div>
+          <h5>Ressources</h5>
+          <ul>
+            <li><a href="#faq">FAQ</a></li>
+            <li><a href="#">Documentation</a></li>
+            <li><a href="#">Changelog</a></li>
+            <li><a href="#">GitHub</a></li>
+          </ul>
+        </div>
+        <div>
+          <h5>Légal</h5>
+          <ul>
+            <li><a href="#">Mentions légales</a></li>
+            <li><a href="#">Confidentialité</a></li>
+            <li><a href="#">Licence MIT</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 EntrepreneurOS · Tout est local, c'est promis.</span>
+        <span>Made with 🤍 for solo entrepreneurs</span>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

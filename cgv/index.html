@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0A0F1E">
+  <meta name="description" content="LexiGen — Générateur de CGV / Terms of Service propulsé par Claude. BYOK, 100% côté client.">
+  <title>LexiGen — CGV Generator (Web)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    @media print {
+      body { background: #fff !important; color: #000 !important; }
+      #sidebar, #navButtons, .gen-status, .preview-header, .export-bar, .modal { display: none !important; }
+      #mainPanel { padding: 0 !important; }
+      #generationPanel { display: block !important; }
+      .preview-wrapper { border: none !important; box-shadow: none !important; background: transparent !important; }
+      .preview-content { background: #fff !important; color: #000 !important; font-family: Georgia, "Times New Roman", serif !important; font-size: 11pt !important; line-height: 1.5 !important; padding: 0 !important; white-space: pre-wrap !important; }
+    }
+    .byok-card { max-width: 480px; }
+    .byok-modal { display: flex; }
+  </style>
+</head>
+<body>
+  <aside id="sidebar">
+    <div class="logo">
+      <span class="logo-icon">⚖</span>
+      <span class="logo-text">LexiGen</span>
+    </div>
+
+    <nav class="steps-nav" id="stepsNav"></nav>
+
+    <div class="sidebar-footer">
+      <div class="lang-toggle" id="langToggle">
+        <button class="lang-btn active" data-lang="fr">FR</button>
+        <button class="lang-btn" data-lang="en">EN</button>
+      </div>
+      <p class="version-tag">LexiGen — Web BYOK</p>
+      <p style="margin-top:8px;font-size:11px;opacity:.5;line-height:1.4;">
+        <a href="../" style="color:inherit;text-decoration:none;">← Retour au hub</a>
+      </p>
+    </div>
+  </aside>
+
+  <main id="mainPanel">
+    <header class="app-header">
+      <div class="header-content">
+        <h1 id="stepTitle">—</h1>
+        <p id="stepSubtitle">—</p>
+      </div>
+      <div class="progress-ring" id="progressRing">
+        <svg viewBox="0 0 44 44">
+          <circle cx="22" cy="22" r="18" class="ring-bg"/>
+          <circle cx="22" cy="22" r="18" class="ring-fill" id="ringFill"/>
+        </svg>
+        <span id="progressPct">0%</span>
+      </div>
+    </header>
+
+    <div id="formContainer"></div>
+
+    <div id="generationPanel" class="hidden">
+      <div class="gen-status">
+        <div class="spinner" id="spinner"></div>
+        <p id="genMessage">—</p>
+        <span class="word-count" id="wordCount"></span>
+      </div>
+      <div class="preview-wrapper">
+        <div class="preview-header">
+          <span id="previewLabel">Preview</span>
+          <div class="preview-actions">
+            <button id="copyBtn" class="btn-ghost">Copy</button>
+          </div>
+        </div>
+        <pre id="previewContent" class="preview-content"></pre>
+      </div>
+      <div class="export-bar">
+        <button id="exportDocx" class="btn-primary" disabled>
+          <span class="btn-ico">⬇</span> <span data-i18n="exportDocx">Export DOCX</span>
+        </button>
+        <button id="exportPdf" class="btn-secondary" disabled>
+          <span class="btn-ico">⬇</span> <span data-i18n="exportPdf">Export PDF</span>
+        </button>
+        <button id="regenerateBtn" class="btn-ghost" disabled>
+          ↺ <span data-i18n="regenerate">Regenerate</span>
+        </button>
+        <div class="export-spacer"></div>
+        <button id="backToFormBtn" class="btn-ghost">
+          ← <span data-i18n="backToForm">Back to form</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="nav-buttons" id="navButtons">
+      <button id="prevBtn" class="btn-secondary hidden" data-i18n="back">← Back</button>
+      <div class="nav-spacer"></div>
+      <button id="nextBtn" class="btn-primary" data-i18n="next">Continue →</button>
+    </div>
+  </main>
+
+  <div id="errorModal" class="modal hidden">
+    <div class="modal-card">
+      <h3 id="errorTitle">Error</h3>
+      <p id="errorMessage">—</p>
+      <div class="modal-actions">
+        <button id="errorClose" class="btn-primary">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden">
+    <span id="toastMsg">—</span>
+  </div>
+
+  <script src="byok-shim.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

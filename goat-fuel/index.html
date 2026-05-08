@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GOAT FUEL — Screenshot Generator</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <div id="resumeBanner" class="resume-banner hidden">
+    <span class="rb-text">📂 Une session précédente a été détectée<span id="resumeSlots"></span>. La reprendre ?</span>
+    <div class="rb-actions">
+      <button id="btnResumeYes" class="btn-primary">Reprendre</button>
+      <button id="btnResumeNo" class="btn-ghost">Nouvelle session</button>
+    </div>
+  </div>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">🐐</span>
+      <div>
+        <h1>GOAT FUEL</h1>
+        <p>Screenshot Generator</p>
+      </div>
+    </div>
+    <div class="format-switch" role="tablist">
+      <button class="fmt active" data-fmt="play" role="tab">Play Store <span>1080×1920</span></button>
+      <button class="fmt" data-fmt="app" role="tab">App Store <span>1290×2796</span></button>
+    </div>
+    <select id="langSelect" class="lang-select" title="Langue active des shuffles et de l'auto-fiche">
+      <option value="fr">🇫🇷 FR</option>
+      <option value="en">🇬🇧 EN</option>
+      <option value="de">🇩🇪 DE</option>
+      <option value="it">🇮🇹 IT</option>
+      <option value="es">🇪🇸 ES</option>
+    </select>
+    <div class="exports">
+      <button id="btnAutoFiche" class="btn-ghost" disabled title="Assigne un rôle narratif Play Store à chaque slide">🎯 Auto-fiche</button>
+      <button id="btnPreviewFiche" class="btn-ghost" disabled title="Affiche les 8 slides en grille pour vérifier la cohérence">👁 Voir la fiche</button>
+      <button id="btnRetranslate" class="btn-ghost" disabled title="Retraduit toutes les slides dans la langue active">🌐 Retraduire</button>
+      <button id="btnDownloadOne" class="btn-ghost" disabled>PNG courante</button>
+      <button id="btnDownloadAll" class="btn-primary" disabled>Télécharger tout .zip</button>
+      <button id="btnDownloadAllLangs" class="btn-ghost" disabled title="Génère un sous-dossier par langue disponible">🌍 Toutes langues</button>
+    </div>
+  </header>
+
+  <main class="main">
+    <aside class="sidebar">
+      <section class="panel">
+        <h2>1 · Images</h2>
+        <div id="dropzone" class="dropzone">
+          <div class="dz-inner">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <p><strong>Glisser-déposer</strong> ou cliquer</p>
+            <p class="hint">2 à 8 screenshots · PNG/JPG</p>
+          </div>
+          <input type="file" id="fileInput" accept="image/*" multiple hidden>
+        </div>
+        <div id="thumbs" class="thumbs"></div>
+        <button id="btnReset" class="btn-ghost small hidden">Réinitialiser</button>
+      </section>
+
+      <section class="panel">
+        <h2>2 · Template</h2>
+        <div class="seg" data-group="template">
+          <button class="seg-opt active" data-val="hero">Hero</button>
+          <button class="seg-opt" data-val="feature">Feature</button>
+          <button class="seg-opt" data-val="proof">Proof</button>
+          <button class="seg-opt" data-val="comparison">Comparaison</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>3 · Style</h2>
+        <div class="seg" data-group="style">
+          <button class="seg-opt" data-val="minimal">Minimal</button>
+          <button class="seg-opt active" data-val="aggressive">Agressif</button>
+          <button class="seg-opt" data-val="premium">Premium</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>4 · Couleurs</h2>
+        <div class="colors">
+          <label><span>BG</span><input type="color" id="colorBg" value="#0A0A0A"></label>
+          <label><span>1</span><input type="color" id="color1" value="#FF3B30"></label>
+          <label><span>2</span><input type="color" id="color2" value="#FF9500"></label>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>5 · Texte (slide courante)</h2>
+        <label class="field">
+          <span>Titre</span>
+          <input type="text" id="inputTitle" placeholder="PASSE EN MODE GOAT">
+        </label>
+        <label class="field">
+          <span>Sous-titre</span>
+          <input type="text" id="inputSubtitle" placeholder="La discipline paie.">
+        </label>
+        <label class="field">
+          <span>Pied (petite ligne)</span>
+          <input type="text" id="inputFooter" placeholder="🐐 1 app au lieu de 4">
+        </label>
+        <div class="row">
+          <button id="btnShuffle" class="btn-ghost small">🎲 Cette slide</button>
+          <button id="btnShuffleAll" class="btn-ghost small">🎲 Toutes</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>6 · Badges (slide courante)</h2>
+        <div id="badgeList" class="badge-list">
+          <button class="badge-toggle" data-icon="✨" data-text="NOUVEAU"        data-color="#FF9500">✨ NOUVEAU</button>
+          <button class="badge-toggle" data-icon="🏆" data-text="#1 EN FRANCE"   data-color="#D4AF37">🏆 #1 EN FRANCE</button>
+          <button class="badge-toggle" data-icon="🔒" data-text="100% RGPD"      data-color="#34C759">🔒 100% RGPD</button>
+          <button class="badge-toggle" data-icon="🚫" data-text="SANS PUB"       data-color="#FF3B30">🚫 SANS PUB</button>
+          <button class="badge-toggle" data-icon="⭐" data-text="4.8/5"          data-color="#FFD700">⭐ 4.8/5</button>
+          <button class="badge-toggle" data-icon="🎁" data-text="7 JOURS GRATUIT" data-color="#FF9500">🎁 7 JOURS GRATUIT</button>
+        </div>
+        <p class="hint badge-hint">Max 3 par slide</p>
+      </section>
+    </aside>
+
+    <section class="stage">
+      <div class="stage-head">
+        <div id="slideLabel" class="slide-label">Aucune image</div>
+        <div class="stage-nav">
+          <button id="btnPrev" class="nav-btn" disabled>‹</button>
+          <button id="btnNext" class="nav-btn" disabled>›</button>
+        </div>
+      </div>
+      <div class="canvas-wrap">
+        <canvas id="canvas"></canvas>
+        <div id="emptyState" class="empty">
+          <div class="empty-icon">🐐</div>
+          <h3>Commence par uploader tes screenshots</h3>
+          <p>Glisse 2 à 8 captures d'écran pour générer automatiquement<br>tes visuels store premium.</p>
+        </div>
+      </div>
+      <div id="strip" class="strip"></div>
+    </section>
+  </main>
+</div>
+
+<div id="previewModal" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modal-content">
+    <header class="modal-head">
+      <h3>🐐 Vue d'ensemble · Fiche Play Store</h3>
+      <button id="btnClosePreview" class="modal-close" title="Fermer">×</button>
+    </header>
+    <div id="previewGrid" class="preview-grid"></div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

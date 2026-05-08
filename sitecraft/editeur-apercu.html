@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SiteForge — Éditeur Aperçu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:       #0d0f14;
+  --surface:  #13161e;
+  --panel:    #181c27;
+  --border:   rgba(255,255,255,0.07);
+  --border-h: rgba(255,255,255,0.15);
+  --text:     #f0f2f7;
+  --muted:    #6b7280;
+  --accent:   #6366f1;
+  --accent-g: #8b5cf6;
+  --success:  #10b981;
+  --input-bg: #1e2433;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);}
+
+/* ── TOP BAR ── */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  height:52px;padding:0 20px;
+  background:var(--surface);border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.topbar-logo{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text);text-decoration:none;}
+.topbar-logo span{color:var(--accent);}
+.topbar-center{display:flex;align-items:center;gap:6px;}
+.view-btn{
+  display:flex;align-items:center;gap:6px;padding:6px 14px;
+  border:1px solid var(--border);border-radius:8px;
+  background:transparent;color:var(--muted);font-size:13px;
+  cursor:pointer;transition:all .2s;font-family:inherit;
+}
+.view-btn.active,.view-btn:hover{background:var(--input-bg);border-color:var(--border-h);color:var(--text);}
+.view-btn svg{width:14px;height:14px;flex-shrink:0;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+/* upload inputs */
+.upload-label{
+  display:flex;align-items:center;gap:8px;padding:8px 12px;
+  background:var(--input-bg);border:1px dashed var(--border);border-radius:8px;
+  color:var(--muted);font-size:12px;cursor:pointer;transition:all .2s;
+  width:100%;
+}
+.upload-label:hover{border-color:var(--accent);color:var(--text);}
+.upload-label input[type=file]{display:none;}
+.upload-label svg{width:14px;height:14px;flex-shrink:0;}
+.upload-preview{
+  margin-top:8px;border-radius:8px;overflow:hidden;
+  border:1px solid var(--border);display:none;
+}
+.upload-preview img{width:100%;max-height:80px;object-fit:contain;background:#fff;display:block;}
+.upload-preview.hero img{max-height:56px;object-fit:cover;}
+.upload-clear{
+  display:none;align-items:center;gap:4px;margin-top:6px;
+  padding:4px 10px;background:transparent;border:1px solid var(--border);
+  border-radius:6px;color:var(--muted);font-size:11px;cursor:pointer;
+  font-family:inherit;transition:all .2s;
+}
+.upload-clear:hover{border-color:#ef4444;color:#ef4444;}
+
+/* ── MAIN LAYOUT ── */
+.workspace{display:flex;height:calc(100vh - 52px - 56px);}
+
+/* ── LEFT PANEL ── */
+.sidebar{
+  width:300px;flex-shrink:0;
+  background:var(--panel);border-right:1px solid var(--border);
+  overflow-y:auto;
+}
+.sidebar::-webkit-scrollbar{width:4px;}
+.sidebar::-webkit-scrollbar-track{background:transparent;}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:4px;}
+
+.section-block{border-bottom:1px solid var(--border);padding:18px 20px;}
+.section-label{
+  font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--muted);margin-bottom:14px;
+}
+.field{margin-bottom:14px;}
+.field:last-child{margin-bottom:0;}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;}
+.field input[type=text],
+.field input[type=email],
+.field input[type=tel],
+.field textarea,
+.field select{
+  width:100%;padding:9px 12px;
+  background:var(--input-bg);border:1px solid var(--border);border-radius:8px;
+  color:var(--text);font-size:13px;font-family:inherit;outline:none;
+  transition:border-color .2s;resize:none;
+}
+.field input[type=text]:focus,
+.field input[type=email]:focus,
+.field input[type=tel]:focus,
+.field textarea:focus,
+.field select:focus{border-color:var(--accent);}
+.field select option{background:#1e2433;}
+.field textarea{height:72px;line-height:1.5;}
+
+/* Color picker row */
+.color-row{display:flex;align-items:center;gap:10px;}
+.color-row input[type=color]{
+  width:36px;height:36px;padding:2px;border:1px solid var(--border);
+  border-radius:8px;background:var(--input-bg);cursor:pointer;flex-shrink:0;
+}
+.color-value{font-size:12px;color:var(--muted);}
+
+/* Palette swatches */
+.palettes{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.swatch{
+  width:28px;height:28px;border-radius:50%;cursor:pointer;
+  border:2px solid transparent;transition:border-color .2s,transform .15s;
+}
+.swatch:hover,.swatch.selected{border-color:#fff;transform:scale(1.15);}
+
+/* Toggle switches */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.toggle-row:last-child{margin-bottom:0;}
+.toggle-row span{font-size:13px;}
+.toggle{position:relative;width:38px;height:22px;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{
+  position:absolute;inset:0;background:rgba(255,255,255,0.15);
+  border-radius:22px;cursor:pointer;transition:background .2s;
+}
+.toggle-slider::before{
+  content:'';position:absolute;
+  width:16px;height:16px;left:3px;top:3px;
+  background:#fff;border-radius:50%;transition:transform .2s;
+}
+.toggle input:checked + .toggle-slider{background:var(--accent);}
+.toggle input:checked + .toggle-slider::before{transform:translateX(16px);}
+
+/* Template selector */
+.template-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.tmpl-card{
+  padding:10px;border:1px solid var(--border);border-radius:8px;
+  cursor:pointer;text-align:center;transition:all .2s;
+}
+.tmpl-card:hover{border-color:var(--border-h);}
+.tmpl-card.selected{border-color:var(--accent);background:rgba(99,102,241,.12);}
+.tmpl-card .tmpl-icon{font-size:22px;margin-bottom:4px;}
+.tmpl-card .tmpl-name{font-size:11px;color:var(--muted);}
+.tmpl-card.selected .tmpl-name{color:var(--accent);}
+
+/* ── PREVIEW AREA ── */
+.preview-area{
+  flex:1;display:flex;flex-direction:column;
+  background:#1a1d28;overflow:hidden;
+}
+.preview-bar{
+  display:flex;align-items:center;justify-content:center;
+  padding:12px 20px;flex-shrink:0;
+}
+.url-bar{
+  display:flex;align-items:center;gap:10px;
+  background:var(--input-bg);border:1px solid var(--border);
+  border-radius:10px;padding:8px 16px;font-size:12px;color:var(--muted);
+  max-width:420px;width:100%;
+}
+.url-bar svg{width:14px;height:14px;flex-shrink:0;}
+#urlText{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+.preview-canvas{
+  flex:1;display:flex;align-items:flex-start;justify-content:center;
+  padding:0 20px 20px;overflow:auto;
+}
+.preview-frame-wrap{
+  transition:width .35s ease,box-shadow .3s;
+  box-shadow:0 30px 80px rgba(0,0,0,0.5);
+  border-radius:16px;overflow:hidden;
+  width:100%;max-width:1200px;
+}
+.preview-frame-wrap.mobile{width:390px;max-width:390px;}
+.preview-frame-wrap iframe{
+  width:100%;border:none;display:block;
+  min-height:calc(100vh - 140px);
+}
+
+/* ── UNSAVED BADGE ── */
+#liveTag{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:4px 10px;background:rgba(16,185,129,.15);
+  border:1px solid rgba(16,185,129,.3);border-radius:20px;
+  font-size:11px;color:var(--success);
+}
+.dot-live{width:6px;height:6px;background:var(--success);border-radius:50%;animation:blink 1.5s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+/* ── CTA BAR ── */
+.cta-bar{
+  position:fixed;bottom:0;left:0;right:0;z-index:100;
+  background:linear-gradient(90deg,#6366f1,#8b5cf6);
+  padding:14px 24px;
+  display:flex;align-items:center;justify-content:center;gap:16px;
+  box-shadow:0 -4px 30px rgba(99,102,241,.4);
+}
+.cta-bar-text{font-size:15px;font-weight:500;color:rgba(255,255,255,.9);}
+.cta-bar a{
+  display:inline-flex;align-items:center;gap:8px;
+  background:#fff;color:#6366f1;
+  padding:10px 24px;border-radius:10px;
+  font-size:15px;font-weight:700;text-decoration:none;
+  transition:transform .15s,box-shadow .15s;
+  box-shadow:0 4px 14px rgba(0,0,0,.15);
+}
+.cta-bar a:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.2);}
+
+/* ── HAMBURGER ── */
+.hamburger-btn{
+  display:none;align-items:center;justify-content:center;
+  width:36px;height:36px;border:1px solid var(--border);
+  border-radius:8px;background:transparent;color:var(--text);
+  cursor:pointer;flex-shrink:0;transition:all .2s;margin-right:8px;
+}
+.hamburger-btn:hover{background:var(--input-bg);border-color:var(--border-h);}
+.hamburger-btn svg{width:18px;height:18px;}
+
+/* ── SIDEBAR OVERLAY ── */
+.sidebar-overlay{
+  display:none;position:fixed;inset:0;z-index:199;
+  background:rgba(0,0,0,.6);backdrop-filter:blur(2px);
+}
+.sidebar-overlay.active{display:block;}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px){
+  .hamburger-btn{display:flex;}
+
+  .topbar{padding:0 14px;}
+  .topbar-logo{font-size:16px;}
+
+  /* hide desktop/mobile view toggle labels on very small screens */
+  .view-btn span{display:none;}
+  .view-btn{padding:6px 10px;}
+
+  #liveTag{display:none;}
+
+  /* sidebar slides in from left */
+  .sidebar{
+    position:fixed;top:52px;left:0;bottom:56px;
+    z-index:200;
+    transform:translateX(-100%);
+    transition:transform .3s cubic-bezier(.4,0,.2,1);
+    box-shadow:none;
+  }
+  .sidebar.open{
+    transform:translateX(0);
+    box-shadow:8px 0 40px rgba(0,0,0,.5);
+  }
+
+  /* preview fills full width */
+  .workspace{height:calc(100vh - 52px - 56px);}
+  .preview-area{width:100%;}
+
+  /* cta bar stacks on very small */
+  .cta-bar{padding:10px 16px;gap:10px;flex-wrap:wrap;}
+  .cta-bar-text{font-size:13px;text-align:center;}
+  .cta-bar a{padding:8px 18px;font-size:13px;}
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR OVERLAY -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div style="display:flex;align-items:center;">
+    <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <a class="topbar-logo" href="index.html">Site<span>Forge</span></a>
+  </div>
+
+  <div class="topbar-center">
+    <button class="view-btn active" id="btnDesktop" onclick="setView('desktop')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      <span>Bureau</span>
+    </button>
+    <button class="view-btn" id="btnMobile" onclick="setView('mobile')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="18" r="1" fill="currentColor"/></svg>
+      <span>Mobile</span>
+    </button>
+    <div id="liveTag"><span class="dot-live"></span>Aperçu en direct</div>
+  </div>
+
+  <div class="topbar-right"></div>
+</div>
+
+<!-- WORKSPACE -->
+<div class="workspace">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <!-- Template -->
+    <div class="section-block">
+      <div class="section-label">Template</div>
+      <div class="template-grid">
+        <div class="tmpl-card selected" data-tmpl="artisan" onclick="selectTemplate(this)">
+          <div class="tmpl-icon">🔨</div>
+          <div class="tmpl-name">Artisan</div>
+        </div>
+        <div class="tmpl-card" data-tmpl="restaurant" onclick="selectTemplate(this)">
+          <div class="tmpl-icon">🍽️</div>
+          <div class="tmpl-name">Restaurant</div>
+        </div>
+        <div class="tmpl-card" data-tmpl="freelance" onclick="selectTemplate(this)">
+          <div class="tmpl-icon">💻</div>
+          <div class="tmpl-name">Freelance</div>
+        </div>
+        <div class="tmpl-card" data-tmpl="commerce" onclick="selectTemplate(this)">
+          <div class="tmpl-icon">🛒</div>
+          <div class="tmpl-name">Commerce</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Identité -->
+    <div class="section-block">
+      <div class="section-label">Identité</div>
+      <div class="field">
+        <label>Nom de l'entreprise</label>
+        <input type="text" id="bizName" value="Dupont Plomberie" oninput="refresh()">
+      </div>
+      <div class="field">
+        <label>Accroche principale</label>
+        <input type="text" id="tagline" value="Votre plombier de confiance à Paris" oninput="refresh()">
+      </div>
+      <div class="field">
+        <label>Description courte</label>
+        <textarea id="desc" oninput="refresh()">Intervention rapide 7j/7. Devis gratuit en 24h. Plus de 15 ans d'expérience.</textarea>
+      </div>
+      <div class="field">
+        <label>Logo (image)</label>
+        <label class="upload-label" title="PNG, JPG, SVG — max 2 Mo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+          Choisir un logo…
+          <input type="file" id="logoInput" accept="image/*" onchange="handleLogoUpload(event)">
+        </label>
+        <div class="upload-preview" id="logoPreview">
+          <img id="logoPreviewImg" src="" alt="Aperçu logo">
+        </div>
+        <button class="upload-clear" id="logoClear" onclick="clearLogo()">✕ Supprimer le logo</button>
+      </div>
+      <div class="field">
+        <label>Image principale (hero)</label>
+        <label class="upload-label" title="PNG, JPG, WebP — max 2 Mo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          Choisir une image hero…
+          <input type="file" id="heroInput" accept="image/*" onchange="handleHeroUpload(event)">
+        </label>
+        <div class="upload-preview hero" id="heroPreview">
+          <img id="heroPreviewImg" src="" alt="Aperçu hero">
+        </div>
+        <button class="upload-clear" id="heroClear" onclick="clearHero()">✕ Supprimer l'image hero</button>
+      </div>
+    </div>
+
+    <!-- Couleur -->
+    <div class="section-block">
+      <div class="section-label">Couleur principale</div>
+      <div class="field">
+        <div class="color-row">
+          <input type="color" id="colorPrimary" value="#2563eb" oninput="updateColor(this.value)">
+          <span class="color-value" id="colorHex">#2563eb</span>
+        </div>
+      </div>
+      <div class="palettes" id="palettes"></div>
+    </div>
+
+    <!-- Sections -->
+    <div class="section-block">
+      <div class="section-label">Sections visibles</div>
+      <div class="toggle-row">
+        <span>Hero / Accroche</span>
+        <label class="toggle"><input type="checkbox" id="secHero" checked onchange="refresh()"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <span>Services</span>
+        <label class="toggle"><input type="checkbox" id="secServices" checked onchange="refresh()"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <span>À propos</span>
+        <label class="toggle"><input type="checkbox" id="secAbout" checked onchange="refresh()"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <span>Avis clients</span>
+        <label class="toggle"><input type="checkbox" id="secReviews" checked onchange="refresh()"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <span>FAQ</span>
+        <label class="toggle"><input type="checkbox" id="secFaq" checked onchange="refresh()"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <span>Contact</span>
+        <label class="toggle"><input type="checkbox" id="secContact" checked onchange="refresh()"><span class="toggle-slider"></span></label>
+      </div>
+    </div>
+
+    <!-- Services -->
+    <div class="section-block">
+      <div class="section-label">Services (un par ligne)</div>
+      <div class="field">
+        <textarea id="services" oninput="refresh()" style="height:100px;">Dépannage urgence
+Installation sanitaire
+Rénovation salle de bain
+Détection de fuites
+Débouchage canalisations</textarea>
+      </div>
+    </div>
+
+    <!-- Contact -->
+    <div class="section-block">
+      <div class="section-label">Coordonnées</div>
+      <div class="field">
+        <label>Téléphone</label>
+        <input type="tel" id="phone" value="06 12 34 56 78" oninput="refresh()">
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="email" value="contact@dupont-plomberie.fr" oninput="refresh()">
+      </div>
+      <div class="field">
+        <label>Ville / Zone</label>
+        <input type="text" id="city" value="Paris & Île-de-France" oninput="refresh()">
+      </div>
+    </div>
+
+  </div><!-- /sidebar -->
+
+  <!-- PREVIEW -->
+  <div class="preview-area">
+    <div class="preview-bar">
+      <div class="url-bar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        <span id="urlText">dupont-plomberie.siteforge.fr</span>
+      </div>
+    </div>
+    <div class="preview-canvas">
+      <div class="preview-frame-wrap" id="frameWrap">
+        <iframe id="previewFrame" title="Aperçu du site"></iframe>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /workspace -->
+
+<!-- CTA BAR -->
+<div class="cta-bar">
+  <span class="cta-bar-text">Votre site vous plaît ?</span>
+  <a href="questionnaire.html">✨ Je veux ce site</a>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  SIDEBAR MOBILE
+// ══════════════════════════════════════════
+function toggleSidebar(){
+  var sb = document.querySelector('.sidebar');
+  var ov = document.getElementById('sidebarOverlay');
+  var open = sb.classList.toggle('open');
+  ov.classList.toggle('active', open);
+}
+function closeSidebar(){
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('active');
+}
+
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+var currentView = 'desktop';
+var currentTemplate = 'artisan';
+var logoBase64 = '';
+var heroImage  = '';
+var paletteDefs = [
+  {color:'#2563eb',name:'Bleu'},
+  {color:'#7c3aed',name:'Violet'},
+  {color:'#059669',name:'Vert'},
+  {color:'#dc2626',name:'Rouge'},
+  {color:'#d97706',name:'Orange'},
+  {color:'#0891b2',name:'Cyan'},
+  {color:'#be185d',name:'Rose'},
+  {color:'#374151',name:'Gris'}
+];
+
+// Build swatches
+(function(){
+  var pal = document.getElementById('palettes');
+  paletteDefs.forEach(function(p,i){
+    var s = document.createElement('div');
+    s.className='swatch'+(i===0?' selected':'');
+    s.style.background=p.color;
+    s.title=p.name;
+    s.setAttribute('data-color',p.color);
+    s.onclick=function(){ updateColor(p.color); document.getElementById('colorPrimary').value=p.color; };
+    pal.appendChild(s);
+  });
+})();
+
+// Presets per template
+var templatePresets={
+  artisan:{name:'Dupont Plomberie',tagline:'Votre plombier de confiance à Paris',desc:'Intervention rapide 7j/7. Devis gratuit en 24h. Plus de 15 ans d\'expérience.',services:'Dépannage urgence\nInstallation sanitaire\nRénovation salle de bain\nDétection de fuites\nDébouchage canalisations',phone:'06 12 34 56 78',email:'contact@dupont-plomberie.fr',city:'Paris & Île-de-France',color:'#2563eb'},
+  restaurant:{name:'La Belle Époque',tagline:'Cuisine française traditionnelle depuis 1998',desc:'Un voyage culinaire au cœur de la gastronomie française. Ouvert midi et soir du mardi au dimanche.',services:'Menu déjeuner\nMenu gastronomique\nService traiteur\nSalle privatisable\nMenu végétarien',phone:'01 23 45 67 89',email:'reservation@labelleepoque.fr',city:'Lyon, 69001',color:'#b45309'},
+  freelance:{name:'Marie Leblanc',tagline:'Designer UI/UX & Intégratrice Web',desc:'Je crée des interfaces belles et efficaces pour startups et PME. Disponible pour projets courts et longs.',services:'Design UI/UX\nIntégration HTML/CSS\nPrototypage Figma\nAudit d\'expérience\nFormation équipe',phone:'06 98 76 54 32',email:'marie@leblanc.design',city:'Lyon • Remote',color:'#7c3aed'},
+  commerce:{name:'La Boutique Bio',tagline:'Produits naturels & bio en circuit court',desc:'Épicerie fine, cosmétiques naturels, compléments alimentaires. Livraison 48h en France.',services:'Épicerie fine\nCosmétiques naturels\nCompléments alimentaires\nPaniers hebdomadaires\nClick & Collect',phone:'04 56 78 90 12',email:'bonjour@laboutiquebio.fr',city:'Bordeaux, 33000',color:'#059669'}
+};
+
+function selectTemplate(el){
+  document.querySelectorAll('.tmpl-card').forEach(function(c){c.classList.remove('selected');});
+  el.classList.add('selected');
+  currentTemplate=el.getAttribute('data-tmpl');
+  var p=templatePresets[currentTemplate];
+  document.getElementById('bizName').value=p.name;
+  document.getElementById('tagline').value=p.tagline;
+  document.getElementById('desc').value=p.desc;
+  document.getElementById('services').value=p.services;
+  document.getElementById('phone').value=p.phone;
+  document.getElementById('email').value=p.email;
+  document.getElementById('city').value=p.city;
+  updateColor(p.color);
+  document.getElementById('colorPrimary').value=p.color;
+  document.getElementById('urlText').value=p.name.toLowerCase().replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-')+'.siteforge.fr';
+  document.getElementById('urlText').textContent=p.name.toLowerCase().replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-')+'.siteforge.fr';
+  refresh();
+}
+
+function updateColor(val){
+  document.getElementById('colorHex').textContent=val;
+  document.querySelectorAll('.swatch').forEach(function(s){
+    s.classList.toggle('selected',s.getAttribute('data-color')===val);
+  });
+  refresh();
+}
+
+// ══════════════════════════════════════════
+//  UPLOAD HELPERS
+// ══════════════════════════════════════════
+var MAX_UPLOAD_SIZE = 2 * 1024 * 1024; // 2 Mo
+
+function handleLogoUpload(e){
+  var file = e.target.files[0];
+  if(!file) return;
+  if(!file.type.startsWith('image/')){
+    alert('Fichier refusé : veuillez sélectionner une image (PNG, JPG, SVG…).');
+    e.target.value = '';
+    return;
+  }
+  if(file.size > MAX_UPLOAD_SIZE){
+    alert('Image trop lourde : la taille maximale est de 2 Mo.');
+    e.target.value = '';
+    return;
+  }
+  var reader = new FileReader();
+  reader.onerror = function(){ alert('Erreur lors de la lecture du fichier.'); };
+  reader.onload = function(evt){
+    logoBase64 = evt.target.result;
+    var prev = document.getElementById('logoPreview');
+    var img  = document.getElementById('logoPreviewImg');
+    var btn  = document.getElementById('logoClear');
+    img.src  = logoBase64;
+    prev.style.display = 'block';
+    btn.style.display  = 'flex';
+    refresh();
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearLogo(){
+  logoBase64 = '';
+  document.getElementById('logoInput').value = '';
+  document.getElementById('logoPreviewImg').src = '';
+  document.getElementById('logoPreview').style.display = 'none';
+  document.getElementById('logoClear').style.display  = 'none';
+  refresh();
+}
+
+function handleHeroUpload(e){
+  var file = e.target.files[0];
+  if(!file) return;
+  if(!file.type.startsWith('image/')){
+    alert('Fichier refusé : veuillez sélectionner une image (PNG, JPG, WebP…).');
+    e.target.value = '';
+    return;
+  }
+  if(file.size > MAX_UPLOAD_SIZE){
+    alert('Image trop lourde : la taille maximale est de 2 Mo.');
+    e.target.value = '';
+    return;
+  }
+  var reader = new FileReader();
+  reader.onerror = function(){ alert('Erreur lors de la lecture du fichier.'); };
+  reader.onload = function(evt){
+    heroImage = evt.target.result;
+    var prev = document.getElementById('heroPreview');
+    var img  = document.getElementById('heroPreviewImg');
+    var btn  = document.getElementById('heroClear');
+    img.src  = heroImage;
+    prev.style.display = 'block';
+    btn.style.display  = 'flex';
+    refresh();
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearHero(){
+  heroImage = '';
+  document.getElementById('heroInput').value = '';
+  document.getElementById('heroPreviewImg').src = '';
+  document.getElementById('heroPreview').style.display = 'none';
+  document.getElementById('heroClear').style.display  = 'none';
+  refresh();
+}
+
+
+function setView(v){
+  currentView=v;
+  var wrap=document.getElementById('frameWrap');
+  wrap.classList.toggle('mobile',v==='mobile');
+  document.getElementById('btnDesktop').classList.toggle('active',v==='desktop');
+  document.getElementById('btnMobile').classList.toggle('active',v==='mobile');
+}
+
+// ══════════════════════════════════════════
+//  GENERATE HTML
+// ══════════════════════════════════════════
+function buildSiteHTML(){
+  var name    = esc(document.getElementById('bizName').value||'Mon Entreprise');
+  var tagline = esc(document.getElementById('tagline').value||'Votre meilleur partenaire');
+  var desc    = esc(document.getElementById('desc').value||'');
+  var phone   = esc(document.getElementById('phone').value||'');
+  var email   = esc(document.getElementById('email').value||'');
+  var city    = esc(document.getElementById('city').value||'');
+  var color   = document.getElementById('colorPrimary').value||'#2563eb';
+  var services= document.getElementById('services').value.split('\n').filter(function(s){return s.trim();});
+  var showHero    = document.getElementById('secHero').checked;
+  var showServices= document.getElementById('secServices').checked;
+  var showAbout   = document.getElementById('secAbout').checked;
+  var showReviews = document.getElementById('secReviews').checked;
+  var showFaq     = document.getElementById('secFaq').checked;
+  var showContact = document.getElementById('secContact').checked;
+
+  var colorDark   = shadeColor(color,-30);
+  var colorLight  = shadeColor(color,85);
+  var initials    = name.split(' ').slice(0,2).map(function(w){return w[0]||'';}).join('').toUpperCase();
+
+  var logoHTML = logoBase64
+    ? '<img src="'+logoBase64+'" alt="'+name+'" style="height:36px;max-width:160px;object-fit:contain;display:block;">'
+    : '<span style="font-size:18px;font-weight:700;color:'+color+';">'+name+'</span>';
+
+  var heroStyle = heroImage
+    ? 'background:url('+heroImage+') center/cover no-repeat;'
+    : 'background:linear-gradient(135deg,'+colorLight+' 0%,#fff 100%);';
+
+  var servicesHTML = services.map(function(s,i){
+    var icons=['🔧','⚡','🏗️','🔍','🧰','📐','🎨','📦'];
+    return '<div style="background:#f8fafc;border-radius:14px;padding:24px;border:1px solid #e5e7eb;"><div style="font-size:28px;margin-bottom:12px;">'+icons[i%icons.length]+'</div><div style="font-weight:600;font-size:15px;color:#111;">' +esc(s)+'</div></div>';
+  }).join('');
+
+  var reviewsHTML=[
+    {name:'Jean-Pierre M.',note:'Super intervention rapide et professionnelle.',stars:5},
+    {name:'Sophie T.',note:'Excellent travail, tarifs très corrects.',stars:5},
+    {name:'Marc D.',note:'Je recommande vivement, travail soigné.',stars:5}
+  ].map(function(r){
+    return '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:24px;"><div style="color:#fbbf24;font-size:16px;margin-bottom:8px;">'+'★'.repeat(r.stars)+'</div><p style="color:#374151;font-size:14px;margin-bottom:14px;line-height:1.6;">"'+r.note+'"</p><div style="font-size:13px;font-weight:600;color:#6b7280;">— '+r.name+'</div></div>';
+  }).join('');
+
+  var faqItems=[
+    {q:'Intervenez-vous en urgence ?',a:'Oui, nous sommes disponibles 7j/7 pour les interventions urgentes. Contactez-nous par téléphone pour un déplacement rapide.'},
+    {q:'Proposez-vous des devis gratuits ?',a:'Absolument. Tous nos devis sont gratuits et sans engagement. Nous nous déplaçons pour évaluer votre situation.'},
+    {q:'Quelle zone géographique couvrez-vous ?',a:'Nous intervenons dans la zone de '+city+'. N\'hésitez pas à nous appeler pour vérifier la disponibilité.'}
+  ].map(function(f){
+    return '<details style="border:1px solid #e5e7eb;border-radius:10px;padding:16px 20px;margin-bottom:10px;"><summary style="font-weight:600;cursor:pointer;color:#111;">'+f.q+'</summary><p style="margin-top:12px;color:#6b7280;font-size:14px;line-height:1.7;">'+f.a+'</p></details>';
+  }).join('');
+
+  return '<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>'+name+'</title><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"><style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:\'DM Sans\',sans-serif;color:#111;background:#fff;}.container{max-width:1100px;margin:0 auto;padding:0 24px;}nav{background:#fff;border-bottom:1px solid #f0f0f0;padding:16px 0;position:sticky;top:0;z-index:10;}.nav-inner{display:flex;align-items:center;justify-content:space-between;}.nav-logo{font-size:18px;font-weight:700;color:'+color+';}.nav-cta{background:'+color+';color:#fff;padding:10px 22px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:600;}</style></head><body>'
+
+  + '<nav><div class="container"><div class="nav-inner"><div class="nav-logo">'+logoHTML+'</div>'+(phone?'<a href="tel:'+phone+'" class="nav-cta">📞 '+phone+'</a>':'')+'</div></div></nav>'
+
+  + (showHero?'<section style="padding:80px 0 70px;'+heroStyle+'"><div class="container"><div style="max-width:640px;"><div style="display:inline-flex;align-items:center;gap:8px;background:'+color+';color:#fff;padding:6px 16px;border-radius:100px;font-size:12px;font-weight:600;margin-bottom:20px;">✅ Devis gratuit en 24h</div><h1 style="font-size:clamp(32px,5vw,52px);font-weight:700;line-height:1.15;margin-bottom:18px;color:#111;">'+tagline+'</h1><p style="font-size:17px;color:#6b7280;margin-bottom:32px;line-height:1.6;">'+desc+'</p><div style="display:flex;gap:14px;flex-wrap:wrap;"><a href="#contact" style="background:'+color+';color:#fff;padding:14px 28px;border-radius:10px;text-decoration:none;font-weight:600;font-size:15px;">Nous contacter</a><a href="#services" style="border:2px solid '+color+';color:'+color+';padding:14px 28px;border-radius:10px;text-decoration:none;font-weight:600;font-size:15px;">Voir nos services</a></div></div></div></section>':'')
+
+  + (showServices && services.length?'<section id="services" style="padding:80px 0;background:#fff;"><div class="container"><h2 style="font-size:32px;font-weight:700;text-align:center;margin-bottom:10px;">Nos services</h2><p style="text-align:center;color:#6b7280;margin-bottom:48px;">Ce que nous proposons pour vous accompagner.</p><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:20px;">'+servicesHTML+'</div></div></section>':'')
+
+  + (showAbout?'<section style="padding:80px 0;background:#f8fafc;"><div class="container"><div style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;"><div><h2 style="font-size:32px;font-weight:700;margin-bottom:16px;">À propos de nous</h2><p style="color:#6b7280;font-size:16px;line-height:1.8;margin-bottom:24px;">'+desc+'</p><div style="display:flex;gap:32px;"><div><div style="font-size:32px;font-weight:700;color:'+color+';">15+</div><div style="font-size:13px;color:#9ca3af;">Ans d\'expérience</div></div><div><div style="font-size:32px;font-weight:700;color:'+color+';">500+</div><div style="font-size:13px;color:#9ca3af;">Clients satisfaits</div></div></div></div><div style="text-align:center;"><div style="width:200px;height:200px;background:linear-gradient(135deg,'+color+','+colorDark+');border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:60px;font-weight:700;color:#fff;margin:0 auto;">'+initials+'</div><div style="margin-top:16px;font-weight:600;font-size:16px;">'+name+'</div><div style="color:#9ca3af;font-size:13px;">'+city+'</div></div></div></div></section>':'')
+
+  + (showReviews?'<section style="padding:80px 0;"><div class="container"><h2 style="font-size:32px;font-weight:700;text-align:center;margin-bottom:10px;">Avis de nos clients</h2><p style="text-align:center;color:#6b7280;margin-bottom:48px;">Ce que disent ceux qui nous font confiance.</p><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:24px;">'+reviewsHTML+'</div></div></section>':'')
+
+  + (showFaq?'<section style="padding:80px 0;background:#f8fafc;"><div class="container"><div style="max-width:700px;margin:0 auto;"><h2 style="font-size:32px;font-weight:700;text-align:center;margin-bottom:10px;">Questions fréquentes</h2><p style="text-align:center;color:#6b7280;margin-bottom:48px;">Tout ce que vous voulez savoir.</p>'+faqItems+'</div></div></section>':'')
+
+  + (showContact?'<section id="contact" style="padding:80px 0;background:'+color+';color:#fff;"><div class="container"><div style="text-align:center;max-width:600px;margin:0 auto;"><h2 style="font-size:32px;font-weight:700;margin-bottom:12px;">Contactez-nous</h2><p style="opacity:.85;margin-bottom:40px;">Nous sommes là pour répondre à toutes vos questions.</p><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px;">'+(phone?'<div style="background:rgba(255,255,255,.15);border-radius:12px;padding:24px;"><div style="font-size:28px;margin-bottom:8px;">📞</div><div style="font-weight:600;margin-bottom:4px;">Téléphone</div><div style="opacity:.9;font-size:15px;">'+phone+'</div></div>':'')+(email?'<div style="background:rgba(255,255,255,.15);border-radius:12px;padding:24px;"><div style="font-size:28px;margin-bottom:8px;">✉️</div><div style="font-weight:600;margin-bottom:4px;">Email</div><div style="opacity:.9;font-size:15px;">'+email+'</div></div>':'')+(city?'<div style="background:rgba(255,255,255,.15);border-radius:12px;padding:24px;"><div style="font-size:28px;margin-bottom:8px;">📍</div><div style="font-weight:600;margin-bottom:4px;">Zone</div><div style="opacity:.9;font-size:15px;">'+city+'</div></div>':'')+'</div></div></div></section>':'')
+
+  + '<footer style="background:#111;color:#9ca3af;text-align:center;padding:32px;font-size:13px;">© 2025 '+name+' · Site réalisé par <a href="https://siteforge.fr" style="color:'+color+';">SiteForge</a></footer>'
+  + '</body></html>';
+}
+
+function esc(str){
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function shadeColor(hex,percent){
+  var num=parseInt(hex.slice(1),16),amt=Math.round(2.55*percent),
+    r=Math.min(255,Math.max(0,(num>>16)+amt)),
+    g=Math.min(255,Math.max(0,(num>>8&0x00FF)+amt)),
+    b=Math.min(255,Math.max(0,(num&0x0000FF)+amt));
+  return '#'+((r<<16)|(g<<8)|b).toString(16).padStart(6,'0');
+}
+
+// ══════════════════════════════════════════
+//  REFRESH
+// ══════════════════════════════════════════
+var refreshTimer=null;
+function refresh(){
+  clearTimeout(refreshTimer);
+  refreshTimer=setTimeout(function(){
+    var html=buildSiteHTML();
+    var frame=document.getElementById('previewFrame');
+    frame.srcdoc=html;
+    // Update URL bar
+    var name=document.getElementById('bizName').value||'mon-site';
+    var slug=name.toLowerCase().replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
+    document.getElementById('urlText').textContent=slug+'.siteforge.fr';
+  },120);
+}
+
+// Initial render
+refresh();
+</script>
+</body>
+</html>

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#08090c">
+<meta name="description" content="Openfeat — Hub regroupant 6 apps IA/web : analyse financière, tracker running, montage vidéo, marketing, génération CGV, suite entrepreneur.">
+<meta name="robots" content="index,follow">
+<title>Openfeat — 6 apps web</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after { box-sizing: border-box; }
+  :root {
+    --bg-0: #08090c;
+    --bg-1: #0e1014;
+    --bg-2: #15181f;
+    --bg-3: #1d212a;
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.16);
+    --text-0: #f4f4f6;
+    --text-1: #b8bac4;
+    --text-2: #74778a;
+    --accent: #ffd166;
+    --accent-2: #6cf0c2;
+    --grad: linear-gradient(135deg, #ffd166 0%, #ef476f 50%, #6cf0c2 100%);
+  }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', -apple-system, system-ui, sans-serif;
+    background: var(--bg-0);
+    color: var(--text-0);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 20% 0%, rgba(108,240,194,0.06), transparent 40%),
+      radial-gradient(circle at 80% 100%, rgba(239,71,111,0.05), transparent 40%);
+  }
+  a { color: inherit; text-decoration: none; }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 56px 24px 80px; }
+
+  header.hero { display: flex; flex-direction: column; gap: 14px; margin-bottom: 56px; }
+  .brand-row { display: flex; align-items: center; gap: 12px; }
+  .brand-logo {
+    width: 36px; height: 36px;
+    border-radius: 9px;
+    background: var(--grad);
+    display: grid; place-items: center;
+    color: #08090c;
+    font-weight: 900;
+    font-size: 18px;
+    letter-spacing: -0.5px;
+  }
+  .brand-name {
+    font-weight: 800; font-size: 16px; letter-spacing: -0.2px;
+  }
+  .brand-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-2);
+    padding: 2px 8px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    margin-left: 8px;
+  }
+
+  h1.title {
+    font-size: clamp(36px, 5.5vw, 64px);
+    line-height: 1.05;
+    letter-spacing: -1.5px;
+    font-weight: 900;
+    margin: 0;
+    max-width: 820px;
+  }
+  h1.title em {
+    font-style: normal;
+    background: var(--grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  p.subtitle {
+    font-size: clamp(15px, 1.6vw, 18px);
+    color: var(--text-1);
+    max-width: 620px;
+    margin: 0;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+  }
+
+  .card {
+    position: relative;
+    display: flex; flex-direction: column;
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 22px 22px 20px;
+    transition: transform .25s ease, border-color .25s ease, background .25s ease;
+    overflow: hidden;
+  }
+  .card::before {
+    content: ''; position: absolute; inset: 0;
+    background: var(--card-grad, transparent);
+    opacity: 0; transition: opacity .3s ease;
+    pointer-events: none;
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    border-color: var(--border-strong);
+    background: var(--bg-2);
+  }
+  .card:hover::before { opacity: 0.07; }
+
+  .card-icon {
+    width: 44px; height: 44px;
+    border-radius: 11px;
+    display: grid; place-items: center;
+    margin-bottom: 14px;
+    font-size: 20px;
+    background: var(--icon-bg, rgba(255,255,255,0.06));
+    color: var(--icon-fg, var(--text-0));
+    border: 1px solid var(--border);
+  }
+  .card-title {
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+    margin: 0 0 6px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    color: var(--text-2);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0 0 10px;
+  }
+  .card-desc {
+    font-size: 14px;
+    color: var(--text-1);
+    margin: 0 0 18px;
+    line-height: 1.55;
+    flex: 1;
+  }
+  .card-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px;
+  }
+  .card-tags {
+    display: flex; gap: 6px; flex-wrap: wrap;
+  }
+  .tag {
+    font-size: 10.5px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    color: var(--text-2);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .card-cta {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-0);
+    display: inline-flex; align-items: center; gap: 4px;
+    transition: transform .2s ease;
+  }
+  .card:hover .card-cta { transform: translateX(2px); }
+
+  /* Per-card accents */
+  .card[data-app="alpha"]    { --card-grad: linear-gradient(135deg,#0d2b3d,#000); --icon-bg: rgba(108,240,194,0.12); --icon-fg: #6cf0c2; }
+  .card[data-app="motion"]   { --card-grad: linear-gradient(135deg,#3d2c0d,#000); --icon-bg: rgba(255,209,102,0.14); --icon-fg: #ffd166; }
+  .card[data-app="video"]    { --card-grad: linear-gradient(135deg,#3d0d2c,#000); --icon-bg: rgba(239,71,111,0.14); --icon-fg: #ef476f; }
+  .card[data-app="builder"]  { --card-grad: linear-gradient(135deg,#2d0d3d,#000); --icon-bg: rgba(170,120,255,0.14); --icon-fg: #b88dff; }
+  .card[data-app="cgv"]      { --card-grad: linear-gradient(135deg,#0d1c3d,#000); --icon-bg: rgba(120,170,255,0.14); --icon-fg: #88baff; }
+  .card[data-app="entr"]     { --card-grad: linear-gradient(135deg,#3d2c0d,#000); --icon-bg: rgba(240,180,108,0.14); --icon-fg: #f0b46c; }
+  .card[data-app="goat"]     { --card-grad: linear-gradient(135deg,#0d3d2c,#000); --icon-bg: rgba(108,240,180,0.14); --icon-fg: #6cf0b4; }
+  .card[data-app="site"]     { --card-grad: linear-gradient(135deg,#1d2a3d,#000); --icon-bg: rgba(140,200,255,0.14); --icon-fg: #8cc8ff; }
+
+  footer {
+    margin-top: 64px;
+    padding-top: 28px;
+    border-top: 1px solid var(--border);
+    color: var(--text-2);
+    font-size: 13px;
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  }
+
+  @media (max-width: 640px) {
+    .wrap { padding: 36px 18px 60px; }
+    h1.title { letter-spacing: -1px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="brand-row">
+      <div class="brand-logo">O</div>
+      <div class="brand-name">Openfeat</div>
+      <div class="brand-tag">v1.0 · 8 apps</div>
+    </div>
+    <h1 class="title">Huit apps web<br>en <em>un seul endroit</em>.</h1>
+    <p class="subtitle">Hub regroupant les apps construites — finance, sport, vidéo, marketing, juridique, entrepreneuriat, screenshots, sites web. Toutes accessibles directement depuis ce site.</p>
+  </header>
+
+  <main class="grid">
+
+    <a class="card" href="./alpha-terminal/" data-app="alpha">
+      <div class="card-icon">α</div>
+      <p class="card-meta">FINANCE · BYOK · PWA</p>
+      <h2 class="card-title">Alpha Terminal</h2>
+      <p class="card-desc">Terminal d'analyse financière IA. 46+ modules (DCF, 10-K Decoder, Audit Buffett, Tax Optimizer 8 pays). 14 LLMs au choix. 100% client-side.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">PWA</span><span class="tag">BYOK</span></div>
+        <span class="card-cta">Ouvrir →</span>
+      </div>
+    </a>
+
+    <a class="card" href="./motion/" data-app="motion">
+      <div class="card-icon">↗</div>
+      <p class="card-meta">SPORT · TRACKER · PWA</p>
+      <h2 class="card-title">Motion · Pace</h2>
+      <p class="card-desc">Tracker running PWA léger. Allure, splits, GPS, météo, dénivelé. Hors-ligne, installable. Aucun compte.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">PWA</span><span class="tag">offline</span></div>
+        <span class="card-cta">Ouvrir →</span>
+      </div>
+    </a>
+
+    <a class="card" href="./video/" data-app="video">
+      <div class="card-icon">▶</div>
+      <p class="card-meta">VIDÉO · FFMPEG.WASM · PWA</p>
+      <h2 class="card-title">Montage AI</h2>
+      <p class="card-desc">Crée des pubs vidéo verticales en 1 clic. Voix IA (ElevenLabs), B-roll Pexels/Pixabay, montage ffmpeg.wasm dans le navigateur.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">WASM</span><span class="tag">BYOK</span></div>
+        <span class="card-cta">Ouvrir →</span>
+      </div>
+    </a>
+
+    <a class="card" href="./builder/" data-app="builder">
+      <div class="card-icon">◆</div>
+      <p class="card-meta">MARKETING · LOCAL-FIRST</p>
+      <h2 class="card-title">BuilderAi</h2>
+      <p class="card-desc">Assistant marketing universel local-first. Audit, contenu, posts, analyses — sans serveur, données chez toi.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">local</span><span class="tag">BYOK</span></div>
+        <span class="card-cta">Ouvrir →</span>
+      </div>
+    </a>
+
+    <a class="card" href="./cgv/" data-app="cgv">
+      <div class="card-icon">⚖</div>
+      <p class="card-meta">LÉGAL · CLAUDE · BYOK</p>
+      <h2 class="card-title">LexiGen</h2>
+      <p class="card-desc">Génère des CGV / Terms of Service complètes (FR, EN, bilingue) en 4 étapes. Conforme Code de la consommation, RGPD. Export DOC/PDF.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">BYOK</span><span class="tag">DOC/PDF</span></div>
+        <span class="card-cta">Ouvrir →</span>
+      </div>
+    </a>
+
+    <a class="card" href="./entrepreneuros/" data-app="entr">
+      <div class="card-icon">⌘</div>
+      <p class="card-meta">DESKTOP · LANDING</p>
+      <h2 class="card-title">EntrepreneurOS</h2>
+      <p class="card-desc">Suite IA desktop pour entrepreneurs solos. 21 modules — business plan, factures, contrats, prévisionnel, contenu. Disponible en .dmg / .exe.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">desktop</span><span class="tag">macOS · Win</span></div>
+        <span class="card-cta">Voir →</span>
+      </div>
+    </a>
+
+    <a class="card" href="./goat-fuel/" data-app="goat">
+      <div class="card-icon">★</div>
+      <p class="card-meta">SCREENSHOTS · OFFLINE</p>
+      <h2 class="card-title">GOAT FUEL</h2>
+      <p class="card-desc">Générateur de screenshots App Store / Play Store. Glisse tes captures, exporte en PNG/ZIP. Auto-fiche 8 rôles narratifs, multi-langue, 100% offline.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">offline</span><span class="tag">PNG/ZIP</span></div>
+        <span class="card-cta">Ouvrir →</span>
+      </div>
+    </a>
+
+    <a class="card" href="./sitecraft/" data-app="site">
+      <div class="card-icon">◐</div>
+      <p class="card-meta">SITES WEB · FREELANCE</p>
+      <h2 class="card-title">SiteCraft</h2>
+      <p class="card-desc">Service de création de sites web pros pour artisans, coachs et indépendants. Livraison 72h, sans abonnement. Templates, éditeur live, questionnaire de devis.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">service</span><span class="tag">72h</span></div>
+        <span class="card-cta">Voir →</span>
+      </div>
+    </a>
+
+  </main>
+
+  <footer>
+    <span>© 2026 Openfeat. Construit avec Claude.</span>
+    <span><a href="https://github.com/adrno496/Openfeat" rel="noopener noreferrer" style="text-decoration:underline;">GitHub</a></span>
+  </footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <script>document.documentElement.setAttribute('data-theme',localStorage.getItem('siteforge-theme')||'light');</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Démarrer mon projet — SiteForge</title>
+  <meta name="description" content="Configurez votre site en quelques clics. Prix mis à jour en temps réel. Réponse sous 24h, aucun engagement." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ─── Configurateur de prix ─── */
+    .configurator-layout {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 28px;
+      align-items: start;
+    }
+
+    /* Formules cliquables */
+    .formula-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .formula-card {
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px 16px;
+      cursor: pointer;
+      transition: all var(--transition);
+      background: var(--surface);
+      text-align: center;
+      position: relative;
+      user-select: none;
+    }
+
+    .formula-card:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .formula-card.selected {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      box-shadow: 0 0 0 3px rgba(232,124,62,0.15);
+    }
+
+    .formula-card-badge {
+      position: absolute;
+      top: -11px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent);
+      color: #fff;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 99px;
+      white-space: nowrap;
+    }
+
+    .formula-card-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .formula-card-price {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: var(--navy);
+      line-height: 1;
+    }
+
+    .formula-card-price sup {
+      font-size: 0.85rem;
+      vertical-align: super;
+    }
+
+    .formula-card-pages {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .formula-card.selected .formula-card-name,
+    .formula-card.selected .formula-card-pages {
+      color: var(--accent);
+    }
+
+    .formula-card.selected .formula-card-price {
+      color: var(--accent);
+    }
+
+    /* Options panneau */
+    .options-panel {
+      display: none;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .options-panel.visible {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Compteur de pages */
+    .page-counter-block {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 16px;
+    }
+
+    .page-counter-info {
+      flex: 1;
+    }
+
+    .page-counter-label {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 2px;
+    }
+
+    .page-counter-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .page-counter-controls {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--surface);
+    }
+
+    .page-counter-btn {
+      width: 40px;
+      height: 40px;
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--navy);
+      transition: background var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .page-counter-btn:hover {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .page-counter-btn:disabled {
+      color: var(--border);
+      cursor: default;
+    }
+
+    .page-counter-val {
+      min-width: 42px;
+      text-align: center;
+      font-family: 'Syne', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--navy);
+      border-left: 1.5px solid var(--border);
+      border-right: 1.5px solid var(--border);
+      padding: 0 8px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Options checkboxes */
+    .options-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .option-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      cursor: pointer;
+      background: var(--surface);
+      transition: all var(--transition);
+      user-select: none;
+    }
+
+    .option-item:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .option-item.included {
+      background: var(--bg-alt);
+      cursor: default;
+      opacity: 0.8;
+    }
+
+    .option-item.checked {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .option-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+      flex-shrink: 0;
+      cursor: pointer;
+      margin: 0;
+      padding: 0;
+      border: none;
+      box-shadow: none;
+    }
+
+    .option-item.included input[type="checkbox"] {
+      cursor: default;
+    }
+
+    .option-item-text {
+      flex: 1;
+    }
+
+    .option-item-name {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--navy);
+    }
+
+    .option-item-price {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--accent);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .option-item.included .option-item-price {
+      color: var(--success);
+    }
+
+    /* Récapitulatif prix (sticky) */
+    .price-summary {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-md);
+      position: sticky;
+      top: 88px;
+    }
+
+    .price-summary-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 16px;
+    }
+
+    .price-lines {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 16px;
+      min-height: 60px;
+    }
+
+    .price-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.88rem;
+      color: var(--text);
+      gap: 8px;
+    }
+
+    .price-line span:first-child {
+      flex: 1;
+    }
+
+    .price-line span:last-child {
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .price-line.extra {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+    }
+
+    .price-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 12px 0;
+    }
+
+    .price-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .price-total-label {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .price-total-val {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .price-note {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 10px;
+      line-height: 1.5;
+    }
+
+    .price-empty {
+      text-align: center;
+      padding: 16px 0;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    .price-section-label {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin: 12px 0 6px;
+    }
+
+    .price-monthly-block {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      margin-top: 12px;
+    }
+
+    .price-monthly-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .price-monthly-total-label {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .price-monthly-total-val {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--navy-light);
+    }
+
+    /* Option avec prix mensuel */
+    .option-item-sublabel {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+      display: block;
+    }
+
+    .option-item-price-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 1px;
+      flex-shrink: 0;
+    }
+
+    .option-item-price-monthly {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--navy-light);
+      white-space: nowrap;
+    }
+
+    /* Section services récurrents */
+    .services-section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 20px 0 12px;
+    }
+
+    .services-section-header::before,
+    .services-section-header::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .services-section-header span {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--navy-light);
+      white-space: nowrap;
+    }
+
+    /* Champs contact (step 6) */
+    .contact-block {
+      margin-top: 8px;
+    }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 900px) {
+      .configurator-layout {
+        grid-template-columns: 1fr;
+      }
+      .price-summary {
+        position: static;
+        order: -1;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .formula-cards {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .formula-card {
+        display: flex;
+        align-items: center;
+        text-align: left;
+        gap: 16px;
+        padding: 16px 18px;
+      }
+      .formula-card-name { margin-bottom: 2px; }
+      .formula-card-price { font-size: 1.4rem; }
+    }
+  </style>
+</head>
+<body class="questionnaire-page">
+
+<!-- ══════════════════════ NAVBAR ══════════════════════ -->
+<nav class="navbar" aria-label="Navigation">
+  <div class="container">
+    <a href="index.html" class="navbar-logo">Site<span>Forge</span></a>
+    <div class="navbar-cta">
+      <button class="theme-toggle" id="themeToggle" aria-label="Changer le thème">🌙</button>
+      <a href="index.html" class="btn-outline" style="padding:9px 18px;font-size:0.85rem;">← Retour au site</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════════ HERO ══════════════════════ -->
+<div class="form-hero">
+  <div class="container">
+    <div class="badge-pill" style="margin-bottom:16px;">🚀 Réponse sous 24h · Aucun engagement</div>
+    <h1>Parlez-moi de votre projet</h1>
+    <p>Répondez étape par étape. À la dernière étape, configurez votre site et voyez le prix évoluer en temps réel.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════ PROGRESS ══════════════════════ -->
+<div class="step-progress">
+  <div class="step-progress-bar-wrap">
+    <div class="step-progress-fill" id="progressFill" style="width:16.6%;"></div>
+  </div>
+  <div class="step-progress-label" id="progressLabel">Étape 1 sur 6</div>
+</div>
+
+<!-- ══════════════════════ FORMULAIRE ══════════════════════ -->
+<div class="form-container" style="max-width:860px;">
+  <form id="questionnaireForm"
+        action="https://formsubmit.co/ptiorkin@hotmail.fr"
+        method="POST">
+
+    <!-- FormSubmit config -->
+    <input type="text"   name="_honey"    style="display:none" tabindex="-1" autocomplete="off">
+    <input type="hidden" name="_captcha"  value="false">
+    <input type="hidden" name="_next"     value="https://siteforge.fr/merci.html">
+    <input type="hidden" name="_subject"  value="Nouveau questionnaire SiteForge">
+    <input type="hidden" name="_template" value="table">
+    <!-- Champ prix calculé (mis à jour dynamiquement) -->
+    <input type="hidden" name="prix_total_estime"  id="hiddenPrixTotal" value="">
+    <input type="hidden" name="formule_choisie"    id="hiddenFormule"   value="">
+    <input type="hidden" name="nb_pages"           id="hiddenPages"     value="">
+    <input type="hidden" name="options_choisies"   id="hiddenOptions"   value="">
+
+    <!-- ════════════ ÉTAPE 1 — VOTRE ACTIVITÉ ════════════ -->
+    <div class="form-step active" data-step="1">
+      <div class="form-section">
+        <div class="form-section-title">
+          <div class="form-section-num">1</div>
+          <h2>Votre activité</h2>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="metier">Quel est votre métier / activité ? <span class="req">*</span></label>
+            <input type="text" id="metier" name="metier"
+              placeholder="Ex : plombier, coach, photographe, menuisier…" required />
+          </div>
+          <div class="form-group">
+            <label for="nom_entreprise">Nom de votre entreprise ou prénom professionnel <span class="req">*</span></label>
+            <input type="text" id="nom_entreprise" name="nom_entreprise"
+              placeholder="Ex : Plomberie Martin, Sophie Coach" required />
+          </div>
+          <div class="form-group">
+            <label for="ville_intervention">Ville et département d'intervention principale <span class="req">*</span></label>
+            <input type="text" id="ville_intervention" name="ville_intervention"
+              placeholder="Ex : Lyon (69), Paris (75), Nantes (44)" required />
+          </div>
+          <div class="form-group">
+            <label for="zone_couverte">Zone couverte <span class="optional">(optionnel)</span></label>
+            <input type="text" id="zone_couverte" name="zone_couverte"
+              placeholder="Ex : rayon 30 km autour de Lyon, ou communes limitrophes" />
+          </div>
+        </div>
+      </div>
+      <div class="step-nav">
+        <span></span>
+        <button type="button" class="btn-accent" onclick="goNext()">Suivant →</button>
+      </div>
+    </div>
+
+    <!-- ════════════ ÉTAPE 2 — VOTRE OFFRE ════════════ -->
+    <div class="form-step" data-step="2">
+      <div class="form-section">
+        <div class="form-section-title">
+          <div class="form-section-num">2</div>
+          <h2>Votre offre</h2>
+        </div>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label for="services_liste">Listez vos services principaux <span class="req">*</span></label>
+            <textarea id="services_liste" name="services_liste" rows="5"
+              placeholder="Écrivez un service par ligne. Ex :&#10;- Dépannage plomberie urgence&#10;- Installation salle de bain&#10;- Remplacement chauffe-eau" required></textarea>
+          </div>
+          <div class="form-group full">
+            <label for="argument_principal">Votre argument principal — pourquoi vous choisir ? <span class="req">*</span></label>
+            <input type="text" id="argument_principal" name="argument_principal"
+              placeholder="Ex : Artisan certifié, disponible 7j/7, devis gratuit sous 2h" required />
+          </div>
+          <div class="form-group">
+            <label for="prix_depart">Votre prix de départ ou fourchette tarifaire <span class="optional">(optionnel)</span></label>
+            <input type="text" id="prix_depart" name="prix_depart"
+              placeholder="Ex : à partir de 80 €/h, forfait dès 250 €" />
+          </div>
+          <div class="form-group">
+            <label>Proposez-vous des urgences / interventions rapides ?</label>
+            <div class="radio-group horizontal">
+              <label class="radio-option">
+                <input type="radio" name="urgences" value="oui" /> Oui
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="urgences" value="non" /> Non
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="step-nav">
+        <button type="button" class="btn-outline" onclick="goPrev()">← Précédent</button>
+        <button type="button" class="btn-accent" onclick="goNext()">Suivant →</button>
+      </div>
+    </div>
+
+    <!-- ════════════ ÉTAPE 3 — VOS CLIENTS ════════════ -->
+    <div class="form-step" data-step="3">
+      <div class="form-section">
+        <div class="form-section-title">
+          <div class="form-section-num">3</div>
+          <h2>Vos clients</h2>
+        </div>
+        <div class="form-grid">
+
+          <div class="form-group full">
+            <label>Qui sont vos clients ? <span class="req">*</span></label>
+            <div class="radio-group horizontal">
+              <label class="radio-option">
+                <input type="radio" name="type_clients" value="particuliers" required /> Particuliers
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="type_clients" value="professionnels" /> Professionnels (B2B)
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="type_clients" value="les_deux" /> Les deux
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group full">
+            <label>Tranche d'âge principale de vos clients <span class="optional">(optionnel)</span></label>
+            <div class="checkbox-group horizontal">
+              <label class="checkbox-option">
+                <input type="checkbox" name="age_clients" value="18-25" /> 18 – 25 ans
+              </label>
+              <label class="checkbox-option">
+                <input type="checkbox" name="age_clients" value="25-40" /> 25 – 40 ans
+              </label>
+              <label class="checkbox-option">
+                <input type="checkbox" name="age_clients" value="40-60" /> 40 – 60 ans
+              </label>
+              <label class="checkbox-option">
+                <input type="checkbox" name="age_clients" value="60+" /> 60 ans et +
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group full">
+            <label>Comment vos clients vous trouvent-ils actuellement ?</label>
+            <div class="checkbox-group horizontal">
+              <label class="checkbox-option">
+                <input type="checkbox" name="canaux_acquisition" value="bouche_a_oreille" /> Bouche à oreille
+              </label>
+              <label class="checkbox-option">
+                <input type="checkbox" name="canaux_acquisition" value="google" /> Google
+              </label>
+              <label class="checkbox-option">
+                <input type="checkbox" name="canaux_acquisition" value="reseaux_sociaux" /> Réseaux sociaux
+              </label>
+              <label class="checkbox-option">
+                <input type="checkbox" name="canaux_acquisition" value="site_existant" /> Site existant
+              </label>
+              <label class="checkbox-option">
+                <input type="checkbox" name="canaux_acquisition" value="annuaires" /> Annuaires (Pages Jaunes…)
+              </label>
+              <label class="checkbox-option">
+                <input type="checkbox" name="canaux_acquisition" value="prospection" /> Prospection directe
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group full">
+            <label>Ce que vos clients cherchent en priorité :</label>
+            <div class="checkbox-group horizontal">
+              <label class="checkbox-option">
+                <input type="checkbox" name="priorites_clients" value="reactivite" /> Réactivité
+              </label>
+              <label class="checkbox-option">
+                <input type="checkbox" name="priorites_clients" value="prix" /> Prix compétitif
+              </label>
+              <label class="checkbox-option">
+                <input type="checkbox" name="priorites_clients" value="qualite" /> Qualité
+              </label>
+              <label class="checkbox-option">
+                <input type="checkbox" name="priorites_clients" value="references" /> Références / avis
+              </label>
+              <label class="checkbox-option">
+                <input type="checkbox" name="priorites_clients" value="proximite" /> Proximité géographique
+              </label>
+              <label class="checkbox-option">
+                <input type="checkbox" name="priorites_clients" value="disponibilite" /> Disponibilité
+              </label>
+              <label class="checkbox-option">
+                <input type="checkbox" name="priorites_clients" value="expertise" /> Expertise / spécialisation
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group full">
+            <label for="client_ideal">Décrivez votre client idéal en quelques mots <span class="optional">(optionnel)</span></label>
+            <textarea id="client_ideal" name="client_ideal" rows="3"
+              placeholder="Ex : Propriétaires de maison entre 35 et 60 ans, en Île-de-France, cherchant quelqu'un de réactif et certifié…"></textarea>
+          </div>
+
+          <div class="form-group full">
+            <label>Objectif principal du site :</label>
+            <div class="radio-group horizontal">
+              <label class="radio-option">
+                <input type="radio" name="objectif_site" value="visibilite" /> Me faire connaître localement
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="objectif_site" value="devis" /> Recevoir des demandes de devis
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="objectif_site" value="credibilite" /> Inspirer confiance / crédibilité
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="objectif_site" value="vente" /> Vendre mes produits / services en ligne
+              </label>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div class="step-nav">
+        <button type="button" class="btn-outline" onclick="goPrev()">← Précédent</button>
+        <button type="button" class="btn-accent" onclick="goNext()">Suivant →</button>
+      </div>
+    </div>
+
+    <!-- ════════════ ÉTAPE 4 — IDENTITÉ VISUELLE ════════════ -->
+    <div class="form-step" data-step="4">
+      <div class="form-section">
+        <div class="form-section-title">
+          <div class="form-section-num">4</div>
+          <h2>Identité visuelle</h2>
+        </div>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label for="ambiance">Ambiance souhaitée <span class="req">*</span></label>
+            <select id="ambiance" name="ambiance" required>
+              <option value="" disabled selected>Choisissez une ambiance</option>
+              <option value="professionnel_sobre">Professionnel sobre</option>
+              <option value="moderne_dynamique">Moderne et dynamique</option>
+              <option value="artisanal_chaleureux">Artisanal et chaleureux</option>
+              <option value="luxe_premium">Luxe et premium</option>
+              <option value="neutre">Neutre / je fais confiance</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="couleurs">Couleurs préférées ou à éviter <span class="optional">(optionnel)</span></label>
+            <input type="text" id="couleurs" name="couleurs"
+              placeholder="Ex : bleu marine + blanc. Éviter : rouge, jaune vif" />
+          </div>
+          <div class="form-group">
+            <label for="logo_description">Avez-vous un logo ? Si oui, décrivez-le <span class="optional">(optionnel)</span></label>
+            <input type="text" id="logo_description" name="logo_description"
+              placeholder="Ex : logo texte bleu et doré, style épuré. Ou : non, pas de logo" />
+          </div>
+          <div class="form-group full">
+            <label for="sites_inspiration">Sites web que vous aimez — URL ou descriptions <span class="optional">(optionnel)</span></label>
+            <textarea id="sites_inspiration" name="sites_inspiration" rows="3"
+              placeholder="Ex : j'aime le style sobre avec des tons neutres…"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="step-nav">
+        <button type="button" class="btn-outline" onclick="goPrev()">← Précédent</button>
+        <button type="button" class="btn-accent" onclick="goNext()">Suivant →</button>
+      </div>
+    </div>
+
+    <!-- ════════════ ÉTAPE 5 — CONTENU ET PAGES ════════════ -->
+    <div class="form-step" data-step="5">
+      <div class="form-section">
+        <div class="form-section-title">
+          <div class="form-section-num">5</div>
+          <h2>Contenu</h2>
+        </div>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label for="photos_description">Avez-vous des photos / visuels ? <span class="optional">(optionnel)</span></label>
+            <textarea id="photos_description" name="photos_description" rows="3"
+              placeholder="Ex : j'ai des photos de 3 chantiers récents, qualité smartphone. Ou : non, besoin d'illustrations."></textarea>
+          </div>
+          <div class="form-group full">
+            <label for="texte_presentation">Texte de présentation existant <span class="optional">(optionnel)</span></label>
+            <textarea id="texte_presentation" name="texte_presentation" rows="4"
+              placeholder="Collez ici un texte que vous avez déjà rédigé (description de votre activité, à propos…)"></textarea>
+          </div>
+          <div class="form-group full">
+            <label for="infos_complementaires">Informations complémentaires ou questions <span class="optional">(optionnel)</span></label>
+            <textarea id="infos_complementaires" name="infos_complementaires" rows="3"
+              placeholder="Contraintes particulières, délai souhaité, questions…"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="step-nav">
+        <button type="button" class="btn-outline" onclick="goPrev()">← Précédent</button>
+        <button type="button" class="btn-accent" onclick="goNext()">Suivant →</button>
+      </div>
+    </div>
+
+    <!-- ════════════ ÉTAPE 6 — CONFIGURATEUR + CONTACT ════════════ -->
+    <div class="form-step" data-step="6">
+
+      <div class="configurator-layout">
+
+        <!-- ── Colonne gauche : sélection ── -->
+        <div>
+
+          <!-- Formules -->
+          <div class="form-section">
+            <div class="form-section-title">
+              <div class="form-section-num">6</div>
+              <h2>Configurez votre site</h2>
+            </div>
+
+            <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:20px;">
+              Choisissez une formule de base — le prix se met à jour en temps réel selon vos options.
+            </p>
+
+            <div class="formula-cards" role="radiogroup" aria-label="Choisir une formule">
+
+              <div class="formula-card" id="fc-essentiel" onclick="selectFormula('essentiel')" role="button" tabindex="0" aria-pressed="false">
+                <div class="formula-card-name">Essentiel</div>
+                <div class="formula-card-price"><sup>€</sup>149</div>
+                <div class="formula-card-pages">1 page incluse</div>
+              </div>
+
+              <div class="formula-card" id="fc-professionnel" onclick="selectFormula('professionnel')" role="button" tabindex="0" aria-pressed="false">
+                <span class="formula-card-badge">⭐ Populaire</span>
+                <div class="formula-card-name">Professionnel</div>
+                <div class="formula-card-price"><sup>€</sup>249</div>
+                <div class="formula-card-pages">3 pages incluses</div>
+              </div>
+
+              <div class="formula-card" id="fc-premium" onclick="selectFormula('premium')" role="button" tabindex="0" aria-pressed="false">
+                <div class="formula-card-name">Premium</div>
+                <div class="formula-card-price"><sup>€</sup>399</div>
+                <div class="formula-card-pages">5 pages incluses</div>
+              </div>
+
+            </div>
+
+            <!-- Options panneau (apparaît après sélection) -->
+            <div class="options-panel" id="optionsPanel">
+
+              <!-- Compteur de pages -->
+              <div class="page-counter-block">
+                <div class="page-counter-info">
+                  <div class="page-counter-label">Nombre de pages</div>
+                  <div class="page-counter-sub" id="pageCounterSub">Pages supplémentaires : +40 € / page</div>
+                </div>
+                <div class="page-counter-controls" role="group" aria-label="Nombre de pages">
+                  <button type="button" class="page-counter-btn" id="pageDecrBtn" onclick="changePage(-1)" aria-label="Réduire">−</button>
+                  <div class="page-counter-val" id="pageCounterVal" aria-live="polite">1</div>
+                  <button type="button" class="page-counter-btn" id="pageIncrBtn" onclick="changePage(+1)" aria-label="Augmenter">+</button>
+                </div>
+              </div>
+
+              <!-- Options incluses & payantes -->
+              <div class="options-title">Options disponibles</div>
+              <div class="options-list" id="optionsList">
+                <!-- Généré par JS -->
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Coordonnées -->
+          <div class="form-section contact-block">
+            <div class="form-section-title" style="margin-bottom:20px;">
+              <div style="width:36px;height:36px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✉</div>
+              <h2 style="font-size:1.1rem;">Vos coordonnées</h2>
+            </div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="email">Email <span class="req">*</span></label>
+                <input type="email" id="email" name="email"
+                  placeholder="jean@exemple.fr" required autocomplete="email" />
+              </div>
+              <div class="form-group">
+                <label for="telephone">Téléphone <span class="optional">(optionnel)</span></label>
+                <input type="tel" id="telephone" name="telephone"
+                  placeholder="06 12 34 56 78" autocomplete="tel" />
+              </div>
+              <div class="form-group full">
+                <label class="checkbox-option" style="background:var(--bg-alt);">
+                  <input type="checkbox" name="rgpd" value="oui" required />
+                  J'accepte que mes données soient utilisées pour la création de mon site, conformément à la
+                  <a href="politique-confidentialite.html" style="color:var(--accent);text-decoration:underline;">politique de confidentialité</a>.
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-nav">
+            <button type="button" class="btn-outline" onclick="goPrev()">← Précédent</button>
+            <button type="submit" class="btn-accent">Envoyer ma demande →</button>
+          </div>
+          <p class="form-disclaimer">
+            Aucun paiement requis maintenant. Vous validerez le devis avant de payer.
+          </p>
+
+        </div>
+
+        <!-- ── Colonne droite : récapitulatif prix ── -->
+        <div>
+          <div class="price-summary" id="priceSummary" aria-live="polite" aria-label="Récapitulatif du prix">
+            <div class="price-summary-title">📋 Votre devis estimé</div>
+            <div id="priceSummaryContent">
+              <div class="price-empty">← Choisissez une formule pour voir votre devis</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /step 6 -->
+
+  </form>
+</div>
+
+<!-- ══════════════════════ FOOTER ══════════════════════ -->
+<footer class="footer" aria-label="Pied de page">
+  <div class="container">
+    <div class="footer-bottom" style="border-top:none;padding-top:0;">
+      <span>© 2025 SiteForge — Tous droits réservés</span>
+      <a href="mentions-legales.html">Mentions légales</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ════════════════════════════════════════
+   THEME
+════════════════════════════════════════ */
+const themeToggle = document.getElementById('themeToggle');
+const html = document.documentElement;
+const applyTheme = (t) => {
+  html.setAttribute('data-theme', t);
+  localStorage.setItem('siteforge-theme', t);
+  themeToggle.textContent = t === 'dark' ? '☀️' : '🌙';
+  themeToggle.setAttribute('aria-label', t === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre');
+};
+applyTheme(localStorage.getItem('siteforge-theme') || 'light');
+themeToggle.addEventListener('click', () => {
+  applyTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+});
+
+/* ════════════════════════════════════════
+   MULTI-ÉTAPES
+════════════════════════════════════════ */
+let currentStep = 1;
+const totalSteps = 6;
+
+function updateProgress() {
+  document.getElementById('progressFill').style.width = ((currentStep / totalSteps) * 100) + '%';
+  document.getElementById('progressLabel').textContent = 'Étape ' + currentStep + ' sur ' + totalSteps;
+}
+
+function validateStep(stepNum) {
+  const stepEl = document.querySelector('.form-step[data-step="' + stepNum + '"]');
+  const required = stepEl.querySelectorAll('[required]');
+  let valid = true;
+  const checkedRadioGroups = new Set();
+
+  required.forEach(el => {
+    if (el.type === 'radio') {
+      if (checkedRadioGroups.has(el.name)) return;
+      checkedRadioGroups.add(el.name);
+      const checked = stepEl.querySelector('input[name="' + el.name + '"]:checked');
+      const container = el.closest('.radio-group, .form-group');
+      if (!checked) { container?.classList.add('group-error'); valid = false; }
+      else { container?.classList.remove('group-error'); }
+      return;
+    }
+    if (el.type === 'checkbox') {
+      if (!el.checked) { el.closest('.checkbox-option')?.classList.add('group-error'); valid = false; }
+      else { el.closest('.checkbox-option')?.classList.remove('group-error'); }
+      return;
+    }
+    if (!el.value.trim()) { el.classList.add('field-error'); valid = false; }
+    else { el.classList.remove('field-error'); }
+  });
+  return valid;
+}
+
+function goNext() {
+  if (!validateStep(currentStep)) {
+    const firstErr = document.querySelector('.form-step.active .field-error, .form-step.active .group-error');
+    if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  if (currentStep < totalSteps) {
+    document.querySelector('.form-step[data-step="' + currentStep + '"]').classList.remove('active');
+    currentStep++;
+    document.querySelector('.form-step[data-step="' + currentStep + '"]').classList.add('active');
+    updateProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function goPrev() {
+  if (currentStep > 1) {
+    document.querySelector('.form-step[data-step="' + currentStep + '"]').classList.remove('active');
+    currentStep--;
+    document.querySelector('.form-step[data-step="' + currentStep + '"]').classList.add('active');
+    updateProgress();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+document.querySelectorAll('input, textarea, select').forEach(el => {
+  el.addEventListener('input',  () => { el.classList.remove('field-error'); el.closest('.checkbox-option, .radio-group, .form-group')?.classList.remove('group-error'); });
+  el.addEventListener('change', () => { el.classList.remove('field-error'); el.closest('.checkbox-option, .radio-group, .form-group')?.classList.remove('group-error'); });
+});
+
+/* ════════════════════════════════════════
+   CONFIGURATEUR DE PRIX
+════════════════════════════════════════ */
+
+/* Options récurrentes communes à toutes les formules */
+const RECURRING_OPTIONS = [
+  {
+    id: 'hebergement',
+    label: 'Mise en ligne & hébergement',
+    sublabel: 'Déploiement, nom de domaine et SSL inclus',
+    price: 100,        // frais unique de mise en place
+    monthly: 20,       // 20 €/mois
+  },
+  {
+    id: 'maintenance',
+    label: 'Maintenance mensuelle',
+    sublabel: '5 modifications/mois incluses + mises à jour',
+    price: 0,          // pas de frais de mise en place
+    monthly: 49.99,    // 49,99 €/mois
+  },
+];
+
+const FORMULAS = {
+  essentiel: {
+    name: 'Essentiel',
+    basePrice: 149,
+    includedPages: 1,
+    maxPages: 3,
+    extraPagePrice: 45,
+    included: [
+      'Design personnalisé',
+      'Site mobile-ready',
+      'SEO de base',
+      'Formulaire de contact',
+      'Livraison en 72h',
+    ],
+    options: [
+      { id: 'seo_avance',   label: 'SEO avancé (balises, schema, sitemap)', price: 30 },
+      { id: 'galerie',      label: 'Galerie photos',                          price: 35 },
+      { id: 'google_maps',  label: 'Intégration Google Maps',                 price: 20 },
+      { id: 'temoignages',  label: 'Section témoignages clients',             price: 25 },
+      { id: 'whatsapp',     label: 'Widget WhatsApp / bouton flottant',       price: 15 },
+    ],
+  },
+  professionnel: {
+    name: 'Professionnel',
+    basePrice: 249,
+    includedPages: 3,
+    maxPages: 5,
+    extraPagePrice: 40,
+    included: [
+      'Design personnalisé',
+      'Site mobile-ready',
+      'SEO avancé',
+      'Formulaire de contact',
+      'Intégration Google Maps',
+      'Section témoignages',
+      'Livraison en 72h',
+    ],
+    options: [
+      { id: 'galerie',      label: 'Galerie photos',                          price: 35 },
+      { id: 'blog',         label: 'Blog / actualités',                       price: 60 },
+      { id: 'animations',   label: 'Animations et transitions premium',       price: 50 },
+      { id: 'multilingue',  label: 'Version bilingue FR / EN',                price: 90 },
+      { id: 'whatsapp',     label: 'Widget WhatsApp / bouton flottant',       price: 15 },
+      { id: 'catalogue',    label: 'Page catalogue produits / tarifs',        price: 55 },
+    ],
+  },
+  premium: {
+    name: 'Premium',
+    basePrice: 399,
+    includedPages: 5,
+    maxPages: 8,
+    extraPagePrice: 35,
+    included: [
+      'Design personnalisé',
+      'Site mobile-ready',
+      'SEO premium complet',
+      'Formulaire de contact',
+      'Google Maps + avis Google',
+      'Blog ou galerie photo',
+      'Animations avancées',
+      'Section témoignages',
+      'Livraison en 72h',
+    ],
+    options: [
+      { id: 'multilingue',  label: 'Version bilingue FR / EN',                price: 80 },
+      { id: 'catalogue',    label: 'Page catalogue produits / tarifs',        price: 45 },
+      { id: 'reservation',  label: 'Formulaire de réservation en ligne',      price: 60 },
+      { id: 'newsletter',   label: 'Intégration newsletter (Mailchimp…)',      price: 40 },
+      { id: 'whatsapp',     label: 'Widget WhatsApp / bouton flottant',       price: 15 },
+    ],
+  },
+};
+
+let currentFormula = null;
+let currentPages   = 1;
+let checkedOptions = {};
+
+function selectFormula(key) {
+  currentFormula = key;
+  const f = FORMULAS[key];
+
+  // Update card UI
+  document.querySelectorAll('.formula-card').forEach(c => {
+    c.classList.remove('selected');
+    c.setAttribute('aria-pressed', 'false');
+  });
+  const card = document.getElementById('fc-' + key);
+  card.classList.add('selected');
+  card.setAttribute('aria-pressed', 'true');
+
+  // Reset page counter to included pages
+  currentPages = f.includedPages;
+  checkedOptions = {};
+
+  renderOptionsPanel(f);
+  updateSummary();
+}
+
+function renderOptionsPanel(f) {
+  const panel = document.getElementById('optionsPanel');
+  panel.classList.add('visible');
+
+  // Page counter
+  document.getElementById('pageCounterVal').textContent = currentPages;
+  document.getElementById('pageCounterSub').textContent =
+    'Pages incluses : ' + f.includedPages + ' · Supp. : +' + f.extraPagePrice + ' € / page (max ' + f.maxPages + ')';
+  updatePageBtns(f);
+
+  // Options list
+  const list = document.getElementById('optionsList');
+  list.innerHTML = '';
+
+  // Included features (read-only)
+  f.included.forEach(label => {
+    const item = document.createElement('div');
+    item.className = 'option-item included';
+    item.innerHTML =
+      '<input type="checkbox" checked disabled aria-label="' + label + ' (inclus)">' +
+      '<span class="option-item-text"><span class="option-item-name">' + label + '</span></span>' +
+      '<span class="option-item-price">Inclus</span>';
+    list.appendChild(item);
+  });
+
+  // Separator
+  if (f.options.length) {
+    const sep = document.createElement('div');
+    sep.style.cssText = 'height:1px;background:var(--border);margin:8px 0;';
+    list.appendChild(sep);
+    const addLabel = document.createElement('div');
+    addLabel.className = 'options-title';
+    addLabel.style.marginTop = '8px';
+    addLabel.textContent = 'Ajouter des options';
+    list.appendChild(addLabel);
+  }
+
+  // Payable options (one-time)
+  f.options.forEach(opt => {
+    list.appendChild(buildOptionItem(opt));
+  });
+
+  // ── Section services récurrents ──
+  const sectionHdr = document.createElement('div');
+  sectionHdr.className = 'services-section-header';
+  sectionHdr.innerHTML = '<span>🔄 Services optionnels récurrents</span>';
+  list.appendChild(sectionHdr);
+
+  RECURRING_OPTIONS.forEach(opt => {
+    list.appendChild(buildOptionItem(opt));
+  });
+}
+
+function buildOptionItem(opt) {
+  const item = document.createElement('label');
+  item.className = 'option-item';
+  item.htmlFor = 'opt-' + opt.id;
+
+  // Prix affiché
+  let priceHtml = '';
+  const isRecurring = (opt.monthly !== undefined);
+  if (isRecurring) {
+    const setupStr = opt.price > 0 ? '+' + opt.price + ' €&nbsp;<span class="option-item-price-monthly">+ ' + opt.monthly.toFixed(2).replace('.', ',') + ' €/mois</span>' : '<span class="option-item-price-monthly">' + opt.monthly.toFixed(2).replace('.', ',') + ' €/mois</span>';
+    priceHtml = '<span class="option-item-price-wrap">' + setupStr + '</span>';
+  } else {
+    priceHtml = '<span class="option-item-price">+' + opt.price + ' €</span>';
+  }
+
+  const sublabelHtml = opt.sublabel
+    ? '<span class="option-item-sublabel">' + opt.sublabel + '</span>'
+    : '';
+
+  item.innerHTML =
+    '<input type="checkbox" id="opt-' + opt.id + '">' +
+    '<span class="option-item-text"><span class="option-item-name">' + opt.label + '</span>' + sublabelHtml + '</span>' +
+    priceHtml;
+
+  const cb = item.querySelector('input');
+  cb.addEventListener('change', () => {
+    checkedOptions[opt.id] = cb.checked ? opt : null;
+    item.classList.toggle('checked', cb.checked);
+    updateSummary();
+  });
+  return item;
+}
+
+function updatePageBtns(f) {
+  const f2 = f || FORMULAS[currentFormula];
+  document.getElementById('pageDecrBtn').disabled = currentPages <= f2.includedPages;
+  document.getElementById('pageIncrBtn').disabled = currentPages >= f2.maxPages;
+  document.getElementById('pageCounterVal').textContent = currentPages;
+}
+
+function changePage(delta) {
+  if (!currentFormula) return;
+  const f = FORMULAS[currentFormula];
+  currentPages = Math.min(f.maxPages, Math.max(f.includedPages, currentPages + delta));
+  updatePageBtns(f);
+  updateSummary();
+}
+
+function updateSummary() {
+  if (!currentFormula) return;
+  const f = FORMULAS[currentFormula];
+  const extraPages    = currentPages - f.includedPages;
+  const extraPageCost = extraPages * f.extraPagePrice;
+
+  const selectedOpts  = Object.values(checkedOptions).filter(Boolean);
+
+  // Séparer options one-time et récurrentes
+  const oneTimeOpts   = selectedOpts.filter(o => !o.monthly);
+  const recurringOpts = selectedOpts.filter(o => o.monthly !== undefined);
+
+  const oneTimeCost   = f.basePrice + extraPageCost + oneTimeOpts.reduce((s, o) => s + o.price, 0)
+                        + recurringOpts.reduce((s, o) => s + (o.price || 0), 0);
+  const monthlyCost   = recurringOpts.reduce((s, o) => s + o.monthly, 0);
+
+  // Update hidden fields
+  document.getElementById('hiddenFormule').value   = f.name;
+  document.getElementById('hiddenPages').value     = currentPages;
+  document.getElementById('hiddenPrixTotal').value =
+    oneTimeCost + ' €' + (monthlyCost > 0 ? ' + ' + monthlyCost.toFixed(2).replace('.', ',') + ' €/mois' : '');
+  document.getElementById('hiddenOptions').value   = selectedOpts.map(o => {
+    let s = o.label;
+    if (o.price)    s += ' (+' + o.price + '€)';
+    if (o.monthly)  s += ' (+' + o.monthly.toFixed(2).replace('.', ',') + '€/mois)';
+    return s;
+  }).join(', ') || 'Aucune';
+
+  // ── Render summary ──
+  let html = '';
+
+  // Section one-time
+  html += '<div class="price-section-label">Paiement unique</div>';
+  html += '<div class="price-lines">';
+  html += '<div class="price-line"><span>' + f.name + ' (' + f.includedPages + ' page' + (f.includedPages > 1 ? 's' : '') + ')</span><span>' + f.basePrice + ' €</span></div>';
+
+  if (extraPages > 0) {
+    html += '<div class="price-line extra"><span>+ ' + extraPages + ' page' + (extraPages > 1 ? 's' : '') + ' supp.</span><span>' + extraPageCost + ' €</span></div>';
+  }
+  oneTimeOpts.forEach(o => {
+    html += '<div class="price-line extra"><span>+ ' + o.label + '</span><span>' + o.price + ' €</span></div>';
+  });
+  recurringOpts.forEach(o => {
+    if (o.price > 0) {
+      html += '<div class="price-line extra"><span>+ ' + o.label + ' (mise en place)</span><span>' + o.price + ' €</span></div>';
+    }
+  });
+  html += '</div>';
+
+  html += '<hr class="price-divider">';
+  html += '<div class="price-total-row">';
+  html += '<span class="price-total-label">TOTAL UNIQUE</span>';
+  html += '<span class="price-total-val">' + oneTimeCost + ' €</span>';
+  html += '</div>';
+  html += '<p class="price-note">Paiement après validation de l\'aperçu · révisions incluses</p>';
+
+  // Section mensuelle (si options récurrentes sélectionnées)
+  if (recurringOpts.length > 0) {
+    html += '<div class="price-monthly-block">';
+    html += '<div class="price-section-label" style="margin-top:0;">Abonnement mensuel</div>';
+    html += '<div class="price-lines">';
+    recurringOpts.forEach(o => {
+      html += '<div class="price-line extra"><span>' + o.label + '</span><span>' + o.monthly.toFixed(2).replace('.', ',') + ' €/mois</span></div>';
+    });
+    html += '</div>';
+    html += '<div class="price-monthly-total-row">';
+    html += '<span class="price-monthly-total-label">TOTAL / MOIS</span>';
+    html += '<span class="price-monthly-total-val">' + monthlyCost.toFixed(2).replace('.', ',') + ' €</span>';
+    html += '</div>';
+    html += '<p class="price-note" style="margin-top:8px;">Résiliable à tout moment · sans engagement</p>';
+    html += '</div>';
+  }
+
+  document.getElementById('priceSummaryContent').innerHTML = html;
+}
+
+/* ════════════════════════════════════════
+   REDIRECTION VERS L'ÉDITEUR
+════════════════════════════════════════ */
+document.getElementById('questionnaireForm').addEventListener('submit', function() {
+  const name    = (document.getElementById('nom_entreprise').value || '').trim();
+  const tagline = (document.getElementById('metier').value || '').trim();
+  const couleurs = (document.getElementById('couleurs').value || '').trim();
+
+  // Tenter d'extraire une couleur hex dans le champ couleurs, sinon valeur par défaut
+  const hexMatch = couleurs.match(/#([0-9a-fA-F]{3,6})\b/);
+  const color = hexMatch ? hexMatch[0] : '#2563eb';
+
+  const params = new URLSearchParams();
+  if (name)    params.set('name', name);
+  if (tagline) params.set('tagline', tagline);
+  params.set('color', color);
+
+  // Mettre à jour le champ _next pour que FormSubmit redirige vers l'éditeur
+  var nextInput = document.querySelector('input[name="_next"]');
+  if (nextInput) {
+    nextInput.value = 'https://siteforge.fr/editeur-apercu.html?' + params.toString();
+  }
+});
+
+// Keyboard accessibility for formula cards
+document.querySelectorAll('.formula-card').forEach(card => {
+  card.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      card.click();
+    }
+  });
+});
+</script>
+</body>
+</html>

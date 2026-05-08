@@ -1,0 +1,26 @@
+.DS_Store
+Thumbs.db
+node_modules/
+.env
+.env.local
+.env.*.local
+.vercel
+dist/
+build/
+*.log
+
+# IDEs
+.idea/
+.vscode/
+
+# OS
+*.swp
+.AppleDouble
+.LSOverride
+
+# Per-app build artifacts
+**/android/
+**/dist-mobile/
+**/*.dmg
+**/*.exe
+**/*.AppImage
