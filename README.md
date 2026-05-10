@@ -1,10 +1,10 @@
 # Openfeat
 
-Hub regroupant 8 apps web sous un seul déploiement Vercel.
+Hub regroupant 10 apps web sous un seul déploiement Vercel.
 
 | Path | App | Tech | Description |
 |---|---|---|---|
-| [`/`](./index.html) | **Hub** | static | Page d'accueil avec liens vers les 8 apps |
+| [`/`](./index.html) | **Hub** | static | Page d'accueil avec liens vers les 10 apps |
 | [`/alpha-terminal/`](./alpha-terminal/) | **Alpha Terminal** | PWA · BYOK | Terminal d'analyse financière IA, 46+ modules, 14 LLMs au choix |
 | [`/motion/`](./motion/) | **Motion · Pace** | PWA | Tracker running (allure, splits, GPS, météo, hors-ligne) |
 | [`/video/`](./video/) | **Montage AI** | PWA · ffmpeg.wasm | Pubs vidéo verticales générées dans le navigateur |
@@ -13,6 +13,8 @@ Hub regroupant 8 apps web sous un seul déploiement Vercel.
 | [`/entrepreneuros/`](./entrepreneuros/) | **EntrepreneurOS** | landing | Page de présentation de l'app desktop |
 | [`/goat-fuel/`](./goat-fuel/) | **GOAT FUEL** | static · offline | Générateur de screenshots Play Store / App Store |
 | [`/sitecraft/`](./sitecraft/) | **SiteCraft** | landing/service | Service de création de sites web pour artisans/indépendants |
+| [`/audit/`](./audit/) | **ConvertAudit** | static · BYOK | Audit IA de landing page (8 dimensions, score 0-100, plan d'action) |
+| [`/devis/`](./devis/) | **SmartDevis Pro** | static · local-first | Génération devis / factures / acomptes, catalogue, historique, dashboard |
 
 ## Architecture
 
@@ -65,6 +67,12 @@ Initialement Electron, **convertie en web BYOK** :
 
 ### EntrepreneurOS
 Landing page seulement. L'app réelle est Electron (.dmg / .exe) — uploader les binaires sur GitHub Releases et linker depuis `entrepreneuros/index.html`.
+
+### ConvertAudit (`/audit/`)
+À l'origine déployée standalone sur `convertaudit.app`. Ses chemins absolus (`/favicon.png`, `/analyse.html`, `/manifest.json`…) ont été préfixés `/audit/` pour fonctionner sous le sous-chemin du hub. `audit/vercel.json` et `audit/_redirects` sont conservés à titre documentaire (non lus par Vercel — seul le `vercel.json` racine l'est).
+
+### SmartDevis Pro (`/devis/`)
+Initialement Electron (SmartDevis Pro v4.0). Seul `index.html` (web) est conservé ici — le bundle Mac (Frameworks/, MacOS/, Resources/, Info.plist) a été retiré : binaires >100 Mo non-pushables sur GitHub. Pour distribuer la version desktop, uploader le `.dmg` sur GitHub Releases et linker depuis ici.
 
 ## License
 

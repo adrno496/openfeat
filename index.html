@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#08090c">
-<meta name="description" content="Openfeat — Hub regroupant 6 apps IA/web : analyse financière, tracker running, montage vidéo, marketing, génération CGV, suite entrepreneur.">
+<meta name="description" content="Openfeat — Hub regroupant 10 apps IA/web : analyse financière, tracker running, montage vidéo, marketing, génération CGV, suite entrepreneur, audit landing, devis.">
 <meta name="robots" content="index,follow">
-<title>Openfeat — 6 apps web</title>
+<title>Openfeat — 10 apps web</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
@@ -185,6 +185,8 @@
   .card[data-app="entr"]     { --card-grad: linear-gradient(135deg,#3d2c0d,#000); --icon-bg: rgba(240,180,108,0.14); --icon-fg: #f0b46c; }
   .card[data-app="goat"]     { --card-grad: linear-gradient(135deg,#0d3d2c,#000); --icon-bg: rgba(108,240,180,0.14); --icon-fg: #6cf0b4; }
   .card[data-app="site"]     { --card-grad: linear-gradient(135deg,#1d2a3d,#000); --icon-bg: rgba(140,200,255,0.14); --icon-fg: #8cc8ff; }
+  .card[data-app="audit"]    { --card-grad: linear-gradient(135deg,#0d3a36,#000); --icon-bg: rgba(10,132,120,0.18); --icon-fg: #2ecdb6; }
+  .card[data-app="devis"]    { --card-grad: linear-gradient(135deg,#1f1840,#000); --icon-bg: rgba(108,99,255,0.16); --icon-fg: #8d85ff; }
 
   footer {
     margin-top: 64px;
@@ -207,10 +209,10 @@
     <div class="brand-row">
       <div class="brand-logo">O</div>
       <div class="brand-name">Openfeat</div>
-      <div class="brand-tag">v1.0 · 8 apps</div>
+      <div class="brand-tag">v1.1 · 10 apps</div>
     </div>
-    <h1 class="title">Huit apps web<br>en <em>un seul endroit</em>.</h1>
-    <p class="subtitle">Hub regroupant les apps construites — finance, sport, vidéo, marketing, juridique, entrepreneuriat, screenshots, sites web. Toutes accessibles directement depuis ce site.</p>
+    <h1 class="title">Dix apps web<br>en <em>un seul endroit</em>.</h1>
+    <p class="subtitle">Hub regroupant les apps construites — finance, sport, vidéo, marketing, juridique, entrepreneuriat, screenshots, sites web, audit conversion, devis. Toutes accessibles directement depuis ce site.</p>
   </header>
 
   <main class="grid">
@@ -300,6 +302,28 @@
       <div class="card-footer">
         <div class="card-tags"><span class="tag">service</span><span class="tag">72h</span></div>
         <span class="card-cta">Voir →</span>
+      </div>
+    </a>
+
+    <a class="card" href="./audit/" data-app="audit">
+      <div class="card-icon">◎</div>
+      <p class="card-meta">AUDIT LANDING · BYOK</p>
+      <h2 class="card-title">ConvertAudit</h2>
+      <p class="card-desc">Audit IA d'une landing page en 30s. Score 0-100 sur 8 dimensions de conversion (Hero, CTA, copywriting…), plan d'action priorisé, rapport HTML téléchargeable.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">BYOK</span><span class="tag">FR · EN</span></div>
+        <span class="card-cta">Ouvrir →</span>
+      </div>
+    </a>
+
+    <a class="card" href="./devis/" data-app="devis">
+      <div class="card-icon">⚡</div>
+      <p class="card-meta">DEVIS · FACTURES · LOCAL</p>
+      <h2 class="card-title">SmartDevis Pro</h2>
+      <p class="card-desc">Génération de devis, factures et acomptes. Catalogue articles, historique, dashboard. App web mono-page, données stockées en local dans le navigateur.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">local</span><span class="tag">PDF</span></div>
+        <span class="card-cta">Ouvrir →</span>
       </div>
     </a>
 

@@ -1,0 +1,4364 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="SmartDevis Pro — Génère devis, factures et acomptes en quelques clics. Catalogue articles, historique, dashboard. 100% local-first.">
+<title>SmartDevis Pro — Devis & factures</title>
+<style>
+/* ============================================================
+   DESIGN SYSTEM — CSS CUSTOM PROPERTIES
+   ============================================================ */
+:root {
+  --bg-global: #0A0A0F;
+  --bg-card: #111118;
+  --bg-card-hover: #16161F;
+  --border: #1E1E2E;
+  --border-light: #2A2A3A;
+  --accent: #6C63FF;
+  --accent-hover: #7B73FF;
+  --accent-glow: rgba(108,99,255,0.15);
+  --success: #22C55E;
+  --danger: #EF4444;
+  --warning: #F59E0B;
+  --info: #3B82F6;
+  --text: #F1F0FF;
+  --text-secondary: #8B8AA0;
+  --text-muted: #5A596E;
+  --sidebar-width: 260px;
+  --radius: 14px;
+  --radius-sm: 8px;
+  --transition: 0.18s ease;
+}
+[data-theme="light"] {
+  --bg-global: #F5F5F8;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #F0F0F5;
+  --border: #E2E2EE;
+  --border-light: #D0D0E0;
+  --text: #111118;
+  --text-secondary: #555566;
+  --text-muted: #888899;
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 15px; }
+body {
+  font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg-global);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background var(--transition), color var(--transition);
+}
+a { color: var(--accent); text-decoration: none; }
+button { cursor: pointer; font-family: inherit; }
+input, select, textarea {
+  font-family: inherit;
+  font-size: 0.9rem;
+  background: var(--bg-global);
+  color: var(--text);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.75rem;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  outline: none;
+  width: 100%;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+textarea { resize: vertical; min-height: 80px; }
+label { font-size: 0.82rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px; }
+fieldset { border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1.25rem; }
+legend { font-weight: 700; font-size: 0.9rem; padding: 0 0.5rem; color: var(--text); }
+select option { background: var(--bg-card); }
+hr { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
+
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+#sidebar {
+  position: fixed;
+  left: 0; top: 0; bottom: 0;
+  width: var(--sidebar-width);
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  transition: transform var(--transition);
+}
+.sidebar-brand {
+  padding: 1.5rem 1.25rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-brand h1 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+.sidebar-brand .tagline {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.config-bar-wrap { margin-top: 0.75rem; }
+.config-bar-label { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 4px; display: flex; justify-content: space-between; }
+.config-bar-track {
+  height: 4px; background: var(--border-light); border-radius: 2px; overflow: hidden;
+}
+.config-bar-fill {
+  height: 100%; background: var(--success); border-radius: 2px; transition: width 0.4s ease;
+}
+.sidebar-nav { flex: 1; padding: 0.75rem 0.75rem; overflow-y: auto; }
+.nav-item {
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+  user-select: none;
+  margin-bottom: 2px;
+}
+.nav-item:hover { background: var(--border); color: var(--text); }
+.nav-item.active { background: var(--accent-glow); color: var(--accent); border: 1px solid rgba(108,99,255,0.25); }
+.nav-item .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+.sidebar-footer {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 0.5rem;
+}
+.btn-theme {
+  background: var(--border);
+  border: 1px solid var(--border-light);
+  color: var(--text-secondary);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
+  width: 100%;
+  transition: background var(--transition), color var(--transition);
+}
+.btn-theme:hover { background: var(--border-light); color: var(--text); }
+.shortcuts-hint { font-size: 0.68rem; color: var(--text-muted); text-align: center; line-height: 1.5; }
+
+/* Hamburger (mobile) */
+#hamburger {
+  display: none;
+  position: fixed; top: 1rem; left: 1rem;
+  z-index: 200;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.65rem;
+  font-size: 1.1rem;
+  color: var(--text);
+}
+#sidebar-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 99;
+}
+
+/* ============================================================
+   MAIN CONTENT
+   ============================================================ */
+#main {
+  margin-left: var(--sidebar-width);
+  padding: 2rem 2rem 4rem;
+  min-height: 100vh;
+}
+.tab-pane { display: none; animation: fadeIn 0.22s ease; }
+.tab-pane.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: none;
+  transition: background var(--transition), transform 0.1s, box-shadow var(--transition);
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent-hover); box-shadow: 0 4px 18px var(--accent-glow); }
+.btn-success { background: var(--success); color: #fff; }
+.btn-success:hover { background: #16a34a; }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-danger:hover { background: #dc2626; }
+.btn-warning { background: var(--warning); color: #000; }
+.btn-info { background: var(--info); color: #fff; }
+.btn-secondary {
+  background: transparent; color: var(--text-secondary);
+  border: 1px solid var(--border-light);
+}
+.btn-secondary:hover { background: var(--bg-card-hover); color: var(--text); }
+.btn-sm { padding: 0.3rem 0.65rem; font-size: 0.8rem; }
+.btn-xs { padding: 0.2rem 0.45rem; font-size: 0.72rem; }
+.btn-group { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+
+/* ============================================================
+   PAGE HEADER
+   ============================================================ */
+.page-header { margin-bottom: 1.75rem; }
+.page-header h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.25rem; }
+.page-header p { color: var(--text-secondary); font-size: 0.875rem; }
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  transition: background var(--transition), box-shadow var(--transition);
+}
+.card:hover { background: var(--bg-card-hover); box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+.card-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 1rem; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+
+/* ============================================================
+   FORM UTILS
+   ============================================================ */
+.form-group { margin-bottom: 0.85rem; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; }
+.form-hint { font-size: 0.72rem; color: var(--text-muted); margin-top: 3px; }
+.char-counter { font-size: 0.72rem; color: var(--text-muted); text-align: right; }
+.toggle-wrap { display: flex; align-items: center; gap: 0.75rem; }
+.toggle {
+  position: relative; width: 40px; height: 22px;
+  display: inline-block; flex-shrink: 0;
+}
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; cursor: pointer; inset: 0;
+  background: var(--border-light); border-radius: 11px;
+  transition: background 0.2s;
+}
+.toggle-slider::before {
+  content: ''; position: absolute;
+  width: 16px; height: 16px; border-radius: 50%;
+  left: 3px; top: 3px;
+  background: #fff;
+  transition: transform 0.2s;
+}
+.toggle input:checked + .toggle-slider { background: var(--accent); }
+.toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
+.toggle-label { font-size: 0.875rem; font-weight: 500; color: var(--text-secondary); }
+.slider-wrap { display: flex; align-items: center; gap: 0.75rem; }
+.slider-wrap input[type="range"] {
+  flex: 1; padding: 0; border: none; background: transparent; box-shadow: none;
+  accent-color: var(--accent);
+}
+.slider-val { font-size: 0.85rem; font-weight: 700; color: var(--accent); min-width: 40px; text-align: right; }
+.conditional { display: none; }
+.conditional.visible { display: block; }
+
+/* ============================================================
+   BADGES & PILLS
+   ============================================================ */
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 0.15rem 0.5rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.badge-brouillon { background: rgba(90,89,110,0.2); color: var(--text-muted); }
+.badge-envoye { background: rgba(59,130,246,0.15); color: var(--info); }
+.badge-en_attente { background: rgba(245,158,11,0.15); color: var(--warning); }
+.badge-accepte { background: rgba(34,197,94,0.1); color: #4ade80; }
+.badge-facture { background: rgba(34,197,94,0.15); color: var(--success); }
+.badge-paye { background: rgba(34,197,94,0.25); color: #16a34a; }
+.badge-refuse { background: rgba(239,68,68,0.15); color: var(--danger); }
+.badge-expire { background: rgba(75,75,75,0.2); color: var(--text-muted); }
+.badge-devis { background: rgba(108,99,255,0.15); color: var(--accent); }
+.badge-facture-type { background: rgba(34,197,94,0.15); color: var(--success); }
+.badge-avoir { background: rgba(245,158,11,0.15); color: var(--warning); }
+.pill-filter {
+  padding: 0.3rem 0.85rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid var(--border-light);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.pill-filter.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.pill-filter:hover:not(.active) { background: var(--bg-card-hover); color: var(--text); }
+
+/* ============================================================
+   KPI CARDS
+   ============================================================ */
+.kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow var(--transition);
+}
+.kpi-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.2); }
+.kpi-label { font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.5rem; }
+.kpi-value { font-size: 1.75rem; font-weight: 800; color: var(--text); }
+.kpi-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.25rem; }
+.kpi-variation { font-size: 0.78rem; font-weight: 600; margin-top: 0.25rem; }
+.kpi-variation.up { color: var(--success); }
+.kpi-variation.down { color: var(--danger); }
+.kpi-icon {
+  position: absolute; right: 1rem; top: 1rem;
+  font-size: 1.75rem; opacity: 0.12;
+}
+
+/* ============================================================
+   TABLE
+   ============================================================ */
+.table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+thead { background: var(--bg-card); }
+th { padding: 0.65rem 0.75rem; text-align: left; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); white-space: nowrap; }
+td { padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: var(--bg-card-hover); }
+tbody tr.row-titre { background: var(--border); }
+tbody tr.row-titre td { font-weight: 700; font-size: 0.9rem; color: var(--text); }
+tbody tr.row-soustotal td { background: var(--accent-glow); font-weight: 700; color: var(--accent); }
+tbody tr:nth-child(even):not(.row-titre):not(.row-soustotal) { background: rgba(255,255,255,0.02); }
+.lines-table input, .lines-table select {
+  padding: 0.3rem 0.4rem; font-size: 0.8rem;
+  border-radius: 4px; min-width: 0;
+}
+
+/* ============================================================
+   STEPPER
+   ============================================================ */
+.stepper {
+  display: flex; gap: 0; margin-bottom: 2rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  padding: 0.75rem 1rem;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+}
+.step-item {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-size: 0.875rem; font-weight: 600;
+  color: var(--text-muted);
+  transition: color var(--transition);
+}
+.step-item.active { color: var(--accent); }
+.step-item.done { color: var(--success); }
+.step-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; font-weight: 700;
+  flex-shrink: 0;
+}
+.step-item.active .step-num { background: var(--accent); color: #fff; }
+.step-item.done .step-num { background: var(--success); color: #fff; }
+.step-sep { color: var(--border-light); font-size: 1.2rem; }
+
+/* ============================================================
+   DOCUMENT LINES TABLE
+   ============================================================ */
+.lines-wrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 1rem; }
+.lines-actions { padding: 0.75rem 1rem; border-top: 1px solid var(--border); display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+/* Sticky summary */
+.devis-layout { display: grid; grid-template-columns: 1fr 300px; gap: 1.5rem; align-items: start; }
+.summary-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  position: sticky; top: 1rem;
+}
+.summary-row { display: flex; justify-content: space-between; padding: 0.4rem 0; font-size: 0.875rem; }
+.summary-row.total { font-weight: 700; font-size: 1rem; border-top: 2px solid var(--border-light); margin-top: 0.25rem; padding-top: 0.5rem; }
+.summary-row.grand-total { font-weight: 800; font-size: 1.15rem; border-top: 3px double var(--border-light); color: var(--accent); }
+.summary-sep { border: none; border-top: 1px solid var(--border); margin: 0.4rem 0; }
+.summary-label { color: var(--text-secondary); }
+.summary-value { font-weight: 600; text-align: right; }
+
+/* ============================================================
+   CATALOGUE GRID
+   ============================================================ */
+.cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; }
+.cat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  transition: all var(--transition);
+  animation: fadeIn 0.22s ease;
+}
+.cat-card:hover { background: var(--bg-card-hover); box-shadow: 0 4px 20px rgba(0,0,0,0.15); transform: translateY(-2px); }
+.cat-card-title { font-weight: 700; margin-bottom: 0.25rem; }
+.cat-card-desc { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem; line-height: 1.4; }
+.cat-card-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+.cat-card-price { font-size: 1.1rem; font-weight: 800; color: var(--accent); }
+.cat-card-unit { font-size: 0.75rem; color: var(--text-muted); }
+.cat-card-actions { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+
+/* ============================================================
+   HISTORY CARDS
+   ============================================================ */
+.history-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  display: flex; align-items: center; gap: 1rem;
+  transition: all var(--transition);
+  animation: slideIn 0.2s ease;
+}
+@keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+.history-card:hover { background: var(--bg-card-hover); box-shadow: 0 3px 15px rgba(0,0,0,0.12); }
+.history-card-info { flex: 1; min-width: 0; }
+.history-card-num { font-weight: 700; font-size: 0.95rem; }
+.history-card-client { font-size: 0.82rem; color: var(--text-secondary); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.history-card-date { font-size: 0.78rem; color: var(--text-muted); }
+.history-card-amount { text-align: right; flex-shrink: 0; }
+.history-card-amount .amount { font-size: 1.05rem; font-weight: 800; }
+.history-card-amount .ttc-label { font-size: 0.7rem; color: var(--text-muted); }
+.history-card-actions { display: flex; gap: 0.3rem; flex-wrap: wrap; justify-content: flex-end; flex-shrink: 0; }
+.history-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.history-card:nth-child(1) { animation-delay: 0s; }
+.history-card:nth-child(2) { animation-delay: 0.04s; }
+.history-card:nth-child(3) { animation-delay: 0.08s; }
+.history-card:nth-child(4) { animation-delay: 0.12s; }
+.history-card:nth-child(5) { animation-delay: 0.16s; }
+
+/* ============================================================
+   MODALS
+   ============================================================ */
+.modal-backdrop {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.modal-backdrop.open { display: flex; }
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  width: 100%; max-width: 640px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalIn 0.2s ease;
+  position: relative;
+}
+.modal-lg { max-width: 900px; }
+.modal-xl { max-width: 1100px; }
+@keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(-10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+.modal-header {
+  padding: 1.25rem 1.5rem 1rem;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; background: var(--bg-card); z-index: 1;
+}
+.modal-title { font-size: 1.05rem; font-weight: 700; }
+.modal-close {
+  background: transparent; border: none; color: var(--text-muted);
+  font-size: 1.3rem; line-height: 1; padding: 0.2rem 0.4rem;
+  border-radius: 4px; transition: color var(--transition), background var(--transition);
+}
+.modal-close:hover { background: var(--border); color: var(--text); }
+.modal-body { padding: 1.25rem 1.5rem; }
+.modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: flex-end; gap: 0.5rem;
+  position: sticky; bottom: 0; background: var(--bg-card);
+}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+#toast-container {
+  position: fixed; bottom: 1.5rem; right: 1.5rem;
+  z-index: 9999;
+  display: flex; flex-direction: column; gap: 0.5rem;
+}
+.toast {
+  padding: 0.75rem 1.1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #fff;
+  min-width: 240px;
+  max-width: 360px;
+  animation: toastIn 0.2s ease, toastOut 0.2s ease 2.8s forwards;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.toast-success { background: var(--success); }
+.toast-error { background: var(--danger); }
+.toast-info { background: var(--info); }
+.toast-warning { background: var(--warning); color: #000; }
+@keyframes toastIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateX(20px); } }
+
+/* ============================================================
+   DRAFT BANNER
+   ============================================================ */
+#draft-banner {
+  background: linear-gradient(135deg, rgba(108,99,255,0.15), rgba(108,99,255,0.05));
+  border: 1px solid rgba(108,99,255,0.3);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+#draft-banner p { font-size: 0.875rem; font-weight: 600; color: var(--accent); }
+
+/* ============================================================
+   ONBOARDING
+   ============================================================ */
+#onboarding-modal .modal { max-width: 520px; }
+.onboarding-step { text-align: center; padding: 0.5rem 0; }
+.onboarding-icon { font-size: 3rem; margin-bottom: 1rem; }
+.onboarding-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem; }
+.onboarding-sub { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem; }
+.onboarding-steps-dots { display: flex; justify-content: center; gap: 0.4rem; margin-top: 1rem; }
+.onboarding-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--border-light); transition: background 0.2s;
+}
+.onboarding-dot.active { background: var(--accent); }
+
+/* ============================================================
+   LOGO UPLOAD
+   ============================================================ */
+.logo-upload-area {
+  border: 2px dashed var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+}
+.logo-upload-area:hover { border-color: var(--accent); background: var(--accent-glow); }
+.logo-preview { max-height: 80px; max-width: 200px; object-fit: contain; margin: 0 auto; display: block; }
+
+/* ============================================================
+   NUMBER PREVIEW
+   ============================================================ */
+.num-preview {
+  font-size: 0.85rem; font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-glow);
+  border: 1px solid rgba(108,99,255,0.2);
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-sm);
+  margin-top: 0.5rem;
+  display: inline-block;
+}
+
+/* ============================================================
+   AUTOCOMPLETE
+   ============================================================ */
+.autocomplete-wrap { position: relative; }
+.autocomplete-dropdown {
+  position: absolute; top: 100%; left: 0; right: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  z-index: 300;
+  max-height: 200px;
+  overflow-y: auto;
+  display: none;
+}
+.autocomplete-dropdown.open { display: block; }
+.ac-item {
+  padding: 0.55rem 0.85rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background var(--transition);
+}
+.ac-item:hover { background: var(--bg-card-hover); }
+.ac-item strong { color: var(--accent); }
+
+/* ============================================================
+   SVG CHART
+   ============================================================ */
+.chart-container { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
+.chart-title { font-weight: 700; margin-bottom: 1rem; }
+#chart-svg-area { width: 100%; overflow: visible; }
+.chart-tooltip {
+  position: absolute;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 0.4rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  pointer-events: none;
+  display: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 10;
+}
+
+/* ============================================================
+   PRINT DOCUMENT
+   ============================================================ */
+.print-document {
+  display: none;
+  font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 11pt;
+  color: #111;
+  background: #fff;
+  padding: 15mm;
+  width: 210mm;
+  margin: 0 auto;
+}
+@media print {
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    width: auto !important;
+    height: auto !important;
+  }
+  body > * { display: none !important; }
+  #toast-container { display: none !important; }
+  .modal-backdrop { display: none !important; }
+  .print-document-active {
+    display: block !important;
+    position: static !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    width: auto !important;
+  }
+  .print-document-active .print-doc-wrap {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: auto !important;
+    margin: 0 !important;
+    padding: 10mm 15mm !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    page-break-inside: auto;
+  }
+  .print-document-active .print-doc-wrap * {
+    page-break-inside: avoid;
+  }
+  .print-document-active table {
+    page-break-inside: auto;
+  }
+  .print-document-active tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+}
+.print-doc-wrap {
+  font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 11pt;
+  color: #111;
+  background: #fff;
+  padding: 15mm;
+  width: 210mm;
+  min-height: 297mm;
+  box-shadow: 0 0 40px rgba(0,0,0,0.3);
+  border-radius: 4px;
+  margin: 0 auto;
+}
+.print-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8mm; gap: 1rem; }
+.print-company { flex: 1; }
+.print-company-name { font-size: 1.2rem; font-weight: 800; margin-bottom: 2px; }
+.print-company-statut { font-size: 0.8rem; color: #666; margin-bottom: 6px; }
+.print-company-detail { font-size: 0.78rem; color: #444; line-height: 1.6; }
+.print-doc-info { text-align: right; flex-shrink: 0; }
+.print-doc-type { font-size: 1.6rem; font-weight: 900; color: #6C63FF; text-transform: uppercase; letter-spacing: 0.04em; }
+.print-doc-num { font-size: 1rem; font-weight: 700; color: #333; margin-bottom: 6px; }
+.print-doc-dates { font-size: 0.78rem; color: #555; line-height: 1.6; }
+.print-client-block {
+  background: #F8F8FF;
+  border-left: 3px solid #6C63FF;
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-bottom: 8mm;
+}
+.print-client-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #6C63FF; letter-spacing: 0.08em; margin-bottom: 4px; }
+.print-client-name { font-size: 1rem; font-weight: 700; }
+.print-client-detail { font-size: 0.78rem; color: #555; line-height: 1.6; }
+.print-lines-table { width: 100%; border-collapse: collapse; margin-bottom: 6mm; font-size: 0.78rem; }
+.print-lines-table th { background: #6C63FF; color: #fff; padding: 5px 7px; text-align: left; font-weight: 700; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.print-lines-table td { padding: 5px 7px; border-bottom: 1px solid #eee; vertical-align: top; }
+.print-lines-table tr:nth-child(even) td { background: #F8F8FF; }
+.print-lines-table tr.row-t td { background: #F0F0F5; font-weight: 700; font-size: 0.8rem; padding: 6px 7px; }
+.print-lines-table tr.row-st td { background: #EEF; font-weight: 700; color: #6C63FF; }
+.print-lines-table td.num { text-align: right; }
+.print-lines-table td.center { text-align: center; }
+.print-totals { display: flex; justify-content: flex-end; margin-bottom: 6mm; }
+.print-totals-table { min-width: 260px; }
+.print-totals-table td { padding: 3px 6px; font-size: 0.82rem; }
+.print-totals-table tr.t-sep td { border-top: 1px solid #ddd; }
+.print-totals-table tr.t-total td { border-top: 2px solid #333; font-weight: 700; font-size: 0.9rem; }
+.print-totals-table tr.t-grand td { border-top: 3px double #6C63FF; font-weight: 900; font-size: 1rem; color: #6C63FF; }
+.print-totals-table td:first-child { color: #555; }
+.print-totals-table td:last-child { text-align: right; font-weight: 600; }
+.print-conditions { font-size: 0.75rem; color: #444; margin-bottom: 6mm; line-height: 1.6; }
+.print-conditions h4 { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #333; margin-bottom: 4px; }
+.print-footer { border-top: 1px solid #ddd; padding-top: 4mm; font-size: 0.7rem; color: #777; line-height: 1.6; }
+.print-sign { margin-top: 8mm; border: 1px solid #ddd; border-radius: 6px; padding: 10px 14px; }
+.print-sign-title { font-weight: 700; font-size: 0.8rem; margin-bottom: 6px; }
+.print-sign-box {
+  border: 1px dashed #aaa; height: 50mm; border-radius: 4px;
+  display: flex; align-items: flex-end; padding: 8px;
+  color: #999; font-size: 0.7rem;
+}
+.print-logo { max-height: 60px; max-width: 160px; object-fit: contain; margin-bottom: 6px; display: block; }
+
+/* ============================================================
+   CLIENT TABLE (config tab)
+   ============================================================ */
+.client-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0; border-bottom: 1px solid var(--border); }
+.client-row:last-child { border-bottom: none; }
+.client-row-info { flex: 1; }
+.client-row-name { font-weight: 600; font-size: 0.875rem; }
+.client-row-email { font-size: 0.78rem; color: var(--text-secondary); }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 768px) {
+  /* Sidebar → Bottom Navigation Bar */
+  #sidebar {
+    position: fixed;
+    bottom: 0; top: auto;
+    left: 0; right: 0;
+    width: 100%; height: 62px;
+    flex-direction: row;
+    border-top: 1px solid var(--border);
+    border-right: none;
+    z-index: 200;
+    padding: 0;
+    overflow: hidden;
+  }
+  .sidebar-logo,
+  .sidebar-bottom,
+  .config-bar,
+  .nav-item span,
+  #hamburger { display: none !important; }
+
+  .sidebar-nav {
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    padding: 0;
+    gap: 0;
+  }
+  .nav-item {
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 0;
+    gap: 3px;
+    border-radius: 0;
+    min-height: 62px;
+  }
+  .nav-item .nav-icon { font-size: 1.3rem; }
+
+  /* Main content */
+  #main {
+    margin-left: 0 !important;
+    padding: 1rem 0.75rem 80px 0.75rem;
+  }
+
+  /* Tableau lignes → Cartes empilées */
+  .lines-wrap { overflow: visible; }
+  .lines-table { display: block; }
+  .lines-table thead { display: none; }
+  .lines-table tbody { display: flex; flex-direction: column; gap: 10px; padding: 10px; }
+  .lines-table tr {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-global);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    padding: 12px;
+    gap: 8px;
+  }
+  .lines-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: none;
+    padding: 4px 0;
+    font-size: 0.85rem;
+  }
+  .lines-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    min-width: 90px;
+  }
+  .lines-table td input,
+  .lines-table td select {
+    max-width: 140px;
+    text-align: right;
+  }
+
+  /* KPI grid */
+  .grid-4 { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+  /* Stepper */
+  .stepper-label { display: none; }
+
+  /* Modales plein écran */
+  .modal { width: 100% !important; max-width: 100% !important; margin: 0 !important;
+           border-radius: var(--radius) var(--radius) 0 0 !important;
+           position: fixed; bottom: 0; left: 0; right: 0; max-height: 90vh; overflow-y: auto; }
+  .modal-backdrop { align-items: flex-end; }
+
+  /* FAB visible */
+  #fab-new { bottom: 75px; }
+
+  /* Page header */
+  .page-header h2 { font-size: 1.2rem; }
+
+  /* General responsive */
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .form-row, .form-row-3 { grid-template-columns: 1fr; }
+  .devis-layout { grid-template-columns: 1fr; }
+  .summary-panel { position: static; }
+  .history-card { flex-direction: column; align-items: flex-start; }
+  .history-card-actions { width: 100%; }
+  #sidebar-overlay { display: none !important; }
+}
+
+/* ============================================================
+   MISC
+   ============================================================ */
+.empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-muted); }
+.empty-state-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+.empty-state p { font-size: 0.9rem; }
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem; }
+.section-title { font-size: 1.05rem; font-weight: 700; }
+.search-bar { position: relative; }
+.search-bar input { padding-left: 2rem; }
+.search-bar::before { content: '🔍'; position: absolute; left: 0.6rem; top: 50%; transform: translateY(-50%); font-size: 0.8rem; pointer-events: none; }
+.filters-row { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.sort-select { width: auto; }
+.overdue { color: var(--danger); font-weight: 700; }
+.warn-days { color: var(--warning); font-weight: 700; }
+.note-client-badge { background: rgba(34,197,94,0.1); color: var(--success); font-size: 0.7rem; padding: 1px 6px; border-radius: 4px; font-weight: 600; }
+.note-int-badge { background: rgba(245,158,11,0.1); color: var(--warning); font-size: 0.7rem; padding: 1px 6px; border-radius: 4px; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     TOAST CONTAINER
+     ============================================================ -->
+<div id="toast-container"></div>
+
+<!-- ============================================================
+     HAMBURGER (mobile)
+     ============================================================ -->
+<button id="hamburger" onclick="toggleSidebar()">☰</button>
+<div id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<!-- ============================================================
+     SIDEBAR
+     ============================================================ -->
+<aside id="sidebar">
+  <div class="sidebar-brand">
+    <h1>⚡ SmartDevis Pro</h1>
+    <div class="tagline">v4.0 · Logiciel professionnel</div>
+    <div style="margin: 0.5rem 0 0.25rem; padding: 0.4rem 0.75rem; background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.3); border-radius: var(--radius-sm); font-size: 0.72rem; text-align:center; color: var(--success);">
+      💾 <strong>Licence à vie</strong> · Paiement unique
+    </div>
+    <div class="config-bar-wrap">
+      <div class="config-bar-label">
+        <span>Config. complète</span>
+        <span id="config-pct-label">0%</span>
+      </div>
+      <div class="config-bar-track">
+        <div class="config-bar-fill" id="config-bar" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-item active" id="tab-config" onclick="switchTab('config')">
+      <span class="nav-icon">⚙</span> Configuration
+    </div>
+    <div class="nav-item" id="tab-nouveau" onclick="switchTab('nouveau')">
+      <span class="nav-icon">✏</span> Nouveau devis
+    </div>
+    <div class="nav-item" id="tab-historique" onclick="switchTab('historique')">
+      <span class="nav-icon">📋</span> Historique
+    </div>
+    <div class="nav-item" id="tab-catalogue" onclick="switchTab('catalogue')">
+      <span class="nav-icon">📦</span> Catalogue
+    </div>
+    <div class="nav-item" id="tab-dashboard" onclick="switchTab('dashboard')">
+      <span class="nav-icon">📊</span> Tableau de bord
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="btn-theme" onclick="toggleTheme()" id="theme-btn">☀ Mode clair</button>
+    <div class="shortcuts-hint">
+      Alt+N Nouveau · Alt+H Historique<br>
+      Alt+D Dashboard · Echap Fermer modal
+    </div>
+    <div id="autosave-indicator" style="font-size:0.7rem;color:var(--text-muted);text-align:center;padding:0.25rem 0;">
+      💾 Sauvegarde auto active
+    </div>
+  </div>
+</aside>
+
+<!-- ============================================================
+     MAIN CONTENT
+     ============================================================ -->
+<main id="main">
+
+  <!-- ==================== TAB CONFIG ==================== -->
+  <div class="tab-pane active" id="pane-config">
+    <div class="page-header">
+      <h2>⚙ Configuration</h2>
+      <p>Paramétrez votre entreprise, vos tarifs et vos mentions légales.</p>
+    </div>
+
+    <!-- 1.1 Informations entreprise -->
+    <fieldset>
+      <legend>🏢 Informations entreprise</legend>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cfg-name">Nom / Raison sociale *</label>
+          <input type="text" id="cfg-name" placeholder="Mon Entreprise">
+        </div>
+        <div class="form-group">
+          <label for="cfg-statut">Statut juridique</label>
+          <select id="cfg-statut" onchange="updateConditionalFields()">
+            <option value="">Sélectionner...</option>
+            <option value="auto-entrepreneur">Auto-entrepreneur</option>
+            <option value="EI">EI</option>
+            <option value="EURL">EURL</option>
+            <option value="SARL">SARL</option>
+            <option value="SAS">SAS</option>
+            <option value="SASU">SASU</option>
+            <option value="artisan">Artisan</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cfg-email">Email *</label>
+          <input type="email" id="cfg-email" placeholder="contact@entreprise.fr">
+        </div>
+        <div class="form-group">
+          <label for="cfg-phone">Téléphone</label>
+          <input type="tel" id="cfg-phone" placeholder="06 00 00 00 00">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cfg-siret">SIRET (14 chiffres)</label>
+          <input type="text" id="cfg-siret" maxlength="14" placeholder="00000000000000" oninput="this.value=this.value.replace(/\D/g,'')">
+        </div>
+        <div class="form-group">
+          <label for="cfg-website">Site web</label>
+          <input type="url" id="cfg-website" placeholder="https://monsite.fr">
+        </div>
+      </div>
+      <div class="form-group conditional" id="wrap-tva-intra">
+        <label for="cfg-tva-intra">N° TVA intracommunautaire</label>
+        <input type="text" id="cfg-tva-intra" placeholder="FR00000000000">
+      </div>
+      <div class="form-group conditional" id="wrap-rm">
+        <label for="cfg-rm">N° Répertoire des Métiers (RM)</label>
+        <input type="text" id="cfg-rm" placeholder="123456789">
+      </div>
+      <div class="form-group conditional" id="wrap-rcs">
+        <label for="cfg-rcs">N° RCS</label>
+        <input type="text" id="cfg-rcs" placeholder="Paris B 000 000 000">
+      </div>
+      <div class="form-group">
+        <label for="cfg-address">Adresse *</label>
+        <textarea id="cfg-address" rows="3" placeholder="1 rue de la Paix&#10;75000 Paris"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Logo (PNG/JPG/SVG, max 2 Mo)</label>
+        <div class="logo-upload-area" onclick="document.getElementById('cfg-logo-input').click()">
+          <img id="cfg-logo-preview" class="logo-preview" src="" style="display:none">
+          <div id="cfg-logo-placeholder">
+            <div>📁 Cliquez pour importer votre logo</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px">PNG · JPG · SVG · max 2 Mo</div>
+          </div>
+        </div>
+        <input type="file" id="cfg-logo-input" accept=".png,.jpg,.jpeg,.svg" style="display:none" onchange="handleLogoUpload(this)">
+        <button class="btn btn-secondary btn-sm" style="margin-top:6px;display:none" id="btn-remove-logo" onclick="removeLogo()">✕ Supprimer le logo</button>
+      </div>
+      <div class="form-group">
+        <label for="cfg-cgv">Conditions générales de vente <span id="cgv-counter" class="char-counter" style="float:right">0/3000</span></label>
+        <textarea id="cfg-cgv" rows="5" maxlength="3000" placeholder="Vos CGV..." oninput="document.getElementById('cgv-counter').textContent=this.value.length+'/3000'"></textarea>
+      </div>
+    </fieldset>
+
+    <!-- 1.2 Régime TVA -->
+    <fieldset>
+      <legend>💶 Régime TVA</legend>
+      <div class="form-group">
+        <div class="toggle-wrap">
+          <label class="toggle">
+            <input type="checkbox" id="cfg-tva-toggle" onchange="updateTVAFields()">
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="toggle-label">Assujetti à la TVA</span>
+        </div>
+        <div class="form-hint">OFF = Franchise en base (art. 293 B du CGI)</div>
+      </div>
+      <div class="form-group conditional" id="wrap-tva-rate">
+        <label for="cfg-tva-rate">Taux TVA (%)</label>
+        <input type="number" id="cfg-tva-rate" value="20" min="0" max="30" step="0.1">
+      </div>
+    </fieldset>
+
+    <!-- 1.3 Assurance pro -->
+    <fieldset id="wrap-assurance" style="display:none">
+      <legend>🛡 Assurance professionnelle</legend>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cfg-assureur">Assureur</label>
+          <input type="text" id="cfg-assureur" placeholder="Nom de l'assureur">
+        </div>
+        <div class="form-group">
+          <label for="cfg-contrat-assurance">N° Contrat</label>
+          <input type="text" id="cfg-contrat-assurance" placeholder="N° de contrat">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="cfg-couverture">Couverture géographique</label>
+        <select id="cfg-couverture">
+          <option value="France métropolitaine">France métropolitaine</option>
+          <option value="Europe">Europe</option>
+          <option value="Monde entier">Monde entier</option>
+          <option value="France + DOM-TOM">France + DOM-TOM</option>
+        </select>
+      </div>
+    </fieldset>
+
+    <!-- 1.4 Numérotation -->
+    <fieldset>
+      <legend>🔢 Numérotation des documents</legend>
+      <div class="form-row-3">
+        <div class="form-group">
+          <label for="cfg-prefix-devis">Préfixe Devis</label>
+          <input type="text" id="cfg-prefix-devis" value="DEV" oninput="updateNumPreview()">
+        </div>
+        <div class="form-group">
+          <label for="cfg-prefix-facture">Préfixe Facture</label>
+          <input type="text" id="cfg-prefix-facture" value="FAC" oninput="updateNumPreview()">
+        </div>
+        <div class="form-group">
+          <label for="cfg-format-numero">Format</label>
+          <select id="cfg-format-numero" onchange="updateNumPreview()">
+            <option value="PREFIX-YYYY-NNN">PREFIX-YYYY-NNN</option>
+            <option value="PREFIX-NNN">PREFIX-NNN</option>
+            <option value="PREFIX-YYYYMM-NNN">PREFIX-YYYYMM-NNN</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cfg-counter-devis">Compteur Devis</label>
+          <input type="number" id="cfg-counter-devis" value="1" min="1">
+        </div>
+        <div class="form-group">
+          <label for="cfg-counter-facture">Compteur Facture</label>
+          <input type="number" id="cfg-counter-facture" value="1" min="1">
+        </div>
+      </div>
+      <div id="num-preview" class="num-preview">→ DEV-2026-001</div>
+    </fieldset>
+
+    <!-- 1.5 Paiement -->
+    <fieldset>
+      <legend>💳 Conditions de paiement</legend>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cfg-delai-paiement">Délai de paiement (jours)</label>
+          <input type="number" id="cfg-delai-paiement" value="30" min="0">
+        </div>
+        <div class="form-group">
+          <label for="cfg-taux-penalites">Taux pénalités de retard</label>
+          <input type="text" id="cfg-taux-penalites" value="3 fois le taux légal" placeholder="Ex: 3 fois le taux légal">
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="toggle-wrap">
+          <label class="toggle">
+            <input type="checkbox" id="cfg-indemnite-recouvrement" checked>
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="toggle-label">Indemnité forfaitaire de recouvrement (40 €)</span>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cfg-iban">IBAN</label>
+          <input type="text" id="cfg-iban" placeholder="FR76 0000 0000 0000 0000 0000 000">
+        </div>
+        <div class="form-group">
+          <label for="cfg-bic">BIC</label>
+          <input type="text" id="cfg-bic" placeholder="BNPAFRPP">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Modes de paiement acceptés</label>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:4px">
+          <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.875rem;font-weight:500;color:var(--text);cursor:pointer"><input type="checkbox" id="pay-virement" checked> Virement</label>
+          <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.875rem;font-weight:500;color:var(--text);cursor:pointer"><input type="checkbox" id="pay-cheque"> Chèque</label>
+          <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.875rem;font-weight:500;color:var(--text);cursor:pointer"><input type="checkbox" id="pay-carte"> Carte</label>
+          <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.875rem;font-weight:500;color:var(--text);cursor:pointer"><input type="checkbox" id="pay-especes"> Espèces</label>
+          <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.875rem;font-weight:500;color:var(--text);cursor:pointer"><input type="checkbox" id="pay-paypal"> PayPal</label>
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- 1.6 Grille tarifaire -->
+    <fieldset>
+      <legend>📐 Grille tarifaire</legend>
+      <div class="form-group">
+        <label>Charges sociales (%)</label>
+        <div class="slider-wrap">
+          <input type="range" id="cfg-charges-pct" min="0" max="50" value="22" oninput="document.getElementById('charges-val').textContent=this.value+'%'">
+          <span class="slider-val" id="charges-val">22%</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Marge bénéficiaire (%)</label>
+        <div class="slider-wrap">
+          <input type="range" id="cfg-marge-pct" min="0" max="80" value="30" oninput="document.getElementById('marge-val').textContent=this.value+'%'">
+          <span class="slider-val" id="marge-val">30%</span>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cfg-taux-horaire">Taux horaire (€/h)</label>
+          <input type="number" id="cfg-taux-horaire" value="45" min="0" step="0.5">
+        </div>
+        <div class="form-group">
+          <label>Surcharge urgence (%)</label>
+          <div class="slider-wrap">
+            <input type="range" id="cfg-urgence-pct" min="0" max="100" value="15" oninput="document.getElementById('urgence-val').textContent=this.value+'%'">
+            <span class="slider-val" id="urgence-val">15%</span>
+          </div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cfg-acompte-pct">Acompte par défaut (%)</label>
+          <input type="number" id="cfg-acompte-pct" value="30" min="0" max="100">
+        </div>
+        <div class="form-group">
+          <label for="cfg-validite-devis">Validité devis (jours)</label>
+          <input type="number" id="cfg-validite-devis" value="30" min="1">
+        </div>
+      </div>
+    </fieldset>
+
+    <!-- 1.7 Mentions libres -->
+    <fieldset>
+      <legend>📝 Mentions libres</legend>
+      <div class="form-group">
+        <label for="cfg-reserve-propriete">Clause de réserve de propriété</label>
+        <textarea id="cfg-reserve-propriete" rows="2" placeholder="Les marchandises livrées demeurent la propriété du vendeur jusqu'au complet paiement..."></textarea>
+      </div>
+      <div class="form-group">
+        <label for="cfg-tribunal-competent">Tribunal compétent</label>
+        <input type="text" id="cfg-tribunal-competent" placeholder="Ex: Tribunal de Commerce de Paris">
+      </div>
+      <div class="form-group">
+        <label for="cfg-note-bas-page">Note de bas de page</label>
+        <textarea id="cfg-note-bas-page" rows="2" placeholder="Toute note de bas de page..."></textarea>
+      </div>
+    </fieldset>
+
+    <!-- 1.8 Base clients -->
+    <fieldset>
+      <legend>👥 Base clients</legend>
+      <div id="clients-list">
+        <div class="empty-state" style="padding:1rem">
+          <div class="empty-state-icon">👤</div>
+          <p>Aucun client enregistré.</p>
+        </div>
+      </div>
+      <button class="btn btn-secondary btn-sm" style="margin-top:0.75rem" onclick="openClientModal()">+ Nouvelle fiche client</button>
+    </fieldset>
+
+    <!-- 1.9 Actions -->
+    <div class="btn-group">
+      <button class="btn btn-primary" onclick="saveConfig()">💾 Sauvegarder</button>
+      <button class="btn btn-secondary" onclick="exportConfigJSON()">📤 Exporter JSON</button>
+      <label class="btn btn-secondary" style="cursor:pointer">
+        📥 Importer JSON
+        <input type="file" accept=".json" style="display:none" onchange="importConfigJSON(this)">
+      </label>
+      <button class="btn btn-danger" onclick="resetConfig()">🗑 Réinitialiser</button>
+    </div>
+    <div style="margin-top:1rem">
+      <button class="btn btn-secondary" onclick="exportBackupJSON()" style="width:100%">
+        💾 Exporter un backup
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== TAB NOUVEAU ==================== -->
+  <div class="tab-pane" id="pane-nouveau">
+    <div class="page-header">
+      <h2>✏ Nouveau document</h2>
+      <p>Créez un devis ou une facture en 3 étapes.</p>
+    </div>
+
+    <!-- Draft banner -->
+    <div id="draft-banner">
+      <p>📄 Brouillon récupéré — Continuer ?</p>
+      <div class="btn-group">
+        <button class="btn btn-primary btn-sm" onclick="loadDraft()">Reprendre</button>
+        <button class="btn btn-secondary btn-sm" onclick="discardDraft()">Ignorer</button>
+      </div>
+    </div>
+
+    <!-- Stepper -->
+    <div class="stepper" id="stepper">
+      <div class="step-item active" id="step-indicator-1">
+        <div class="step-num">1</div>
+        <span class="stepper-label">Client</span>
+      </div>
+      <span class="step-sep">›</span>
+      <div class="step-item" id="step-indicator-2">
+        <div class="step-num">2</div>
+        <span class="stepper-label">Lignes</span>
+      </div>
+      <span class="step-sep">›</span>
+      <div class="step-item" id="step-indicator-3">
+        <div class="step-num">3</div>
+        <span class="stepper-label">Conditions</span>
+      </div>
+      <span id="draft-saved-indicator" style="font-size:0.75rem;color:var(--success);transition:opacity 0.5s;opacity:0;margin-left:0.5rem;"></span>
+    </div>
+
+    <!-- Step 1: Client -->
+    <div id="step-1" class="step-content">
+      <div class="card">
+        <div class="card-title">👤 Informations client</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="client-nom">Nom / Prénom *</label>
+            <div class="autocomplete-wrap">
+              <input type="text" id="client-nom" placeholder="Nom du client" oninput="acClientSearch(this.value)" autocomplete="off">
+              <div class="autocomplete-dropdown" id="ac-dropdown"></div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="client-entreprise">Entreprise</label>
+            <input type="text" id="client-entreprise" placeholder="Nom de l'entreprise">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="client-email">Email *</label>
+            <input type="email" id="client-email" placeholder="client@email.com">
+          </div>
+          <div class="form-group">
+            <label for="client-telephone">Téléphone</label>
+            <input type="tel" id="client-telephone" placeholder="06 00 00 00 00">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="client-siren">SIREN</label>
+            <input type="text" id="client-siren" placeholder="000000000" maxlength="9">
+          </div>
+          <div class="form-group">
+            <label for="client-adresse">Adresse</label>
+            <input type="text" id="client-adresse" placeholder="Adresse complète">
+          </div>
+        </div>
+        <div class="btn-group" style="margin-top:0.5rem">
+          <button class="btn btn-primary" onclick="goToStep(2)">Suivant →</button>
+          <button class="btn btn-secondary" onclick="saveClientToDB()">💾 Enregistrer ce client</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Lines -->
+    <div id="step-2" class="step-content" style="display:none">
+      <div class="devis-layout">
+        <div>
+          <div class="lines-wrap">
+            <table class="lines-table" id="lines-table">
+              <thead>
+                <tr>
+                  <th style="width:30px">#</th>
+                  <th>Désignation</th>
+                  <th>Description</th>
+                  <th style="width:60px">Qté</th>
+                  <th style="width:90px">Unité</th>
+                  <th style="width:90px">P.U. HT</th>
+                  <th style="width:80px">Remise</th>
+                  <th style="width:90px">Total HT</th>
+                  <th style="width:70px">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="lines-tbody"></tbody>
+            </table>
+          </div>
+          <div class="lines-actions">
+            <button class="btn btn-primary btn-sm" onclick="addLine()">+ Ajouter une ligne</button>
+            <button class="btn btn-secondary btn-sm" onclick="openCatalogModal()">📦 Depuis catalogue</button>
+            <button class="btn btn-secondary btn-sm" onclick="addSection()">+ Section</button>
+            <button class="btn btn-secondary btn-sm" onclick="addSousTotal()">+ Sous-total</button>
+          </div>
+          <div class="btn-group" style="margin-top:1rem">
+            <button class="btn btn-secondary" onclick="goToStep(1)">← Retour</button>
+            <button class="btn btn-primary" onclick="goToStep(3)">Suivant →</button>
+          </div>
+        </div>
+        <!-- Summary -->
+        <div class="summary-panel" id="summary-panel">
+          <div class="card-title">📊 Récapitulatif</div>
+          <div class="summary-row">
+            <span class="summary-label">Sous-total HT</span>
+            <span class="summary-value" id="sum-subtotal">0,00 €</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">
+              Remise globale
+              <div style="margin-top:4px;display:flex;gap:4px">
+                <input type="number" id="sum-remise-val" value="0" min="0" step="0.01" style="width:60px;font-size:0.75rem;padding:2px 4px" oninput="recalc()">
+                <select id="sum-remise-type" style="width:50px;font-size:0.75rem;padding:2px 4px" onchange="recalc()">
+                  <option value="pct">%</option>
+                  <option value="eur">€</option>
+                </select>
+              </div>
+            </span>
+            <span class="summary-value" id="sum-remise">-0,00 €</span>
+          </div>
+          <div class="summary-row" id="sum-urgence-row" style="display:none">
+            <span class="summary-label">⚡ Urgence</span>
+            <span class="summary-value" id="sum-urgence">0,00 €</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Charges <small id="sum-charges-pct">(22%)</small></span>
+            <span class="summary-value" id="sum-charges">0,00 €</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Marge <small id="sum-marge-pct">(30%)</small></span>
+            <span class="summary-value" id="sum-marge">0,00 €</span>
+          </div>
+          <hr class="summary-sep">
+          <div class="summary-row total">
+            <span class="summary-label">Total HT</span>
+            <span class="summary-value" id="sum-total-ht">0,00 €</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label" id="sum-tva-label">TVA (20%)</span>
+            <span class="summary-value" id="sum-tva">0,00 €</span>
+          </div>
+          <div class="summary-row grand-total">
+            <span>Total TTC</span>
+            <span id="sum-total-ttc">0,00 €</span>
+          </div>
+          <hr class="summary-sep">
+          <div class="summary-row">
+            <span class="summary-label">Acompte <small id="sum-acompte-pct">(30%)</small></span>
+            <span class="summary-value" id="sum-acompte">0,00 €</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Solde à payer</span>
+            <span class="summary-value" id="sum-solde">0,00 €</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Conditions -->
+    <div id="step-3" class="step-content" style="display:none">
+      <div class="card">
+        <div class="card-title">⚙ Conditions du document</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="doc-type">Type de document</label>
+            <select id="doc-type">
+              <option value="devis">Devis</option>
+              <option value="facture">Facture</option>
+              <option value="avoir">Avoir</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="doc-date">Date d'émission</label>
+            <input type="date" id="doc-date">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="doc-date-exec">Date d'exécution</label>
+            <input type="date" id="doc-date-exec">
+          </div>
+          <div class="form-group">
+            <label for="doc-validite">Validité (jours)</label>
+            <input type="number" id="doc-validite" value="30" min="1">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="doc-acompte">Acompte (%)</label>
+            <input type="number" id="doc-acompte" value="30" min="0" max="100" oninput="recalc()">
+          </div>
+          <div class="form-group">
+            <label for="doc-ref-commande">Référence commande</label>
+            <input type="text" id="doc-ref-commande" placeholder="BC-2026-001">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="toggle-wrap">
+            <label class="toggle">
+              <input type="checkbox" id="doc-urgent" onchange="toggleUrgent()">
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="toggle-label">⚡ Urgence <span id="urgence-badge" style="display:none" class="badge badge-en_attente">+15%</span></span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="doc-notes-client">Notes client <span class="note-client-badge">visible sur le document</span></label>
+          <textarea id="doc-notes-client" rows="3" placeholder="Message visible par le client sur le document..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="doc-notes-internes">Notes internes <span class="note-int-badge">non visible</span></label>
+          <textarea id="doc-notes-internes" rows="2" placeholder="Notes privées, non imprimées..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="doc-conditions-paiement">Conditions de paiement</label>
+          <textarea id="doc-conditions-paiement" rows="2" placeholder="Paiement à 30 jours..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Modes de paiement</label>
+          <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:4px">
+            <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.875rem;font-weight:500;color:var(--text);cursor:pointer"><input type="checkbox" id="dpay-virement" checked> Virement</label>
+            <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.875rem;font-weight:500;color:var(--text);cursor:pointer"><input type="checkbox" id="dpay-cheque"> Chèque</label>
+            <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.875rem;font-weight:500;color:var(--text);cursor:pointer"><input type="checkbox" id="dpay-carte"> Carte</label>
+            <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.875rem;font-weight:500;color:var(--text);cursor:pointer"><input type="checkbox" id="dpay-especes"> Espèces</label>
+            <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.875rem;font-weight:500;color:var(--text);cursor:pointer"><input type="checkbox" id="dpay-paypal"> PayPal</label>
+          </div>
+        </div>
+        <div class="btn-group" style="margin-top:0.5rem">
+          <button class="btn btn-secondary" onclick="goToStep(2)">← Retour</button>
+          <button class="btn btn-primary" onclick="generateDocument()">⚡ Générer le document</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TAB HISTORIQUE ==================== -->
+  <div class="tab-pane" id="pane-historique">
+    <div class="page-header">
+      <h2>📋 Historique</h2>
+      <p>Tous vos devis et factures.</p>
+    </div>
+
+    <!-- KPIs -->
+    <div class="grid-4" style="margin-bottom:1.5rem">
+      <div class="kpi-card">
+        <div class="kpi-icon">📄</div>
+        <div class="kpi-label">Devis émis</div>
+        <div class="kpi-value" id="kpi-devis-count">0</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">🧾</div>
+        <div class="kpi-label">Factures</div>
+        <div class="kpi-value" id="kpi-factures-count">0</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">💰</div>
+        <div class="kpi-label">CA encaissé</div>
+        <div class="kpi-value" id="kpi-ca">0 €</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">📈</div>
+        <div class="kpi-label">Taux de conversion</div>
+        <div class="kpi-value" id="kpi-conversion">0%</div>
+      </div>
+    </div>
+
+    <!-- Filters & search -->
+    <div class="section-header">
+      <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap">
+        <div class="search-bar" style="min-width:220px">
+          <input type="text" id="hist-search" placeholder="Rechercher..." oninput="renderHistory()">
+        </div>
+        <select class="sort-select" id="hist-sort" onchange="renderHistory()">
+          <option value="date-desc">Date ↓</option>
+          <option value="date-asc">Date ↑</option>
+          <option value="amount-desc">Montant ↓</option>
+          <option value="amount-asc">Montant ↑</option>
+          <option value="client-az">Client A-Z</option>
+        </select>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-secondary btn-sm" onclick="exportAllJSON()">📤 Exporter JSON</button>
+        <label class="btn btn-secondary btn-sm" style="cursor:pointer">📥 Importer JSON <input type="file" accept=".json" style="display:none" onchange="importAllJSON(this)"></label>
+      </div>
+    </div>
+    <div class="filters-row" id="hist-filters">
+      <button class="pill-filter active" data-filter="tous" onclick="setHistFilter('tous',this)">Tous</button>
+      <button class="pill-filter" data-filter="brouillon" onclick="setHistFilter('brouillon',this)">Brouillon</button>
+      <button class="pill-filter" data-filter="envoye" onclick="setHistFilter('envoye',this)">Envoyé</button>
+      <button class="pill-filter" data-filter="en_attente" onclick="setHistFilter('en_attente',this)">En attente</button>
+      <button class="pill-filter" data-filter="accepte" onclick="setHistFilter('accepte',this)">Accepté</button>
+      <button class="pill-filter" data-filter="facture" onclick="setHistFilter('facture',this)">Facturé</button>
+      <button class="pill-filter" data-filter="paye" onclick="setHistFilter('paye',this)">Payé</button>
+      <button class="pill-filter" data-filter="refuse" onclick="setHistFilter('refuse',this)">Refusé</button>
+      <button class="pill-filter" data-filter="expire" onclick="setHistFilter('expire',this)">Expiré</button>
+    </div>
+
+    <div class="history-list" id="history-list">
+      <div class="empty-state">
+        <div class="empty-state-icon">📋</div>
+        <p>Aucun document créé.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TAB CATALOGUE ==================== -->
+  <div class="tab-pane" id="pane-catalogue">
+    <div class="page-header">
+      <h2>📦 Catalogue articles</h2>
+      <p>Gérez vos articles et prestations.</p>
+    </div>
+
+    <!-- Category management -->
+    <fieldset style="margin-bottom:1.25rem">
+      <legend>📁 Catégories</legend>
+      <div id="categories-list" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.75rem"></div>
+      <div style="display:flex;gap:0.5rem">
+        <input type="text" id="new-cat-input" placeholder="Nouvelle catégorie..." style="max-width:220px" onkeydown="if(event.key==='Enter'){event.preventDefault();addCategory();}">
+        <button class="btn btn-secondary btn-sm" onclick="addCategory()">+ Ajouter</button>
+      </div>
+    </fieldset>
+
+    <div class="section-header">
+      <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap">
+        <div class="search-bar" style="min-width:220px">
+          <input type="text" id="cat-search" placeholder="Rechercher un article..." oninput="renderCatalog()">
+        </div>
+        <select id="cat-filter-cat" style="width:auto" onchange="renderCatalog()">
+          <option value="">Toutes catégories</option>
+        </select>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary btn-sm" onclick="openArticleModal()">+ Nouvel article</button>
+        <button class="btn btn-secondary btn-sm" onclick="openModal('templates-modal')">📋 Templates métiers</button>
+        <label class="btn btn-secondary btn-sm" style="cursor:pointer">📥 Importer CSV <input type="file" accept=".csv" style="display:none" onchange="importCatalogCSV(this)"></label>
+        <button class="btn btn-secondary btn-sm" onclick="exportCatalogCSV()">📤 Exporter CSV</button>
+      </div>
+    </div>
+    <div class="cat-grid" id="catalog-grid">
+      <div class="empty-state" style="grid-column:1/-1">
+        <div class="empty-state-icon">📦</div>
+        <p>Aucun article dans le catalogue.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TAB DASHBOARD ==================== -->
+  <div class="tab-pane" id="pane-dashboard">
+    <div class="page-header">
+      <h2>📊 Tableau de bord</h2>
+      <p>Synthèse de votre activité.</p>
+    </div>
+
+    <!-- KPIs -->
+    <div class="grid-4" style="margin-bottom:1.5rem">
+      <div class="kpi-card">
+        <div class="kpi-icon">💰</div>
+        <div class="kpi-label">CA du mois</div>
+        <div class="kpi-value" id="dash-ca-mois">0 €</div>
+        <div class="kpi-variation" id="dash-ca-var"></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">📄</div>
+        <div class="kpi-label">Devis ce mois</div>
+        <div class="kpi-value" id="dash-devis-mois">0</div>
+        <div class="kpi-variation" id="dash-devis-var"></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">📈</div>
+        <div class="kpi-label">Taux de conversion</div>
+        <div class="kpi-value" id="dash-conv">0%</div>
+        <div class="kpi-variation" id="dash-conv-var"></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon">⏱</div>
+        <div class="kpi-label">Délai moyen paiement</div>
+        <div class="kpi-value" id="dash-delai">— j</div>
+        <div class="kpi-sub">jours</div>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="chart-container" style="margin-bottom:1.5rem;position:relative">
+      <div class="chart-title">📊 Chiffre d'affaires — 6 derniers mois</div>
+      <div id="chart-container"></div>
+      <div class="chart-tooltip" id="chart-tooltip"></div>
+    </div>
+
+    <!-- Pending quotes -->
+    <div style="margin-bottom:1.5rem">
+      <div class="section-title" style="margin-bottom:0.75rem">⏳ Devis en attente</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Numéro</th><th>Client</th><th>Montant TTC</th><th>Expiration</th><th>Jours restants</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="pending-quotes-tbody">
+            <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:1.5rem">Aucun devis en attente.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Unpaid invoices -->
+    <div>
+      <div class="section-title" style="margin-bottom:0.75rem">🔴 Factures impayées</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Numéro</th><th>Client</th><th>Montant TTC</th><th>Échéance</th><th>Retard</th><th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="unpaid-invoices-tbody">
+            <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:1.5rem">Aucune facture impayée.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ============================================================
+     MODALS
+     ============================================================ -->
+
+<!-- Preview Modal -->
+<div class="modal-backdrop" id="preview-modal">
+  <div class="modal modal-xl">
+    <div class="modal-header">
+      <span class="modal-title" id="preview-modal-title">Aperçu du document</span>
+      <button class="modal-close" onclick="closeModal('preview-modal')">✕</button>
+    </div>
+    <div class="modal-body" style="padding:1rem">
+      <div id="preview-doc-container"></div>
+    </div>
+    <div class="modal-footer" id="preview-modal-actions">
+      <button class="btn btn-primary" onclick="printDocument()">🖨 Imprimer / PDF</button>
+      <button class="btn btn-primary" onclick="downloadPDF(previewQuoteId)">⬇️ Télécharger PDF</button>
+      <button class="btn btn-secondary" id="preview-btn-email" onclick="sendEmail()">📧 Envoyer client</button>
+      <button class="btn btn-secondary" id="preview-btn-edit" onclick="editDocument()">✏ Modifier</button>
+      <button class="btn btn-secondary" id="preview-btn-dup" onclick="duplicateDocument()">⎘ Dupliquer</button>
+      <span id="preview-status-actions"></span>
+      <button class="btn btn-secondary" onclick="closeModal('preview-modal')">✕ Fermer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Client Modal -->
+<div class="modal-backdrop" id="client-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="client-modal-title">Fiche client</span>
+      <button class="modal-close" onclick="closeModal('client-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="client-modal-id">
+      <div class="form-group"><label>Nom *</label><input type="text" id="cm-nom" placeholder="Nom / Prénom"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Entreprise</label><input type="text" id="cm-entreprise"></div>
+        <div class="form-group"><label>SIREN</label><input type="text" id="cm-siren" maxlength="9"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Email</label><input type="email" id="cm-email"></div>
+        <div class="form-group"><label>Téléphone</label><input type="tel" id="cm-telephone"></div>
+      </div>
+      <div class="form-group"><label>Adresse</label><textarea id="cm-adresse" rows="2"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('client-modal')">Annuler</button>
+      <button class="btn btn-primary" onclick="saveClientModal()">💾 Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Article Modal -->
+<div class="modal-backdrop" id="article-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="article-modal-title">Article</span>
+      <button class="modal-close" onclick="closeModal('article-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="am-id">
+      <div class="form-row">
+        <div class="form-group"><label>Désignation *</label><input type="text" id="am-designation"></div>
+        <div class="form-group"><label>Catégorie</label><input type="text" id="am-categorie" list="am-cat-list"><datalist id="am-cat-list"></datalist></div>
+      </div>
+      <div class="form-group"><label>Description</label><textarea id="am-description" rows="2"></textarea></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Unité</label>
+          <select id="am-unite">
+            <option>heures</option><option>jours</option><option>m²</option><option>m³</option>
+            <option>ml</option><option>unités</option><option>forfait</option><option>lot</option>
+            <option>kg</option><option>tonne</option><option>litre</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Prix unitaire HT (€)</label><input type="number" id="am-prix" value="0" min="0" step="0.01"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>TVA (%)</label><input type="number" id="am-tva" value="20" min="0" step="0.1"></div>
+        <div class="form-group">
+          <label>Actif</label>
+          <div class="toggle-wrap" style="margin-top:6px">
+            <label class="toggle"><input type="checkbox" id="am-actif" checked><span class="toggle-slider"></span></label>
+            <span class="toggle-label">Article actif</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('article-modal')">Annuler</button>
+      <button class="btn btn-primary" onclick="saveArticleModal()">💾 Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Catalog picker modal (from new devis step 2) -->
+<div class="modal-backdrop" id="catalog-picker-modal">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <span class="modal-title">📦 Choisir depuis le catalogue</span>
+      <button class="modal-close" onclick="closeModal('catalog-picker-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="text" id="cp-search" placeholder="Rechercher..." oninput="renderCatalogPicker()" style="margin-bottom:1rem">
+      <div class="cat-grid" id="catalog-picker-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL TEMPLATES MÉTIERS
+     ============================================================ -->
+<div class="modal-backdrop" id="templates-modal">
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-header">
+      <span class="modal-title">📋 Templates métiers</span>
+      <button class="modal-close" onclick="closeModal('templates-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:1.25rem;">
+        Chargez un catalogue pré-rempli pour votre métier.
+        <strong style="color:var(--warning);">⚠ Remplace le catalogue actuel.</strong>
+      </p>
+      <div style="display:flex;flex-direction:column;gap:0.75rem;">
+
+        <div class="card" style="cursor:pointer;" onclick="loadTemplate('plombier')">
+          <div style="display:flex;align-items:center;gap:1rem;">
+            <div style="font-size:2rem;">🔧</div>
+            <div>
+              <div style="font-weight:700;margin-bottom:2px;">Plombier / Chauffagiste</div>
+              <div style="font-size:0.8rem;color:var(--text-secondary);">
+                Débouchage, installation sanitaire, remplacement chauffe-eau, dépannage urgence…
+              </div>
+            </div>
+            <div style="margin-left:auto;">
+              <span class="badge badge-devis">12 lignes</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="cursor:pointer;" onclick="loadTemplate('electricien')">
+          <div style="display:flex;align-items:center;gap:1rem;">
+            <div style="font-size:2rem;">⚡</div>
+            <div>
+              <div style="font-weight:700;margin-bottom:2px;">Électricien</div>
+              <div style="font-size:0.8rem;color:var(--text-secondary);">
+                Tableau électrique, prise/interrupteur, câblage, VMC, éclairage LED…
+              </div>
+            </div>
+            <div style="margin-left:auto;">
+              <span class="badge badge-devis">11 lignes</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="cursor:pointer;" onclick="loadTemplate('peintre')">
+          <div style="display:flex;align-items:center;gap:1rem;">
+            <div style="font-size:2rem;">🎨</div>
+            <div>
+              <div style="font-weight:700;margin-bottom:2px;">Peintre / Décorateur</div>
+              <div style="font-size:0.8rem;color:var(--text-secondary);">
+                Peinture intérieure/extérieure, sous-couche, enduit, tapisserie, ravalement…
+              </div>
+            </div>
+            <div style="margin-left:auto;">
+              <span class="badge badge-devis">10 lignes</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Onboarding Modal -->
+<div class="modal-backdrop" id="onboarding-modal" style="background:rgba(0,0,0,0.9)">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-body" style="padding:2rem">
+      <!-- Step 1 -->
+      <div id="ob-step-1" class="onboarding-step">
+        <div class="onboarding-icon">⚡</div>
+        <div class="onboarding-title">Bienvenue sur SmartDevis Pro !</div>
+        <div class="onboarding-sub">La solution française de devis et facturation pour entrepreneurs.</div>
+        <button class="btn btn-primary" style="width:100%;margin-top:1rem" onclick="obNext(2)">Commencer →</button>
+      </div>
+      <!-- Step 2 -->
+      <div id="ob-step-2" class="onboarding-step" style="display:none;text-align:left">
+        <div class="onboarding-title" style="font-size:1.2rem;margin-bottom:1rem">🏢 Configuration rapide</div>
+        <div class="form-group"><label>Nom / Raison sociale *</label><input type="text" id="ob-name" placeholder="Mon Entreprise"></div>
+        <div class="form-group">
+          <label>Statut juridique</label>
+          <select id="ob-statut">
+            <option value="auto-entrepreneur">Auto-entrepreneur</option>
+            <option value="EI">EI</option>
+            <option value="EURL">EURL</option>
+            <option value="SARL">SARL</option>
+            <option value="SAS">SAS</option>
+            <option value="SASU">SASU</option>
+            <option value="artisan">Artisan</option>
+          </select>
+        </div>
+        <div class="form-group"><label>SIRET (14 chiffres)</label><input type="text" id="ob-siret" maxlength="14" placeholder="00000000000000" oninput="this.value=this.value.replace(/\D/g,'')"></div>
+        <div class="form-group"><label>Email *</label><input type="email" id="ob-email" placeholder="contact@entreprise.fr"></div>
+        <div class="btn-group" style="margin-top:1rem;justify-content:space-between">
+          <button class="btn btn-secondary" onclick="obNext(1)">← Retour</button>
+          <button class="btn btn-primary" onclick="obNext(3)">Suivant →</button>
+        </div>
+      </div>
+      <!-- Step 3 -->
+      <div id="ob-step-3" class="onboarding-step" style="display:none;text-align:left">
+        <div class="onboarding-title" style="font-size:1.2rem;margin-bottom:1rem">💶 Régime TVA</div>
+        <div class="form-group">
+          <div class="toggle-wrap">
+            <label class="toggle"><input type="checkbox" id="ob-tva"><span class="toggle-slider"></span></label>
+            <span class="toggle-label">Assujetti à la TVA</span>
+          </div>
+          <div class="form-hint" style="margin-top:8px">
+            <strong>TVA OFF</strong> = Franchise en base (art. 293 B du CGI) — mention auto sur vos documents.<br>
+            <strong>TVA ON</strong> = TVA collectée et déclarée.
+          </div>
+        </div>
+        <div class="btn-group" style="margin-top:1.5rem;justify-content:space-between">
+          <button class="btn btn-secondary" onclick="obNext(2)">← Retour</button>
+          <button class="btn btn-primary" onclick="obFinish()">Terminer → Accéder à SmartDevis</button>
+        </div>
+      </div>
+      <!-- Dots -->
+      <div class="onboarding-steps-dots">
+        <div class="onboarding-dot active" id="ob-dot-1"></div>
+        <div class="onboarding-dot" id="ob-dot-2"></div>
+        <div class="onboarding-dot" id="ob-dot-3"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Print container (hidden, shown during print) -->
+<div id="print-area" style="display:none"></div>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+'use strict';
+
+/* ============================================================
+   SECURITY: HTML escape
+   ============================================================ */
+function escHTML(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/* ============================================================
+   DATA LAYER
+   ============================================================ */
+function getConfig() {
+  try {
+    const raw = localStorage.getItem('smartdevis_config');
+    return raw ? JSON.parse(raw) : getDefaultConfig();
+  } catch(e) { return getDefaultConfig(); }
+}
+function setConfig(cfg) {
+  localStorage.setItem('smartdevis_config', JSON.stringify(cfg));
+}
+function getQuotes() {
+  try {
+    const raw = localStorage.getItem('smartdevis_quotes');
+    return raw ? JSON.parse(raw) : [];
+  } catch(e) { return []; }
+}
+function setQuotes(arr) {
+  localStorage.setItem('smartdevis_quotes', JSON.stringify(arr));
+  checkStorageUsage();
+}
+function getClients() {
+  try {
+    const raw = localStorage.getItem('smartdevis_clients');
+    return raw ? JSON.parse(raw) : [];
+  } catch(e) { return []; }
+}
+function setClients(arr) {
+  localStorage.setItem('smartdevis_clients', JSON.stringify(arr));
+}
+function getCatalog() {
+  try {
+    const raw = localStorage.getItem('smartdevis_catalog');
+    return raw ? JSON.parse(raw) : [];
+  } catch(e) { return []; }
+}
+function setCatalog(arr) {
+  localStorage.setItem('smartdevis_catalog', JSON.stringify(arr));
+}
+function getDraft() {
+  try {
+    const raw = localStorage.getItem('smartdevis_draft');
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
+}
+function setDraft(obj) {
+  localStorage.setItem('smartdevis_draft', JSON.stringify(obj));
+}
+function clearDraft() {
+  localStorage.removeItem('smartdevis_draft');
+}
+
+function getDefaultConfig() {
+  return {
+    company: { name: '', statut: '', email: '', phone: '', siret: '', tvaIntra: '', rm: '', rcs: '', address: '', website: '', logo: '', cgv: '', assureur: '', contratAssurance: '', couverture: 'France métropolitaine' },
+    pricing: { tvaActive: false, vatRate: 20, chargesPercent: 22, marginPercent: 30, tauxHoraire: 45, urgencePct: 15, acomptePct: 30, validiteDevis: 30 },
+    numerotation: { prefixDevis: 'DEV', prefixFacture: 'FAC', counterDevis: 1, counterFacture: 1, format: 'PREFIX-YYYY-NNN' },
+    paiement: { delai: 30, tauxPenalites: '3 fois le taux légal', indemniteRecouvrement: true, iban: '', bic: '', modes: ['virement'] },
+    mentions: { reservePropriete: '', tribunalCompetent: '', noteBasPage: '' }
+  };
+}
+
+/* ============================================================
+   DOCUMENT NUMBER GENERATION
+   ============================================================ */
+function generateDocumentNumber(type) {
+  const cfg = getConfig();
+  if (!cfg.numerotation) cfg.numerotation = getDefaultConfig().numerotation;
+  const prefix = type === 'facture' ? cfg.numerotation.prefixFacture : cfg.numerotation.prefixDevis;
+  const counter = type === 'facture' ? cfg.numerotation.counterFacture : cfg.numerotation.counterDevis;
+  const format = cfg.numerotation.format || 'PREFIX-YYYY-NNN';
+  const year = new Date().getFullYear();
+  const month = String(new Date().getMonth() + 1).padStart(2, '0');
+  const num = String(counter).padStart(3, '0');
+  let id;
+  switch(format) {
+    case 'PREFIX-YYYY-NNN':   id = `${prefix}-${year}-${num}`; break;
+    case 'PREFIX-NNN':        id = `${prefix}-${num}`; break;
+    case 'PREFIX-YYYYMM-NNN': id = `${prefix}-${year}${month}-${num}`; break;
+    default:                  id = `${prefix}-${year}-${num}`;
+  }
+  if (type === 'facture') cfg.numerotation.counterFacture++;
+  else cfg.numerotation.counterDevis++;
+  setConfig(cfg);
+  return id;
+}
+
+/* ============================================================
+   CALCULATION
+   ============================================================ */
+function calculateDocument(lines, cfg, options = {}) {
+  if (!cfg.pricing) cfg.pricing = getDefaultConfig().pricing;
+  let subtotalHT = 0;
+  lines.forEach(line => {
+    if (line.type === 'titre' || line.type === 'soustotal') return;
+    const lineTotal = (parseFloat(line.qte) || 0) * (parseFloat(line.prixUnitaireHT) || 0);
+    const remiseRaw = parseFloat(line.remise) || 0;
+    const remiseVal = line.remiseType === 'pct'
+      ? lineTotal * (remiseRaw / 100)
+      : remiseRaw;
+    line.totalHT = lineTotal - remiseVal;
+    subtotalHT += line.totalHT;
+  });
+  const remiseGlobaleRaw = parseFloat(options.remiseGlobaleVal) || 0;
+  let remiseGlobale = options.remiseGlobaleType === 'pct'
+    ? subtotalHT * (remiseGlobaleRaw / 100)
+    : remiseGlobaleRaw;
+  let afterRemise = subtotalHT - remiseGlobale;
+  const urgentSurcharge = options.urgent
+    ? afterRemise * ((parseFloat(cfg.pricing.urgencePct) || 15) / 100) : 0;
+  afterRemise += urgentSurcharge;
+  const charges = afterRemise * ((parseFloat(cfg.pricing.chargesPercent) || 22) / 100);
+  const marge = (afterRemise + charges) * ((parseFloat(cfg.pricing.marginPercent) || 30) / 100);
+  const totalHT = afterRemise + charges + marge;
+  const vat = cfg.pricing.tvaActive ? totalHT * ((parseFloat(cfg.pricing.vatRate) || 20) / 100) : 0;
+  const totalTTC = totalHT + vat;
+  const acompteVal = totalTTC * ((parseFloat(options.acomptePct) || 0) / 100);
+  const solde = totalTTC - acompteVal;
+  return { subtotalHT, remiseGlobale, urgentSurcharge, charges, marge, totalHT, vat, totalTTC, acompteVal, solde };
+}
+
+/* ============================================================
+   MENTIONS LÉGALES
+   ============================================================ */
+function formatPenalites(value) {
+  if (typeof value === 'number') return `${value}%`;
+  const str = String(value).trim();
+  // Si la valeur se termine déjà par '%', on ne double pas
+  return str.endsWith('%') ? str : str;
+}
+
+function getMentionsLegales(cfg) {
+  const mentions = [];
+  if (!cfg.pricing || !cfg.pricing.tvaActive)
+    mentions.push("TVA non applicable, art. 293 B du CGI");
+  if (cfg.company && cfg.company.statut === 'artisan' && cfg.company.rm)
+    mentions.push(`Inscrit au Répertoire des Métiers sous le n° ${cfg.company.rm}`);
+  if (cfg.company && cfg.company.assureur)
+    mentions.push(`Assurance pro : ${cfg.company.assureur} · Contrat : ${cfg.company.contratAssurance} · Couverture : ${cfg.company.couverture}`);
+  if (cfg.paiement && cfg.paiement.indemniteRecouvrement)
+    mentions.push(`Pénalités de retard exigibles dès le lendemain de l'échéance au taux de ${formatPenalites(cfg.paiement.tauxPenalites)} l'an. Indemnité forfaitaire de recouvrement : 40 €.`);
+  return mentions;
+}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+function showToast(message, type = 'success') {
+  const container = document.getElementById('toast-container');
+  const icons = { success: '✓', error: '✕', info: 'ℹ', warning: '⚠' };
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.innerHTML = `<span>${icons[type] || '•'}</span><span>${escHTML(message)}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3200);
+}
+
+/* ============================================================
+   FORMAT CURRENCY
+   ============================================================ */
+function fmt(n) {
+  return (parseFloat(n) || 0).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+}
+function fmtNum(n) {
+  return parseFloat(n).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+/* ============================================================
+   THEME
+   ============================================================ */
+function initTheme() {
+  const saved = localStorage.getItem('smartdevis_theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  updateThemeBtn(saved);
+}
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('smartdevis_theme', next);
+  updateThemeBtn(next);
+}
+function updateThemeBtn(theme) {
+  const btn = document.getElementById('theme-btn');
+  if (btn) btn.textContent = theme === 'dark' ? '☀ Mode clair' : '🌙 Mode sombre';
+}
+
+/* ============================================================
+   TABS
+   ============================================================ */
+let currentTab = 'config';
+function switchTab(tab) {
+  // Hide all panes
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  // Show selected
+  const pane = document.getElementById(`pane-${tab}`);
+  const nav = document.getElementById(`tab-${tab}`);
+  if (pane) pane.classList.add('active');
+  if (nav) nav.classList.add('active');
+  currentTab = tab;
+  // Tab-specific init
+  if (tab === 'historique') { checkExpiredQuotes(); renderHistory(); renderHistoryKPIs(); }
+  if (tab === 'catalogue') { renderCatalog(); renderCategories(); }
+  if (tab === 'dashboard') { renderDashboard(); }
+  if (tab === 'nouveau') { checkDraftBanner(); }
+  if (tab === 'config') { renderClientsList(); updateNumPreview(); updateConfigProgress(); }
+  // Close mobile sidebar
+  if (window.innerWidth <= 768) {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebar-overlay').classList.remove('open');
+  }
+}
+
+/* ============================================================
+   SIDEBAR MOBILE
+   ============================================================ */
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('sidebar-overlay');
+  sb.classList.toggle('open');
+  ov.classList.toggle('open');
+}
+
+/* ============================================================
+   MODAL HELPERS
+   ============================================================ */
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+/* ============================================================
+   CONFIG: LOAD & SAVE
+   ============================================================ */
+function loadConfigUI() {
+  const cfg = getConfig();
+  const c = cfg.company || {};
+  const p = cfg.pricing || {};
+  const n = cfg.numerotation || {};
+  const pay = cfg.paiement || {};
+  const m = cfg.mentions || {};
+
+  document.getElementById('cfg-name').value = c.name || '';
+  document.getElementById('cfg-statut').value = c.statut || '';
+  document.getElementById('cfg-email').value = c.email || '';
+  document.getElementById('cfg-phone').value = c.phone || '';
+  document.getElementById('cfg-siret').value = c.siret || '';
+  document.getElementById('cfg-tva-intra').value = c.tvaIntra || '';
+  document.getElementById('cfg-rm').value = c.rm || '';
+  document.getElementById('cfg-rcs').value = c.rcs || '';
+  document.getElementById('cfg-address').value = c.address || '';
+  document.getElementById('cfg-website').value = c.website || '';
+  document.getElementById('cfg-cgv').value = c.cgv || '';
+  document.getElementById('cgv-counter').textContent = (c.cgv || '').length + '/3000';
+
+  if (c.logo) {
+    const preview = document.getElementById('cfg-logo-preview');
+    preview.src = c.logo;
+    preview.style.display = 'block';
+    document.getElementById('cfg-logo-placeholder').style.display = 'none';
+    document.getElementById('btn-remove-logo').style.display = 'inline-flex';
+  }
+
+  document.getElementById('cfg-tva-toggle').checked = !!p.tvaActive;
+  document.getElementById('cfg-tva-rate').value = p.vatRate || 20;
+  updateTVAFields();
+
+  document.getElementById('cfg-assureur').value = c.assureur || '';
+  document.getElementById('cfg-contrat-assurance').value = c.contratAssurance || '';
+  document.getElementById('cfg-couverture').value = c.couverture || 'France métropolitaine';
+
+  document.getElementById('cfg-prefix-devis').value = n.prefixDevis || 'DEV';
+  document.getElementById('cfg-prefix-facture').value = n.prefixFacture || 'FAC';
+  document.getElementById('cfg-counter-devis').value = n.counterDevis || 1;
+  document.getElementById('cfg-counter-facture').value = n.counterFacture || 1;
+  document.getElementById('cfg-format-numero').value = n.format || 'PREFIX-YYYY-NNN';
+
+  document.getElementById('cfg-delai-paiement').value = pay.delai || 30;
+  document.getElementById('cfg-taux-penalites').value = pay.tauxPenalites || '3 fois le taux légal';
+  document.getElementById('cfg-indemnite-recouvrement').checked = pay.indemniteRecouvrement !== false;
+  document.getElementById('cfg-iban').value = pay.iban || '';
+  document.getElementById('cfg-bic').value = pay.bic || '';
+  const modes = pay.modes || ['virement'];
+  document.getElementById('pay-virement').checked = modes.includes('virement');
+  document.getElementById('pay-cheque').checked = modes.includes('cheque');
+  document.getElementById('pay-carte').checked = modes.includes('carte');
+  document.getElementById('pay-especes').checked = modes.includes('especes');
+  document.getElementById('pay-paypal').checked = modes.includes('paypal');
+
+  const chargesPct = p.chargesPercent || 22;
+  document.getElementById('cfg-charges-pct').value = chargesPct;
+  document.getElementById('charges-val').textContent = chargesPct + '%';
+  const margePct = p.marginPercent || 30;
+  document.getElementById('cfg-marge-pct').value = margePct;
+  document.getElementById('marge-val').textContent = margePct + '%';
+  document.getElementById('cfg-taux-horaire').value = p.tauxHoraire || 45;
+  const urgPct = p.urgencePct || 15;
+  document.getElementById('cfg-urgence-pct').value = urgPct;
+  document.getElementById('urgence-val').textContent = urgPct + '%';
+  document.getElementById('cfg-acompte-pct').value = p.acomptePct || 30;
+  document.getElementById('cfg-validite-devis').value = p.validiteDevis || 30;
+
+  document.getElementById('cfg-reserve-propriete').value = m.reservePropriete || '';
+  document.getElementById('cfg-tribunal-competent').value = m.tribunalCompetent || '';
+  document.getElementById('cfg-note-bas-page').value = m.noteBasPage || '';
+
+  updateConditionalFields();
+  updateNumPreview();
+  updateConfigProgress();
+}
+
+function saveConfig() {
+  const modes = [];
+  if (document.getElementById('pay-virement').checked) modes.push('virement');
+  if (document.getElementById('pay-cheque').checked) modes.push('cheque');
+  if (document.getElementById('pay-carte').checked) modes.push('carte');
+  if (document.getElementById('pay-especes').checked) modes.push('especes');
+  if (document.getElementById('pay-paypal').checked) modes.push('paypal');
+
+  const cfg = {
+    company: {
+      name: document.getElementById('cfg-name').value.trim(),
+      statut: document.getElementById('cfg-statut').value,
+      email: document.getElementById('cfg-email').value.trim(),
+      phone: document.getElementById('cfg-phone').value.trim(),
+      siret: document.getElementById('cfg-siret').value.trim(),
+      tvaIntra: document.getElementById('cfg-tva-intra').value.trim(),
+      rm: document.getElementById('cfg-rm').value.trim(),
+      rcs: document.getElementById('cfg-rcs').value.trim(),
+      address: document.getElementById('cfg-address').value.trim(),
+      website: document.getElementById('cfg-website').value.trim(),
+      logo: getConfig().company?.logo || '',
+      cgv: document.getElementById('cfg-cgv').value.trim(),
+      assureur: document.getElementById('cfg-assureur').value.trim(),
+      contratAssurance: document.getElementById('cfg-contrat-assurance').value.trim(),
+      couverture: document.getElementById('cfg-couverture').value
+    },
+    pricing: {
+      tvaActive: document.getElementById('cfg-tva-toggle').checked,
+      vatRate: parseFloat(document.getElementById('cfg-tva-rate').value) || 20,
+      chargesPercent: parseInt(document.getElementById('cfg-charges-pct').value) || 22,
+      marginPercent: parseInt(document.getElementById('cfg-marge-pct').value) || 30,
+      tauxHoraire: parseFloat(document.getElementById('cfg-taux-horaire').value) || 45,
+      urgencePct: parseInt(document.getElementById('cfg-urgence-pct').value) || 15,
+      acomptePct: parseInt(document.getElementById('cfg-acompte-pct').value) || 30,
+      validiteDevis: parseInt(document.getElementById('cfg-validite-devis').value) || 30
+    },
+    numerotation: {
+      prefixDevis: document.getElementById('cfg-prefix-devis').value || 'DEV',
+      prefixFacture: document.getElementById('cfg-prefix-facture').value || 'FAC',
+      counterDevis: parseInt(document.getElementById('cfg-counter-devis').value) || 1,
+      counterFacture: parseInt(document.getElementById('cfg-counter-facture').value) || 1,
+      format: document.getElementById('cfg-format-numero').value
+    },
+    paiement: {
+      delai: parseInt(document.getElementById('cfg-delai-paiement').value) || 30,
+      tauxPenalites: document.getElementById('cfg-taux-penalites').value,
+      indemniteRecouvrement: document.getElementById('cfg-indemnite-recouvrement').checked,
+      iban: document.getElementById('cfg-iban').value.trim(),
+      bic: document.getElementById('cfg-bic').value.trim(),
+      modes
+    },
+    mentions: {
+      reservePropriete: document.getElementById('cfg-reserve-propriete').value.trim(),
+      tribunalCompetent: document.getElementById('cfg-tribunal-competent').value.trim(),
+      noteBasPage: document.getElementById('cfg-note-bas-page').value.trim()
+    }
+  };
+  setConfig(cfg);
+  updateConfigProgress();
+  showToast('Configuration sauvegardée !', 'success');
+}
+
+function resetConfig() {
+  if (!confirm('Réinitialiser toute la configuration ? Cette action est irréversible.')) return;
+  localStorage.removeItem('smartdevis_config');
+  loadConfigUI();
+  showToast('Configuration réinitialisée.', 'info');
+}
+
+function exportConfigJSON() {
+  const cfg = getConfig();
+  const blob = new Blob([JSON.stringify(cfg, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'smartdevis-config.json';
+  a.click();
+  showToast('Configuration exportée.', 'success');
+}
+
+function importConfigJSON(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const cfg = JSON.parse(e.target.result);
+      setConfig(cfg);
+      loadConfigUI();
+      showToast('Configuration importée !', 'success');
+    } catch(err) { showToast('Fichier JSON invalide.', 'error'); }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+/* ============================================================
+   CONFIG: CONDITIONAL FIELDS
+   ============================================================ */
+function updateConditionalFields() {
+  const statut = document.getElementById('cfg-statut').value;
+  const tvaOn = document.getElementById('cfg-tva-toggle').checked;
+  const isArtisan = statut === 'artisan';
+  const hasRCS = ['SARL','SAS','SASU','EURL'].includes(statut);
+  const hasAssurance = ['artisan','EI'].includes(statut);
+
+  toggleEl('wrap-rm', isArtisan);
+  toggleEl('wrap-rcs', hasRCS);
+  toggleEl('wrap-tva-intra', tvaOn);
+  toggleEl('wrap-assurance', hasAssurance, 'fieldset');
+}
+
+function updateTVAFields() {
+  const on = document.getElementById('cfg-tva-toggle').checked;
+  toggleEl('wrap-tva-rate', on);
+  updateConditionalFields();
+}
+
+function toggleEl(id, show, tag) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (tag === 'fieldset') {
+    el.style.display = show ? 'block' : 'none';
+  } else {
+    el.classList.toggle('visible', show);
+    el.style.display = show ? 'block' : 'none';
+  }
+}
+
+/* ============================================================
+   LOGO
+   ============================================================ */
+function handleLogoUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) { showToast('Logo trop lourd (max 2 Mo)', 'error'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const cfg = getConfig();
+    cfg.company.logo = e.target.result;
+    setConfig(cfg);
+    const preview = document.getElementById('cfg-logo-preview');
+    preview.src = e.target.result;
+    preview.style.display = 'block';
+    document.getElementById('cfg-logo-placeholder').style.display = 'none';
+    document.getElementById('btn-remove-logo').style.display = 'inline-flex';
+    showToast('Logo importé.', 'success');
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeLogo() {
+  const cfg = getConfig();
+  cfg.company.logo = '';
+  setConfig(cfg);
+  document.getElementById('cfg-logo-preview').style.display = 'none';
+  document.getElementById('cfg-logo-preview').src = '';
+  document.getElementById('cfg-logo-placeholder').style.display = 'block';
+  document.getElementById('btn-remove-logo').style.display = 'none';
+  showToast('Logo supprimé.', 'info');
+}
+
+/* ============================================================
+   NUMERO PREVIEW
+   ============================================================ */
+function updateNumPreview() {
+  const prefix = document.getElementById('cfg-prefix-devis')?.value || 'DEV';
+  const format = document.getElementById('cfg-format-numero')?.value || 'PREFIX-YYYY-NNN';
+  const year = new Date().getFullYear();
+  const month = String(new Date().getMonth() + 1).padStart(2, '0');
+  let preview;
+  switch(format) {
+    case 'PREFIX-YYYY-NNN': preview = `${prefix}-${year}-001`; break;
+    case 'PREFIX-NNN': preview = `${prefix}-001`; break;
+    case 'PREFIX-YYYYMM-NNN': preview = `${prefix}-${year}${month}-001`; break;
+    default: preview = `${prefix}-${year}-001`;
+  }
+  const el = document.getElementById('num-preview');
+  if (el) el.textContent = `→ ${preview}`;
+}
+
+/* ============================================================
+   CONFIG PROGRESS BAR
+   ============================================================ */
+function updateConfigProgress() {
+  const cfg = getConfig();
+  const c = cfg.company || {};
+  let filled = 0;
+  const checks = [c.name, c.email, c.siret, c.address, c.statut];
+  checks.forEach(v => { if (v && v.trim()) filled++; });
+  const pct = Math.round((filled / checks.length) * 100);
+  const bar = document.getElementById('config-bar');
+  const label = document.getElementById('config-pct-label');
+  if (bar) bar.style.width = pct + '%';
+  if (label) label.textContent = pct + '%';
+}
+
+/* ============================================================
+   CLIENTS
+   ============================================================ */
+function renderClientsList() {
+  const clients = getClients();
+  const container = document.getElementById('clients-list');
+  if (!container) return;
+  if (!clients.length) {
+    container.innerHTML = '<div class="empty-state" style="padding:1rem"><div class="empty-state-icon">👤</div><p>Aucun client enregistré.</p></div>';
+    return;
+  }
+  container.innerHTML = clients.map((c, i) => `
+    <div class="client-row">
+      <div class="client-row-info">
+        <div class="client-row-name">${escHTML(c.nom)}${c.entreprise ? ' — ' + escHTML(c.entreprise) : ''}</div>
+        <div class="client-row-email">${escHTML(c.email || '')}</div>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-secondary btn-xs" onclick="editClientModal(${i})">✏</button>
+        <button class="btn btn-danger btn-xs" onclick="deleteClient(${i})">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openClientModal(idx) {
+  document.getElementById('client-modal-id').value = idx !== undefined ? idx : '';
+  document.getElementById('client-modal-title').textContent = idx !== undefined ? 'Modifier client' : 'Nouveau client';
+  if (idx !== undefined) {
+    const c = getClients()[idx];
+    document.getElementById('cm-nom').value = c.nom || '';
+    document.getElementById('cm-entreprise').value = c.entreprise || '';
+    document.getElementById('cm-siren').value = c.siren || '';
+    document.getElementById('cm-email').value = c.email || '';
+    document.getElementById('cm-telephone').value = c.telephone || '';
+    document.getElementById('cm-adresse').value = c.adresse || '';
+  } else {
+    ['cm-nom','cm-entreprise','cm-siren','cm-email','cm-telephone','cm-adresse'].forEach(id => document.getElementById(id).value = '');
+  }
+  openModal('client-modal');
+}
+function editClientModal(idx) { openClientModal(idx); }
+
+function saveClientModal() {
+  const nom = document.getElementById('cm-nom').value.trim();
+  if (!nom) { showToast('Le nom est requis.', 'error'); return; }
+  const client = {
+    id: Date.now(),
+    nom,
+    entreprise: document.getElementById('cm-entreprise').value.trim(),
+    siren: document.getElementById('cm-siren').value.trim(),
+    email: document.getElementById('cm-email').value.trim(),
+    telephone: document.getElementById('cm-telephone').value.trim(),
+    adresse: document.getElementById('cm-adresse').value.trim()
+  };
+  const clients = getClients();
+  const idxStr = document.getElementById('client-modal-id').value;
+  if (idxStr !== '') {
+    clients[parseInt(idxStr)] = { ...clients[parseInt(idxStr)], ...client };
+  } else {
+    clients.push(client);
+  }
+  setClients(clients);
+  renderClientsList();
+  closeModal('client-modal');
+  showToast('Client enregistré.', 'success');
+}
+
+function deleteClient(idx) {
+  if (!confirm('Supprimer ce client ?')) return;
+  const clients = getClients();
+  clients.splice(idx, 1);
+  setClients(clients);
+  renderClientsList();
+  showToast('Client supprimé.', 'info');
+}
+
+function saveClientToDB() {
+  const nom = document.getElementById('client-nom').value.trim();
+  if (!nom) { showToast('Entrez un nom client d\'abord.', 'warning'); return; }
+  const client = {
+    id: Date.now(),
+    nom,
+    entreprise: document.getElementById('client-entreprise').value.trim(),
+    siren: document.getElementById('client-siren').value.trim(),
+    email: document.getElementById('client-email').value.trim(),
+    telephone: document.getElementById('client-telephone').value.trim(),
+    adresse: document.getElementById('client-adresse').value.trim()
+  };
+  const clients = getClients();
+  clients.push(client);
+  setClients(clients);
+  showToast('Client enregistré dans la base.', 'success');
+}
+
+/* ============================================================
+   AUTOCOMPLETE CLIENT
+   ============================================================ */
+function acClientSearch(val) {
+  const dd = document.getElementById('ac-dropdown');
+  if (val.length < 2) { dd.classList.remove('open'); return; }
+  const clients = getClients();
+  const q = val.toLowerCase();
+  const matches = clients.filter(c =>
+    (c.nom||'').toLowerCase().includes(q) ||
+    (c.entreprise||'').toLowerCase().includes(q) ||
+    (c.email||'').toLowerCase().includes(q)
+  ).slice(0, 8);
+  if (!matches.length) { dd.classList.remove('open'); return; }
+  dd.innerHTML = matches.map(c => `
+    <div class="ac-item" onclick="fillClient(${c.id})">
+      <strong>${escHTML(c.nom)}</strong>${c.entreprise ? ' · ' + escHTML(c.entreprise) : ''}
+      ${c.email ? '<br><small style="color:var(--text-muted)">' + escHTML(c.email) + '</small>' : ''}
+    </div>
+  `).join('');
+  dd.classList.add('open');
+}
+
+function fillClient(id) {
+  const clients = getClients();
+  const c = clients.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('client-nom').value = c.nom || '';
+  document.getElementById('client-entreprise').value = c.entreprise || '';
+  document.getElementById('client-siren').value = c.siren || '';
+  document.getElementById('client-email').value = c.email || '';
+  document.getElementById('client-telephone').value = c.telephone || '';
+  document.getElementById('client-adresse').value = c.adresse || '';
+  document.getElementById('ac-dropdown').classList.remove('open');
+  draftAutoSave();
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.autocomplete-wrap')) {
+    document.getElementById('ac-dropdown')?.classList.remove('open');
+  }
+});
+
+/* ============================================================
+   STEPPER / NOUVEAU DEVIS
+   ============================================================ */
+let currentStep = 1;
+
+function goToStep(n) {
+  // Validate step 1
+  if (n > 1) {
+    const nom = document.getElementById('client-nom').value.trim();
+    const email = document.getElementById('client-email').value.trim();
+    if (!nom || !email) { showToast('Nom et email client requis.', 'warning'); return; }
+  }
+  // Show/hide step content
+  for (let i = 1; i <= 3; i++) {
+    const el = document.getElementById(`step-${i}`);
+    if (el) el.style.display = i === n ? 'block' : 'none';
+  }
+  // Update stepper indicators
+  for (let i = 1; i <= 3; i++) {
+    const ind = document.getElementById(`step-indicator-${i}`);
+    if (!ind) continue;
+    ind.classList.remove('active', 'done');
+    if (i < n) ind.classList.add('done');
+    else if (i === n) ind.classList.add('active');
+  }
+  currentStep = n;
+  if (n === 2) recalc();
+  draftAutoSave();
+}
+
+/* ============================================================
+   LINES TABLE
+   ============================================================ */
+let lineId = 0;
+const UNITS = ['heures','jours','m²','m³','ml','unités','forfait','lot','kg','tonne','litre'];
+
+function addLine(data) {
+  lineId++;
+  const id = lineId;
+  const tbody = document.getElementById('lines-tbody');
+  const tr = document.createElement('tr');
+  tr.id = `line-${id}`;
+  tr.dataset.id = id;
+  const d = data || {};
+  tr.innerHTML = `
+    <td data-label="#"><span class="line-num"></span></td>
+    <td data-label="Désignation"><input type="text" placeholder="Désignation" value="${escHTML(d.designation||'')}" oninput="lineChanged()" style="min-width:120px"></td>
+    <td data-label="Description"><input type="text" placeholder="Description" value="${escHTML(d.description||'')}" oninput="lineChanged()" style="min-width:100px"></td>
+    <td data-label="Qté"><input type="number" value="${d.qte||1}" min="0" step="0.01" oninput="lineChanged()" style="width:55px"></td>
+    <td data-label="Unité">
+      <select oninput="lineChanged()" style="width:80px">
+        ${UNITS.map(u => `<option ${(d.unite||'unités')===u?'selected':''}>${u}</option>`).join('')}
+      </select>
+    </td>
+    <td data-label="Prix HT"><input type="number" value="${d.prixUnitaireHT||0}" min="0" step="0.01" oninput="lineChanged()" style="width:80px"></td>
+    <td data-label="Remise" style="white-space:nowrap">
+      <input type="number" value="${d.remise||0}" min="0" step="0.01" oninput="lineChanged()" style="width:45px">
+      <select oninput="lineChanged()" style="width:42px">
+        <option value="pct" ${(d.remiseType||'pct')==='pct'?'selected':''}>%</option>
+        <option value="eur" ${d.remiseType==='eur'?'selected':''}>€</option>
+      </select>
+    </td>
+    <td data-label="Total HT" class="line-total-cell" style="font-weight:600">0,00 €</td>
+    <td data-label="Actions" style="white-space:nowrap">
+      <button class="btn btn-secondary btn-xs" onclick="moveLine(${id},-1)" title="Monter">↑</button>
+      <button class="btn btn-secondary btn-xs" onclick="moveLine(${id},1)" title="Descendre">↓</button>
+      <button class="btn btn-danger btn-xs" onclick="removeLine(${id})">✕</button>
+    </td>
+  `;
+  tbody.appendChild(tr);
+  updateLineNumbers();
+  recalc();
+}
+
+function addSection(title) {
+  lineId++;
+  const id = lineId;
+  const tbody = document.getElementById('lines-tbody');
+  const tr = document.createElement('tr');
+  tr.id = `line-${id}`;
+  tr.dataset.id = id;
+  tr.dataset.type = 'titre';
+  tr.className = 'row-titre';
+  tr.innerHTML = `
+    <td colspan="7"><input type="text" value="${escHTML(title||'Section')}" placeholder="Titre de section" oninput="lineChanged()" style="font-weight:700;background:transparent;border:none;width:100%;outline:none;color:var(--text)"></td>
+    <td></td>
+    <td style="white-space:nowrap">
+      <button class="btn btn-secondary btn-xs" onclick="moveLine(${id},-1)">↑</button>
+      <button class="btn btn-secondary btn-xs" onclick="moveLine(${id},1)">↓</button>
+      <button class="btn btn-danger btn-xs" onclick="removeLine(${id})">✕</button>
+    </td>
+  `;
+  tbody.appendChild(tr);
+}
+
+function addSousTotal() {
+  lineId++;
+  const id = lineId;
+  const tbody = document.getElementById('lines-tbody');
+  const tr = document.createElement('tr');
+  tr.id = `line-${id}`;
+  tr.dataset.id = id;
+  tr.dataset.type = 'soustotal';
+  tr.className = 'row-soustotal';
+  tr.innerHTML = `
+    <td colspan="7" style="font-weight:700">Sous-total</td>
+    <td class="soustotal-val" style="font-weight:700;color:var(--accent)">0,00 €</td>
+    <td style="white-space:nowrap">
+      <button class="btn btn-secondary btn-xs" onclick="moveLine(${id},-1)">↑</button>
+      <button class="btn btn-secondary btn-xs" onclick="moveLine(${id},1)">↓</button>
+      <button class="btn btn-danger btn-xs" onclick="removeLine(${id})">✕</button>
+    </td>
+  `;
+  tbody.appendChild(tr);
+  recalc();
+}
+
+function removeLine(id) {
+  const tr = document.getElementById(`line-${id}`);
+  if (tr) tr.remove();
+  updateLineNumbers();
+  recalc();
+}
+
+function moveLine(id, dir) {
+  const tr = document.getElementById(`line-${id}`);
+  if (!tr) return;
+  const tbody = document.getElementById('lines-tbody');
+  const rows = Array.from(tbody.children);
+  const idx = rows.indexOf(tr);
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= rows.length) return;
+  if (dir === -1) tbody.insertBefore(tr, rows[newIdx]);
+  else tbody.insertBefore(rows[newIdx], tr);
+  updateLineNumbers();
+  recalc();
+}
+
+function updateLineNumbers() {
+  let n = 1;
+  document.querySelectorAll('#lines-tbody tr').forEach(tr => {
+    const numEl = tr.querySelector('.line-num');
+    if (numEl) { numEl.textContent = n++; }
+  });
+}
+
+function lineChanged() {
+  recalc();
+  draftAutoSave();
+}
+
+/* ============================================================
+   RECALC / SUMMARY
+   ============================================================ */
+function recalc() {
+  const cfg = getConfig();
+  const lines = getLineData();
+  const remiseVal = parseFloat(document.getElementById('sum-remise-val')?.value) || 0;
+  const remiseType = document.getElementById('sum-remise-type')?.value || 'pct';
+  const urgent = document.getElementById('doc-urgent')?.checked || false;
+  const acomptePct = parseFloat(document.getElementById('doc-acompte')?.value) || (cfg.pricing?.acomptePct || 30);
+
+  const calc = calculateDocument(lines, cfg, {
+    remiseGlobaleVal: remiseVal,
+    remiseGlobaleType: remiseType,
+    urgent,
+    acomptePct
+  });
+
+  // Update line totals in table
+  let lineIdx = 0;
+  document.querySelectorAll('#lines-tbody tr').forEach(tr => {
+    if (tr.dataset.type === 'soustotal') {
+      // Running subtotal up to here
+      let st = 0;
+      let prev = tr.previousElementSibling;
+      while (prev) {
+        if (prev.dataset.type === 'soustotal') break;
+        if (!prev.dataset.type) {
+          const totalEl = prev.querySelector('.line-total-cell');
+          if (totalEl) {
+            const v = parseFloat(totalEl.textContent.replace(/[^0-9,\-]/g,'').replace(',','.')) || 0;
+            st += v;
+          }
+        }
+        prev = prev.previousElementSibling;
+      }
+      const stEl = tr.querySelector('.soustotal-val');
+      if (stEl) stEl.textContent = fmt(st);
+      return;
+    }
+    if (tr.dataset.type === 'titre') return;
+    const totalEl = tr.querySelector('.line-total-cell');
+    if (totalEl && lines[lineIdx]) {
+      totalEl.textContent = fmt(lines[lineIdx].totalHT || 0);
+      lineIdx++;
+    }
+  });
+
+  // Update summary
+  const s = id => document.getElementById(id);
+  if (s('sum-subtotal')) s('sum-subtotal').textContent = fmt(calc.subtotalHT);
+  if (s('sum-remise')) s('sum-remise').textContent = '-' + fmt(calc.remiseGlobale);
+  if (s('sum-charges')) s('sum-charges').textContent = fmt(calc.charges);
+  if (s('sum-marge')) s('sum-marge').textContent = fmt(calc.marge);
+  if (s('sum-total-ht')) s('sum-total-ht').textContent = fmt(calc.totalHT);
+  if (s('sum-acompte')) s('sum-acompte').textContent = fmt(calc.acompteVal);
+  if (s('sum-solde')) s('sum-solde').textContent = fmt(calc.solde);
+
+  // Urgence
+  if (s('sum-urgence-row')) s('sum-urgence-row').style.display = urgent ? 'flex' : 'none';
+  if (s('sum-urgence')) s('sum-urgence').textContent = fmt(calc.urgentSurcharge);
+
+  // TVA
+  if (cfg.pricing?.tvaActive) {
+    if (s('sum-tva-label')) s('sum-tva-label').textContent = `TVA (${cfg.pricing.vatRate}%)`;
+    if (s('sum-tva')) s('sum-tva').textContent = fmt(calc.vat);
+    if (s('sum-total-ttc')) s('sum-total-ttc').textContent = fmt(calc.totalTTC);
+  } else {
+    if (s('sum-tva-label')) s('sum-tva-label').textContent = 'TVA';
+    if (s('sum-tva')) s('sum-tva').textContent = 'Non applicable';
+    if (s('sum-total-ttc')) s('sum-total-ttc').textContent = fmt(calc.totalTTC);
+  }
+
+  // Charges/marge labels
+  if (s('sum-charges-pct')) s('sum-charges-pct').textContent = `(${cfg.pricing?.chargesPercent || 22}%)`;
+  if (s('sum-marge-pct')) s('sum-marge-pct').textContent = `(${cfg.pricing?.marginPercent || 30}%)`;
+  if (s('sum-acompte-pct')) s('sum-acompte-pct').textContent = `(${acomptePct}%)`;
+}
+
+/* ============================================================
+   GET LINE DATA FROM DOM
+   ============================================================ */
+function getLineData() {
+  const lines = [];
+  document.querySelectorAll('#lines-tbody tr').forEach(tr => {
+    if (tr.dataset.type === 'titre') {
+      const inp = tr.querySelector('input[type="text"]');
+      lines.push({ id: tr.dataset.id, type: 'titre', designation: inp ? inp.value : '' });
+      return;
+    }
+    if (tr.dataset.type === 'soustotal') {
+      lines.push({ id: tr.dataset.id, type: 'soustotal' });
+      return;
+    }
+    const inputs = tr.querySelectorAll('input');
+    const selects = tr.querySelectorAll('select');
+    lines.push({
+      id: tr.dataset.id,
+      type: 'ligne',
+      designation: inputs[0]?.value || '',
+      description: inputs[1]?.value || '',
+      qte: parseFloat(inputs[2]?.value) || 0,
+      unite: selects[0]?.value || 'unités',
+      prixUnitaireHT: parseFloat(inputs[3]?.value) || 0,
+      remise: parseFloat(inputs[4]?.value) || 0,
+      remiseType: selects[1]?.value || 'pct',
+      totalHT: 0
+    });
+  });
+  return lines;
+}
+
+/* ============================================================
+   TOGGLE URGENT
+   ============================================================ */
+function toggleUrgent() {
+  const on = document.getElementById('doc-urgent').checked;
+  const badge = document.getElementById('urgence-badge');
+  if (badge) badge.style.display = on ? 'inline-flex' : 'none';
+  const cfg = getConfig();
+  if (badge) badge.textContent = `+${cfg.pricing?.urgencePct || 15}%`;
+  recalc();
+}
+
+/* ============================================================
+   DRAFT AUTO-SAVE
+   ============================================================ */
+let draftTimer;
+function draftAutoSave() {
+  clearTimeout(draftTimer);
+  draftTimer = setTimeout(() => {
+    const draft = {
+      client: {
+        nom: document.getElementById('client-nom')?.value || '',
+        entreprise: document.getElementById('client-entreprise')?.value || '',
+        siren: document.getElementById('client-siren')?.value || '',
+        email: document.getElementById('client-email')?.value || '',
+        telephone: document.getElementById('client-telephone')?.value || '',
+        adresse: document.getElementById('client-adresse')?.value || ''
+      },
+      lines: getLineData(),
+      options: {
+        type: document.getElementById('doc-type')?.value || 'devis',
+        date: document.getElementById('doc-date')?.value || '',
+        dateExec: document.getElementById('doc-date-exec')?.value || '',
+        validite: document.getElementById('doc-validite')?.value || 30,
+        acomptePct: document.getElementById('doc-acompte')?.value || 30,
+        refCommande: document.getElementById('doc-ref-commande')?.value || '',
+        notesClient: document.getElementById('doc-notes-client')?.value || '',
+        notesInternes: document.getElementById('doc-notes-internes')?.value || '',
+        conditionsPaiement: document.getElementById('doc-conditions-paiement')?.value || '',
+        urgent: document.getElementById('doc-urgent')?.checked || false,
+        remiseGlobaleVal: document.getElementById('sum-remise-val')?.value || 0,
+        remiseGlobaleType: document.getElementById('sum-remise-type')?.value || 'pct',
+        step: currentStep
+      },
+      savedAt: new Date().toISOString()
+    };
+    setDraft(draft);
+    const el = document.getElementById('draft-saved-indicator');
+    if (el) { el.textContent = '✓ Sauvegardé ' + new Date().toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'}); el.style.opacity = '1'; setTimeout(() => el.style.opacity = '0', 2000); }
+    const indicator = document.getElementById('autosave-indicator');
+    if (indicator) {
+      indicator.textContent = '✅ Sauvegardé — ' + new Date().toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'});
+      indicator.style.color = 'var(--success)';
+      setTimeout(() => {
+        indicator.textContent = '💾 Sauvegarde auto active';
+        indicator.style.color = '';
+      }, 3000);
+    }
+  }, 1500);
+}
+
+function checkDraftBanner() {
+  const draft = getDraft();
+  const banner = document.getElementById('draft-banner');
+  if (draft && banner) {
+    banner.style.display = 'flex';
+  } else if (banner) {
+    banner.style.display = 'none';
+  }
+}
+
+function loadDraft() {
+  const draft = getDraft();
+  if (!draft) return;
+  // Fill client
+  const c = draft.client || {};
+  document.getElementById('client-nom').value = c.nom || '';
+  document.getElementById('client-entreprise').value = c.entreprise || '';
+  document.getElementById('client-siren').value = c.siren || '';
+  document.getElementById('client-email').value = c.email || '';
+  document.getElementById('client-telephone').value = c.telephone || '';
+  document.getElementById('client-adresse').value = c.adresse || '';
+  // Rebuild lines
+  document.getElementById('lines-tbody').innerHTML = '';
+  lineId = 0;
+  (draft.lines || []).forEach(line => {
+    if (line.type === 'titre') addSection(line.designation);
+    else if (line.type === 'soustotal') addSousTotal();
+    else addLine(line);
+  });
+  // Fill options
+  const o = draft.options || {};
+  if (document.getElementById('doc-type')) document.getElementById('doc-type').value = o.type || 'devis';
+  if (document.getElementById('doc-date')) document.getElementById('doc-date').value = o.date || '';
+  if (document.getElementById('doc-date-exec')) document.getElementById('doc-date-exec').value = o.dateExec || '';
+  if (document.getElementById('doc-validite')) document.getElementById('doc-validite').value = o.validite || 30;
+  if (document.getElementById('doc-acompte')) document.getElementById('doc-acompte').value = o.acomptePct || 30;
+  if (document.getElementById('doc-ref-commande')) document.getElementById('doc-ref-commande').value = o.refCommande || '';
+  if (document.getElementById('doc-notes-client')) document.getElementById('doc-notes-client').value = o.notesClient || '';
+  if (document.getElementById('doc-notes-internes')) document.getElementById('doc-notes-internes').value = o.notesInternes || '';
+  if (document.getElementById('doc-conditions-paiement')) document.getElementById('doc-conditions-paiement').value = o.conditionsPaiement || '';
+  if (document.getElementById('doc-urgent')) document.getElementById('doc-urgent').checked = !!o.urgent;
+  if (document.getElementById('sum-remise-val')) document.getElementById('sum-remise-val').value = o.remiseGlobaleVal || 0;
+  if (document.getElementById('sum-remise-type')) document.getElementById('sum-remise-type').value = o.remiseGlobaleType || 'pct';
+  goToStep(o.step || 1);
+  document.getElementById('draft-banner').style.display = 'none';
+  showToast('Brouillon restauré.', 'success');
+}
+
+function discardDraft() {
+  clearDraft();
+  document.getElementById('draft-banner').style.display = 'none';
+  resetNewDevisForm();
+  showToast('Brouillon ignoré.', 'info');
+}
+
+function resetNewDevisForm() {
+  ['client-nom','client-entreprise','client-siren','client-email','client-telephone','client-adresse'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.getElementById('lines-tbody').innerHTML = '';
+  lineId = 0;
+  goToStep(1);
+  const cfg = getConfig();
+  if (document.getElementById('doc-date')) document.getElementById('doc-date').value = todayISO();
+  if (document.getElementById('doc-validite')) document.getElementById('doc-validite').value = cfg.pricing?.validiteDevis || 30;
+  if (document.getElementById('doc-acompte')) document.getElementById('doc-acompte').value = cfg.pricing?.acomptePct || 30;
+}
+
+function todayISO() {
+  return new Date().toISOString().split('T')[0];
+}
+
+/* ============================================================
+   GENERATE DOCUMENT
+   ============================================================ */
+function generateDocument() {
+  const cfg = getConfig();
+  const nom = document.getElementById('client-nom').value.trim();
+  const email = document.getElementById('client-email').value.trim();
+  if (!nom || !email) { showToast('Nom et email client requis.', 'warning'); goToStep(1); return; }
+
+  const lines = getLineData();
+  const docType = document.getElementById('doc-type').value;
+  const remiseGlobaleVal = parseFloat(document.getElementById('sum-remise-val').value) || 0;
+  const remiseGlobaleType = document.getElementById('sum-remise-type').value;
+  const urgent = document.getElementById('doc-urgent').checked;
+  const acomptePct = parseFloat(document.getElementById('doc-acompte').value) || 0;
+  const validite = parseInt(document.getElementById('doc-validite').value) || 30;
+
+  const calc = calculateDocument(JSON.parse(JSON.stringify(lines)), cfg, {
+    remiseGlobaleVal, remiseGlobaleType, urgent, acomptePct
+  });
+
+  // Get modes
+  const modesPaiement = [];
+  if (document.getElementById('dpay-virement').checked) modesPaiement.push('Virement');
+  if (document.getElementById('dpay-cheque').checked) modesPaiement.push('Chèque');
+  if (document.getElementById('dpay-carte').checked) modesPaiement.push('Carte');
+  if (document.getElementById('dpay-especes').checked) modesPaiement.push('Espèces');
+  if (document.getElementById('dpay-paypal').checked) modesPaiement.push('PayPal');
+
+  const docId = generateDocumentNumber(docType);
+  const quote = {
+    id: docId,
+    type: docType,
+    status: 'brouillon',
+    createdAt: new Date().toISOString(),
+    sentAt: null,
+    acceptedAt: null,
+    paidAt: null,
+    client: {
+      nom,
+      entreprise: document.getElementById('client-entreprise').value.trim(),
+      siren: document.getElementById('client-siren').value.trim(),
+      email,
+      telephone: document.getElementById('client-telephone').value.trim(),
+      adresse: document.getElementById('client-adresse').value.trim()
+    },
+    lines: JSON.parse(JSON.stringify(lines)),
+    options: {
+      urgent,
+      remiseGlobaleType,
+      remiseGlobaleVal,
+      acomptePct,
+      validiteDays: validite,
+      dateExecution: document.getElementById('doc-date-exec').value,
+      referenceCommande: document.getElementById('doc-ref-commande').value.trim(),
+      notesClient: document.getElementById('doc-notes-client').value.trim(),
+      notesInternes: document.getElementById('doc-notes-internes').value.trim(),
+      conditionsPaiement: document.getElementById('doc-conditions-paiement').value.trim(),
+      modesPaiement,
+      docDate: document.getElementById('doc-date').value || todayISO()
+    },
+    calculation: calc
+  };
+
+  const quotes = getQuotes();
+  quotes.push(quote);
+  setQuotes(quotes);
+  clearDraft();
+
+  openPreviewModal(docId);
+  showToast(`${docType === 'devis' ? 'Devis' : docType === 'facture' ? 'Facture' : 'Avoir'} ${docId} créé !`, 'success');
+}
+
+/* ============================================================
+   PREVIEW MODAL
+   ============================================================ */
+let previewQuoteId = null;
+
+function openPreviewModal(id) {
+  previewQuoteId = id;
+  const quotes = getQuotes();
+  const q = quotes.find(x => x.id === id);
+  if (!q) return;
+  const cfg = getConfig();
+  document.getElementById('preview-modal-title').textContent = `Aperçu — ${id}`;
+  document.getElementById('preview-doc-container').innerHTML = buildPrintDoc(q, cfg);
+  buildPreviewActions(q);
+  openModal('preview-modal');
+}
+
+function buildPreviewActions(q) {
+  const container = document.getElementById('preview-status-actions');
+  let btns = '';
+  if (q.status === 'brouillon' || q.status === 'envoye') {
+    btns += `<button class="btn btn-info btn-sm" onclick="setStatus('${q.id}','en_attente');closeModal('preview-modal');renderHistory()">Marquer envoyé</button>`;
+  }
+  if (q.status === 'en_attente') {
+    btns += `<button class="btn btn-success btn-sm" onclick="setStatus('${q.id}','accepte');closeModal('preview-modal');renderHistory()">✓ Accepté</button>`;
+    btns += `<button class="btn btn-danger btn-sm" onclick="setStatus('${q.id}','refuse');closeModal('preview-modal');renderHistory()">✕ Refusé</button>`;
+  }
+  if (q.status === 'accepte' && q.type === 'devis') {
+    btns += `<button class="btn btn-primary btn-sm" onclick="convertToInvoice('${q.id}')">→ Convertir en facture</button>`;
+  }
+  if (q.status === 'facture') {
+    btns += `<button class="btn btn-success btn-sm" onclick="setStatus('${q.id}','paye');closeModal('preview-modal');renderHistory()">✓ Marquer payé</button>`;
+  }
+  container.innerHTML = btns;
+}
+
+function setStatus(id, status) {
+  const quotes = getQuotes();
+  const idx = quotes.findIndex(x => x.id === id);
+  if (idx < 0) return;
+  quotes[idx].status = status;
+  if (status === 'paye') quotes[idx].paidAt = new Date().toISOString();
+  if (status === 'accepte') quotes[idx].acceptedAt = new Date().toISOString();
+  setQuotes(quotes);
+  showToast(`Statut mis à jour : ${status}`, 'success');
+}
+
+// convertToInvoice is defined in the PDF/backup section above
+
+function sendEmail() {
+  const quotes = getQuotes();
+  const q = quotes.find(x => x.id === previewQuoteId);
+  if (!q) return;
+  const cfg = getConfig();
+  const subject = encodeURIComponent(`${q.type === 'facture' ? 'Facture' : 'Devis'} ${q.id} — ${cfg.company?.name || ''}`);
+  const body = encodeURIComponent(`Bonjour ${q.client.nom},\n\nVeuillez trouver ci-joint votre ${q.type === 'facture' ? 'facture' : 'devis'} n° ${q.id} d'un montant de ${fmt(q.calculation.totalTTC)}.\n\nCordialement,\n${cfg.company?.name || ''}`);
+  window.location.href = `mailto:${q.client.email}?subject=${subject}&body=${body}`;
+}
+
+function editDocument() {
+  const quotes = getQuotes();
+  const q = quotes.find(x => x.id === previewQuoteId);
+  if (!q) return;
+  closeModal('preview-modal');
+  // Load into form
+  document.getElementById('client-nom').value = q.client.nom || '';
+  document.getElementById('client-entreprise').value = q.client.entreprise || '';
+  document.getElementById('client-siren').value = q.client.siren || '';
+  document.getElementById('client-email').value = q.client.email || '';
+  document.getElementById('client-telephone').value = q.client.telephone || '';
+  document.getElementById('client-adresse').value = q.client.adresse || '';
+  document.getElementById('lines-tbody').innerHTML = '';
+  lineId = 0;
+  (q.lines || []).forEach(line => {
+    if (line.type === 'titre') addSection(line.designation);
+    else if (line.type === 'soustotal') addSousTotal();
+    else addLine(line);
+  });
+  if (q.options) {
+    document.getElementById('doc-type').value = q.type || 'devis';
+    document.getElementById('doc-date').value = q.options.docDate || todayISO();
+    document.getElementById('doc-date-exec').value = q.options.dateExecution || '';
+    document.getElementById('doc-validite').value = q.options.validiteDays || 30;
+    document.getElementById('doc-acompte').value = q.options.acomptePct || 0;
+    document.getElementById('doc-ref-commande').value = q.options.referenceCommande || '';
+    document.getElementById('doc-notes-client').value = q.options.notesClient || '';
+    document.getElementById('doc-notes-internes').value = q.options.notesInternes || '';
+    document.getElementById('doc-conditions-paiement').value = q.options.conditionsPaiement || '';
+    document.getElementById('doc-urgent').checked = !!q.options.urgent;
+    document.getElementById('sum-remise-val').value = q.options.remiseGlobaleVal || 0;
+    document.getElementById('sum-remise-type').value = q.options.remiseGlobaleType || 'pct';
+  }
+  // Remove old quote
+  const idx = quotes.findIndex(x => x.id === previewQuoteId);
+  if (idx >= 0) quotes.splice(idx, 1);
+  setQuotes(quotes);
+  switchTab('nouveau');
+  goToStep(3);
+  showToast('Document chargé pour modification.', 'info');
+}
+
+function duplicateDocument() {
+  const quotes = getQuotes();
+  const q = quotes.find(x => x.id === previewQuoteId);
+  if (!q) return;
+  const newDoc = JSON.parse(JSON.stringify(q));
+  const cfg = getConfig();
+  newDoc.id = generateDocumentNumber(newDoc.type);
+  newDoc.status = 'brouillon';
+  newDoc.createdAt = new Date().toISOString();
+  newDoc.sentAt = null; newDoc.acceptedAt = null; newDoc.paidAt = null;
+  quotes.push(newDoc);
+  setQuotes(quotes);
+  closeModal('preview-modal');
+  openPreviewModal(newDoc.id);
+  showToast(`Copie créée : ${newDoc.id}`, 'success');
+}
+
+function printDocument() {
+  const quotes = getQuotes();
+  const q = quotes.find(x => x.id === previewQuoteId);
+  if (!q) {
+    alert('Aucun devis sélectionné. Veuillez ouvrir un devis avant d\'imprimer.');
+    return;
+  }
+  console.log('[Print] Génération du document :', q.id);
+  const cfg = getConfig();
+  const html = buildPrintDoc(q, cfg);
+  if (!html) {
+    alert('Impossible de générer le document. Vérifiez les données du devis.');
+    return;
+  }
+  const printArea = document.getElementById('print-area');
+  // Injecter le HTML généré et ajouter la classe sur #print-area lui-même
+  // (enfant direct de <body>) pour que le CSS @media print l'affiche correctement
+  printArea.innerHTML = html;
+  printArea.classList.add('print-document-active');
+  console.log('[Print] Contenu injecté, lancement de l\'impression...');
+  // Laisser le navigateur rendre le DOM avant d'ouvrir la boîte de dialogue
+  setTimeout(() => {
+    window.print();
+  }, 80);
+}
+
+/* ============================================================
+   BUILD PRINT DOCUMENT
+   ============================================================ */
+function buildPrintDoc(q, cfg) {
+  const c = cfg.company || {};
+  const p = cfg.pricing || {};
+  const pay = cfg.paiement || {};
+  const m = cfg.mentions || {};
+  const calc = q.calculation || {};
+  const opts = q.options || {};
+
+  const docDate = opts.docDate || q.createdAt?.split('T')[0] || todayISO();
+  const validUntil = q.type === 'devis' ? addDays(docDate, opts.validiteDays || 30) : null;
+  const echeance = q.type === 'facture' ? addDays(docDate, pay.delai || 30) : null;
+  const mentions = getMentionsLegales(cfg);
+
+  let linesHtml = '';
+  let n = 1;
+  (q.lines || []).forEach(line => {
+    if (line.type === 'titre') {
+      linesHtml += `<tr class="row-t"><td colspan="8">${escHTML(line.designation)}</td></tr>`;
+      return;
+    }
+    if (line.type === 'soustotal') {
+      // Compute subtotal up to here
+      linesHtml += `<tr class="row-st"><td colspan="7" style="text-align:right;font-weight:700">Sous-total</td><td style="text-align:right;font-weight:700">${fmt(line._st||0)}</td></tr>`;
+      return;
+    }
+    const lineTotal = (parseFloat(line.qte)||0) * (parseFloat(line.prixUnitaireHT)||0);
+    const remise = line.remiseType === 'pct' ? lineTotal * ((parseFloat(line.remise)||0)/100) : (parseFloat(line.remise)||0);
+    const total = lineTotal - remise;
+    const remiseText = (parseFloat(line.remise)||0) > 0 ? (line.remiseType === 'pct' ? `${line.remise}%` : fmt(line.remise)) : '';
+    linesHtml += `<tr>
+      <td class="center">${n++}</td>
+      <td>${escHTML(line.designation)}</td>
+      <td style="font-size:0.75rem;color:#555">${escHTML(line.description||'')}</td>
+      <td class="num">${fmtNum(line.qte||0)}</td>
+      <td class="center">${escHTML(line.unite||'')}</td>
+      <td class="num">${fmt(line.prixUnitaireHT)}</td>
+      <td class="num">${escHTML(remiseText)}</td>
+      <td class="num">${fmt(total)}</td>
+    </tr>`;
+  });
+
+  // Totals
+  let totalsHtml = `
+    <tr><td>Sous-total HT</td><td>${fmt(calc.subtotalHT)}</td></tr>
+  `;
+  if ((calc.remiseGlobale||0) > 0)
+    totalsHtml += `<tr><td>Remise</td><td>-${fmt(calc.remiseGlobale)}</td></tr>`;
+  if ((calc.urgentSurcharge||0) > 0)
+    totalsHtml += `<tr><td>⚡ Urgence</td><td>+${fmt(calc.urgentSurcharge)}</td></tr>`;
+  if ((calc.charges||0) > 0)
+    totalsHtml += `<tr><td>Charges (${p.chargesPercent||22}%)</td><td>${fmt(calc.charges)}</td></tr>`;
+  if ((calc.marge||0) > 0)
+    totalsHtml += `<tr><td>Marge (${p.marginPercent||30}%)</td><td>${fmt(calc.marge)}</td></tr>`;
+  totalsHtml += `<tr class="t-sep t-total"><td>Total HT</td><td>${fmt(calc.totalHT)}</td></tr>`;
+  if (p.tvaActive) {
+    totalsHtml += `<tr><td>TVA (${p.vatRate||20}%)</td><td>${fmt(calc.vat)}</td></tr>`;
+  } else {
+    totalsHtml += `<tr><td>TVA</td><td>Non applicable</td></tr>`;
+  }
+  totalsHtml += `<tr class="t-sep t-grand"><td>Total TTC</td><td>${fmt(calc.totalTTC)}</td></tr>`;
+  if ((calc.acompteVal||0) > 0)
+    totalsHtml += `<tr><td>Acompte (${opts.acomptePct||0}%)</td><td>${fmt(calc.acompteVal)}</td></tr>`;
+  if ((calc.acompteVal||0) > 0)
+    totalsHtml += `<tr><td><strong>Solde à payer</strong></td><td><strong>${fmt(calc.solde)}</strong></td></tr>`;
+
+  const logoHtml = c.logo ? `<img src="${c.logo}" class="print-logo" alt="logo">` : '';
+
+  const docTypeLabel = q.type === 'facture' ? 'FACTURE' : q.type === 'avoir' ? 'AVOIR' : 'DEVIS';
+
+  let conditionsHtml = '';
+  if (opts.conditionsPaiement || pay.delai) {
+    conditionsHtml += `<p><strong>Conditions de paiement :</strong> ${escHTML(opts.conditionsPaiement || `Paiement à ${pay.delai||30} jours`)}</p>`;
+  }
+  if (opts.modesPaiement && opts.modesPaiement.length)
+    conditionsHtml += `<p><strong>Modes de paiement :</strong> ${escHTML(opts.modesPaiement.join(', '))}</p>`;
+  if (pay.iban)
+    conditionsHtml += `<p><strong>IBAN :</strong> ${escHTML(pay.iban)}${pay.bic ? ' · <strong>BIC :</strong> ' + escHTML(pay.bic) : ''}</p>`;
+  if (opts.notesClient)
+    conditionsHtml += `<p><strong>Note :</strong> ${escHTML(opts.notesClient)}</p>`;
+
+  let footerHtml = mentions.map(mn => `<p>${escHTML(mn)}</p>`).join('');
+  if (m.reservePropriete) footerHtml += `<p><strong>Réserve de propriété :</strong> ${escHTML(m.reservePropriete)}</p>`;
+  if (m.tribunalCompetent) footerHtml += `<p><strong>Tribunal compétent :</strong> ${escHTML(m.tribunalCompetent)}</p>`;
+  if (c.cgv) footerHtml += `<p><strong>CGV :</strong> ${escHTML(c.cgv)}</p>`;
+  if (m.noteBasPage) footerHtml += `<p>${escHTML(m.noteBasPage)}</p>`;
+
+  const signHtml = q.type === 'devis' ? `
+    <div class="print-sign">
+      <div class="print-sign-title">Bon pour accord</div>
+      <p style="font-size:0.75rem;color:#666;margin-bottom:8px">Lu et approuvé — Devis reçu avant l'exécution des travaux</p>
+      <div style="display:flex;gap:1rem">
+        <div style="flex:1">
+          <p style="font-size:0.72rem;color:#888;margin-bottom:4px">Date :</p>
+          <div style="border-bottom:1px solid #999;height:20px"></div>
+        </div>
+        <div style="flex:2">
+          <p style="font-size:0.72rem;color:#888;margin-bottom:4px">Signature et cachet :</p>
+          <div class="print-sign-box"></div>
+        </div>
+      </div>
+    </div>
+  ` : '';
+
+  return `
+  <div class="print-doc-wrap">
+    <div class="print-header">
+      <div class="print-company">
+        ${logoHtml}
+        <div class="print-company-name">${escHTML(c.name || 'Mon Entreprise')}</div>
+        <div class="print-company-statut">${escHTML(c.statut || '')}</div>
+        <div class="print-company-detail">
+          ${c.address ? escHTML(c.address).replace(/\n/g,'<br>') + '<br>' : ''}
+          ${c.siret ? 'SIRET : ' + escHTML(c.siret) + '<br>' : ''}
+          ${c.rm ? 'RM : ' + escHTML(c.rm) + '<br>' : ''}
+          ${c.rcs ? 'RCS : ' + escHTML(c.rcs) + '<br>' : ''}
+          ${p.tvaActive && c.tvaIntra ? 'N°TVA : ' + escHTML(c.tvaIntra) + '<br>' : ''}
+          ${c.email ? '📧 ' + escHTML(c.email) : ''}${c.phone ? ' · 📞 ' + escHTML(c.phone) : ''}${c.website ? ' · 🌐 ' + escHTML(c.website) : ''}
+          ${c.assureur ? '<br>Assurance : ' + escHTML(c.assureur) + (c.contratAssurance ? ' n° ' + escHTML(c.contratAssurance) : '') : ''}
+        </div>
+      </div>
+      <div class="print-doc-info">
+        <div class="print-doc-type">${docTypeLabel}</div>
+        <div class="print-doc-num">N° ${escHTML(q.id)}</div>
+        <div class="print-doc-dates">
+          Date : ${escHTML(formatDate(docDate))}<br>
+          ${q.type === 'devis' && validUntil ? 'Valable jusqu\'au : ' + escHTML(formatDate(validUntil)) + '<br>' : ''}
+          ${q.type === 'facture' && echeance ? 'Échéance : ' + escHTML(formatDate(echeance)) + '<br>' : ''}
+          ${opts.dateExecution ? 'Exécution : ' + escHTML(formatDate(opts.dateExecution)) + '<br>' : ''}
+          ${opts.referenceCommande ? 'Réf. : ' + escHTML(opts.referenceCommande) : ''}
+        </div>
+      </div>
+    </div>
+
+    <div class="print-client-block">
+      <div class="print-client-label">Client</div>
+      <div class="print-client-name">${escHTML(q.client.nom)}${q.client.entreprise ? ' — ' + escHTML(q.client.entreprise) : ''}</div>
+      <div class="print-client-detail">
+        ${q.client.siren ? 'SIREN : ' + escHTML(q.client.siren) + '<br>' : ''}
+        ${q.client.adresse ? escHTML(q.client.adresse).replace(/\n/g,'<br>') + '<br>' : ''}
+        ${q.client.email ? '📧 ' + escHTML(q.client.email) : ''}${q.client.telephone ? ' · 📞 ' + escHTML(q.client.telephone) : ''}
+      </div>
+    </div>
+
+    <table class="print-lines-table">
+      <thead>
+        <tr>
+          <th style="width:25px">N°</th>
+          <th>Désignation</th>
+          <th>Description</th>
+          <th style="width:45px;text-align:right">Qté</th>
+          <th style="width:55px;text-align:center">Unité</th>
+          <th style="width:70px;text-align:right">P.U. HT</th>
+          <th style="width:55px;text-align:right">Remise</th>
+          <th style="width:75px;text-align:right">Total HT</th>
+        </tr>
+      </thead>
+      <tbody>${linesHtml}</tbody>
+    </table>
+
+    <div class="print-totals">
+      <table class="print-totals-table">
+        <tbody>${totalsHtml}</tbody>
+      </table>
+    </div>
+
+    ${conditionsHtml ? `<div class="print-conditions"><h4>Conditions</h4>${conditionsHtml}</div>` : ''}
+
+    ${signHtml}
+
+    <div class="print-footer">${footerHtml}</div>
+  </div>
+  `;
+}
+
+function formatDate(iso) {
+  if (!iso) return '';
+  const [y, m, d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+function addDays(isoDate, days) {
+  const d = new Date(isoDate);
+  d.setDate(d.getDate() + parseInt(days));
+  return d.toISOString().split('T')[0];
+}
+
+/* ============================================================
+   HISTORIQUE
+   ============================================================ */
+let histFilter = 'tous';
+
+function setHistFilter(f, btn) {
+  histFilter = f;
+  document.querySelectorAll('#hist-filters .pill-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderHistory();
+}
+
+function checkExpiredQuotes() {
+  const quotes = getQuotes();
+  let changed = false;
+  const today = todayISO();
+  quotes.forEach(q => {
+    if (q.status === 'en_attente' && q.options?.validiteDays) {
+      const expiry = addDays(q.options.docDate || q.createdAt?.split('T')[0] || today, q.options.validiteDays);
+      if (expiry < today) { q.status = 'expire'; changed = true; }
+    }
+  });
+  if (changed) setQuotes(quotes);
+}
+
+function renderHistory() {
+  const quotes = getQuotes();
+  const search = document.getElementById('hist-search')?.value.toLowerCase() || '';
+  const sort = document.getElementById('hist-sort')?.value || 'date-desc';
+
+  let filtered = quotes.filter(q => {
+    if (histFilter !== 'tous' && q.status !== histFilter) return false;
+    if (search) {
+      const haystack = [q.id, q.client?.nom, q.client?.entreprise, ...(q.lines||[]).map(l=>l.designation)].join(' ').toLowerCase();
+      if (!haystack.includes(search)) return false;
+    }
+    return true;
+  });
+
+  filtered.sort((a, b) => {
+    switch(sort) {
+      case 'date-desc': return new Date(b.createdAt) - new Date(a.createdAt);
+      case 'date-asc': return new Date(a.createdAt) - new Date(b.createdAt);
+      case 'amount-desc': return (b.calculation?.totalTTC||0) - (a.calculation?.totalTTC||0);
+      case 'amount-asc': return (a.calculation?.totalTTC||0) - (b.calculation?.totalTTC||0);
+      case 'client-az': return (a.client?.nom||'').localeCompare(b.client?.nom||'');
+      default: return 0;
+    }
+  });
+
+  const container = document.getElementById('history-list');
+  if (!filtered.length) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📋</div><p>Aucun document trouvé.</p></div>';
+    return;
+  }
+  container.innerHTML = filtered.map(q => buildHistoryCard(q)).join('');
+  renderHistoryKPIs();
+}
+
+function renderHistoryKPIs() {
+  const quotes = getQuotes();
+  const devis = quotes.filter(q => q.type === 'devis');
+  const factures = quotes.filter(q => q.type === 'facture');
+  const ca = quotes.filter(q => q.status === 'paye').reduce((s, q) => s + (q.calculation?.totalTTC||0), 0);
+  const conv = devis.length > 0 ? Math.round((factures.length / devis.length) * 100) : 0;
+  document.getElementById('kpi-devis-count').textContent = devis.length;
+  document.getElementById('kpi-factures-count').textContent = factures.length;
+  document.getElementById('kpi-ca').textContent = fmt(ca);
+  document.getElementById('kpi-conversion').textContent = conv + '%';
+}
+
+function buildHistoryCard(q) {
+  const statusLabels = {
+    brouillon:'Brouillon', envoye:'Envoyé', en_attente:'En attente',
+    accepte:'Accepté', facture:'Facturé', paye:'Payé', refuse:'Refusé', expire:'Expiré'
+  };
+  const typeLabels = { devis:'Devis', facture:'Facture', avoir:'Avoir' };
+  const date = q.createdAt ? q.createdAt.split('T')[0] : '';
+  return `
+  <div class="history-card">
+    <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">
+      <span class="badge badge-${q.type === 'devis' ? 'devis' : q.type === 'facture' ? 'facture-type' : 'avoir'}">${typeLabels[q.type]||q.type}</span>
+      <span class="badge badge-${q.status}">${statusLabels[q.status]||q.status}</span>
+    </div>
+    <div class="history-card-info">
+      <div class="history-card-num">${escHTML(q.id)}</div>
+      <div class="history-card-client">${escHTML(q.client?.nom||'')}${q.client?.entreprise ? ' — '+escHTML(q.client.entreprise) : ''}</div>
+      <div class="history-card-date">${formatDate(date)}</div>
+    </div>
+    <div class="history-card-amount">
+      <div class="amount">${fmt(q.calculation?.totalTTC||0)}</div>
+      <div class="ttc-label">TTC</div>
+    </div>
+    <div class="history-card-actions">
+      <button class="btn btn-secondary btn-xs" onclick="openPreviewModal('${escHTML(q.id)}')">👁 Aperçu</button>
+      <button class="btn btn-secondary btn-xs" onclick="editDocumentById('${escHTML(q.id)}')">✏</button>
+      <button class="btn btn-secondary btn-xs" onclick="duplicateDocumentById('${escHTML(q.id)}')" title="Dupliquer ce document">⎘ Dupliquer</button>
+      ${q.status === 'accepte' && q.type === 'devis' ? `<button class="btn btn-success btn-xs" onclick="convertToInvoice('${escHTML(q.id)}')">📄 Facturer</button>` : ''}
+      ${q.status === 'facture' ? `<button class="btn btn-success btn-xs" onclick="setStatusAndRefresh('${escHTML(q.id)}','paye')">✓ Payé</button>` : ''}
+      <button class="btn btn-danger btn-xs" onclick="deleteDocument('${escHTML(q.id)}')">✕</button>
+    </div>
+  </div>
+  `;
+}
+
+function setStatusAndRefresh(id, status) {
+  setStatus(id, status);
+  renderHistory();
+}
+
+function editDocumentById(id) {
+  previewQuoteId = id;
+  editDocument();
+}
+
+function duplicateDocumentById(id) {
+  previewQuoteId = id;
+  duplicateDocument();
+  renderHistory();
+}
+
+function deleteDocument(id) {
+  if (!confirm(`Supprimer le document ${id} ?`)) return;
+  const quotes = getQuotes().filter(q => q.id !== id);
+  setQuotes(quotes);
+  renderHistory();
+  showToast('Document supprimé.', 'info');
+}
+
+function exportAllJSON() {
+  const data = {
+    quotes: getQuotes(),
+    clients: getClients(),
+    catalog: getCatalog(),
+    config: getConfig(),
+    exportedAt: new Date().toISOString()
+  };
+  const today = todayISO();
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `smartdevis_backup_${today}.json`;
+  a.click();
+  showToast('Exportation réussie.', 'success');
+}
+
+function importAllJSON(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (!confirm('Importer ces données ? Les données actuelles seront écrasées.')) { input.value = ''; return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data.quotes) setQuotes(data.quotes);
+      if (data.clients) setClients(data.clients);
+      if (data.catalog) setCatalog(data.catalog);
+      if (data.config) setConfig(data.config);
+      renderHistory();
+      showToast('Import réussi !', 'success');
+    } catch(err) { showToast('Fichier invalide.', 'error'); }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+/* ============================================================
+   CATALOGUE
+   ============================================================ */
+let categories = [];
+
+/* --- Catégories persistantes (standalone, sans articles) --- */
+function getStoredCategories() {
+  return JSON.parse(localStorage.getItem('smartdevis_categories') || '[]');
+}
+function setStoredCategories(arr) {
+  localStorage.setItem('smartdevis_categories', JSON.stringify(arr));
+}
+
+function getCategories() {
+  // Catégories dérivées des articles du catalogue
+  const cats = new Set();
+  getCatalog().forEach(a => { if (a.categorie) cats.add(a.categorie); });
+  // Fusionner avec les catégories standalone sauvegardées
+  getStoredCategories().forEach(c => cats.add(c));
+  return Array.from(cats).sort();
+}
+
+function renderCategories() {
+  categories = getCategories();
+  const container = document.getElementById('categories-list');
+  if (!container) return;
+  container.innerHTML = categories.length
+    ? categories.map((cat) => `
+      <div style="display:flex;align-items:center;gap:4px;background:var(--bg-global);border:1px solid var(--border-light);border-radius:20px;padding:2px 10px 2px 2px">
+        <span style="font-size:0.8rem;padding:2px 6px">${escHTML(cat)}</span>
+        <button class="btn btn-danger btn-xs" style="padding:1px 5px;border-radius:50%" onclick="deleteCategoryConfirm('${escHTML(cat)}')">✕</button>
+      </div>
+    `).join('')
+    : '<span style="font-size:0.8rem;color:var(--text-muted)">Aucune catégorie. Ajoutez-en une ci-dessus.</span>';
+
+  // Update filter select
+  const sel = document.getElementById('cat-filter-cat');
+  if (sel) {
+    sel.innerHTML = '<option value="">Toutes catégories</option>' +
+      categories.map(c => `<option value="${escHTML(c)}">${escHTML(c)}</option>`).join('');
+  }
+
+  // Update datalist
+  const dl = document.getElementById('am-cat-list');
+  if (dl) dl.innerHTML = categories.map(c => `<option value="${escHTML(c)}">`).join('');
+}
+
+function addCategory() {
+  const input = document.getElementById('new-cat-input');
+  const val = input.value.trim();
+  if (!val) { showToast('Entrez un nom de catégorie.', 'error'); return; }
+
+  // Persister dans localStorage avant le re-render
+  const stored = getStoredCategories();
+  if (!stored.includes(val)) {
+    stored.push(val);
+    setStoredCategories(stored);
+  }
+
+  renderCategories();
+  input.value = '';
+  showToast(`Catégorie "${val}" ajoutée.`, 'success');
+}
+
+function deleteCategoryConfirm(cat) {
+  if (!confirm(`Supprimer la catégorie "${cat}" ? Les articles de cette catégorie ne seront pas supprimés.`)) return;
+  // Retirer des articles
+  const catalog = getCatalog();
+  catalog.forEach(a => { if (a.categorie === cat) a.categorie = ''; });
+  setCatalog(catalog);
+  // Retirer du stockage standalone
+  const stored = getStoredCategories().filter(c => c !== cat);
+  setStoredCategories(stored);
+  renderCategories();
+  renderCatalog();
+  showToast('Catégorie supprimée.', 'info');
+}
+
+function renderCatalog() {
+  const catalog = getCatalog();
+  const search = document.getElementById('cat-search')?.value.toLowerCase() || '';
+  const catFilter = document.getElementById('cat-filter-cat')?.value || '';
+  const grid = document.getElementById('catalog-grid');
+  if (!grid) return;
+
+  const filtered = catalog.filter(a => {
+    if (!a.actif) return false;
+    if (catFilter && a.categorie !== catFilter) return false;
+    if (search) {
+      const hay = [a.designation, a.description, a.categorie].join(' ').toLowerCase();
+      if (!hay.includes(search)) return false;
+    }
+    return true;
+  });
+
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">📦</div><p>Aucun article.</p></div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(a => `
+    <div class="cat-card">
+      ${a.categorie ? `<div style="font-size:0.7rem;color:var(--accent);font-weight:700;text-transform:uppercase;margin-bottom:4px">${escHTML(a.categorie)}</div>` : ''}
+      <div class="cat-card-title">${escHTML(a.designation)}</div>
+      <div class="cat-card-desc">${escHTML(a.description||'')}</div>
+      <div class="cat-card-meta">
+        <span class="cat-card-price">${fmt(a.prixUnitaireHT)}</span>
+        <span class="cat-card-unit">${escHTML(a.unite||'')}</span>
+      </div>
+      ${a.tva ? `<div style="font-size:0.72rem;color:var(--text-muted)">TVA : ${escHTML(String(a.tva))}%</div>` : ''}
+      <div class="cat-card-actions">
+        <button class="btn btn-secondary btn-xs" onclick="openArticleModal('${escHTML(a.id)}')">✏ Modifier</button>
+        <button class="btn btn-secondary btn-xs" onclick="duplicateArticle('${escHTML(a.id)}')">⎘ Dupliquer</button>
+        <button class="btn btn-warning btn-xs" onclick="toggleArticleActive('${escHTML(a.id)}')">○ Désactiver</button>
+        <button class="btn btn-danger btn-xs" onclick="deleteArticle('${escHTML(a.id)}')">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openArticleModal(id) {
+  document.getElementById('am-id').value = id || '';
+  document.getElementById('article-modal-title').textContent = id ? 'Modifier article' : 'Nouvel article';
+  if (id) {
+    const a = getCatalog().find(x => x.id === id);
+    if (a) {
+      document.getElementById('am-designation').value = a.designation || '';
+      document.getElementById('am-categorie').value = a.categorie || '';
+      document.getElementById('am-description').value = a.description || '';
+      document.getElementById('am-unite').value = a.unite || 'unités';
+      document.getElementById('am-prix').value = a.prixUnitaireHT || 0;
+      document.getElementById('am-tva').value = a.tva || 20;
+      document.getElementById('am-actif').checked = a.actif !== false;
+    }
+  } else {
+    document.getElementById('am-designation').value = '';
+    document.getElementById('am-categorie').value = '';
+    document.getElementById('am-description').value = '';
+    document.getElementById('am-unite').value = 'unités';
+    document.getElementById('am-prix').value = 0;
+    document.getElementById('am-tva').value = 20;
+    document.getElementById('am-actif').checked = true;
+  }
+  openModal('article-modal');
+}
+
+function saveArticleModal() {
+  const desig = document.getElementById('am-designation').value.trim();
+  if (!desig) { showToast('Désignation requise.', 'error'); return; }
+  const article = {
+    id: document.getElementById('am-id').value || String(Date.now()),
+    categorie: document.getElementById('am-categorie').value.trim(),
+    designation: desig,
+    description: document.getElementById('am-description').value.trim(),
+    unite: document.getElementById('am-unite').value,
+    prixUnitaireHT: parseFloat(document.getElementById('am-prix').value) || 0,
+    tva: parseFloat(document.getElementById('am-tva').value) || 20,
+    actif: document.getElementById('am-actif').checked,
+    createdAt: new Date().toISOString()
+  };
+  const catalog = getCatalog();
+  const existIdx = catalog.findIndex(x => x.id === article.id);
+  if (existIdx >= 0) catalog[existIdx] = article;
+  else catalog.push(article);
+  setCatalog(catalog);
+  closeModal('article-modal');
+  renderCatalog();
+  renderCategories();
+  showToast('Article enregistré.', 'success');
+}
+
+function duplicateArticle(id) {
+  const catalog = getCatalog();
+  const a = catalog.find(x => x.id === id);
+  if (!a) return;
+  const newA = { ...a, id: String(Date.now()), designation: a.designation + ' (copie)' };
+  catalog.push(newA);
+  setCatalog(catalog);
+  renderCatalog();
+  showToast('Article dupliqué.', 'success');
+}
+
+function toggleArticleActive(id) {
+  const catalog = getCatalog();
+  const a = catalog.find(x => x.id === id);
+  if (!a) return;
+  a.actif = !a.actif;
+  setCatalog(catalog);
+  renderCatalog();
+  showToast(a.actif ? 'Article activé.' : 'Article désactivé.', 'info');
+}
+
+function deleteArticle(id) {
+  if (!confirm('Supprimer cet article ?')) return;
+  const catalog = getCatalog().filter(x => x.id !== id);
+  setCatalog(catalog);
+  renderCatalog();
+  showToast('Article supprimé.', 'info');
+}
+
+function importCatalogCSV(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const lines = e.target.result.split('\n').filter(l => l.trim());
+    const catalog = getCatalog();
+    let count = 0;
+    lines.forEach((line, i) => {
+      if (i === 0 && line.toLowerCase().includes('designation')) return; // skip header
+      const parts = line.split(',');
+      if (parts.length < 4) return;
+      catalog.push({
+        id: String(Date.now() + i),
+        designation: parts[0]?.trim() || '',
+        description: parts[1]?.trim() || '',
+        unite: parts[2]?.trim() || 'unités',
+        prixUnitaireHT: parseFloat(parts[3]) || 0,
+        tva: parseFloat(parts[4]) || 20,
+        categorie: parts[5]?.trim() || '',
+        actif: true,
+        createdAt: new Date().toISOString()
+      });
+      count++;
+    });
+    setCatalog(catalog);
+    renderCatalog();
+    renderCategories();
+    showToast(`${count} articles importés.`, 'success');
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+function exportCatalogCSV() {
+  const catalog = getCatalog();
+  const header = 'designation,description,unite,prix_ht,tva,categorie\n';
+  const rows = catalog.map(a =>
+    [a.designation, a.description, a.unite, a.prixUnitaireHT, a.tva, a.categorie].map(v => `"${String(v||'').replace(/"/g,'""')}"`).join(',')
+  ).join('\n');
+  const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8' });
+  const a2 = document.createElement('a');
+  a2.href = URL.createObjectURL(blob);
+  a2.download = 'catalogue.csv';
+  a2.click();
+  showToast('Catalogue exporté.', 'success');
+}
+
+/* ============================================================
+   CATALOG PICKER (from devis)
+   ============================================================ */
+function openCatalogModal() {
+  renderCatalogPicker();
+  openModal('catalog-picker-modal');
+}
+
+/* ============================================================
+   TEMPLATES MÉTIERS
+   ============================================================ */
+const METIER_TEMPLATES = {
+  plombier: [
+    { ref:'PLB-001', designation:'Débouchage canalisation (intervention standard)', unite:'forfait', prixUnitaireHT:150, tva:10 },
+    { ref:'PLB-002', designation:'Remplacement robinetterie (fournitures comprises)', unite:'U', prixUnitaireHT:120, tva:10 },
+    { ref:'PLB-003', designation:'Remplacement chauffe-eau électrique 150L', unite:'forfait', prixUnitaireHT:650, tva:10 },
+    { ref:'PLB-004', designation:'Installation WC suspendu (hors carrelage)', unite:'forfait', prixUnitaireHT:480, tva:10 },
+    { ref:'PLB-005', designation:'Remplacement siphon / joint siphon', unite:'U', prixUnitaireHT:65, tva:10 },
+    { ref:'PLB-006', designation:'Pose lave-mains / vasque (hors maçonnerie)', unite:'U', prixUnitaireHT:200, tva:10 },
+    { ref:'PLB-007', designation:'Détartrage cumulus (forfait entretien)', unite:'forfait', prixUnitaireHT:95, tva:10 },
+    { ref:'PLB-008', designation:'Dépannage urgence (supplément ≥ 20h ou WE)', unite:'h', prixUnitaireHT:90, tva:20 },
+    { ref:'PLB-009', designation:'Main-d\'œuvre standard', unite:'h', prixUnitaireHT:55, tva:20 },
+    { ref:'PLB-010', designation:'Déplacement (zone ≤ 20 km)', unite:'forfait', prixUnitaireHT:35, tva:20 },
+    { ref:'PLB-011', designation:'Fournitures et petits matériaux', unite:'forfait', prixUnitaireHT:0, tva:20 },
+    { ref:'PLB-012', designation:'Nettoyage et évacuation déchets chantier', unite:'forfait', prixUnitaireHT:40, tva:20 },
+  ],
+  electricien: [
+    { ref:'ELC-001', designation:'Mise en conformité tableau électrique (NF C 15-100)', unite:'forfait', prixUnitaireHT:850, tva:10 },
+    { ref:'ELC-002', designation:'Remplacement tableau + disjoncteurs (jusqu\'à 12 circuits)', unite:'forfait', prixUnitaireHT:1200, tva:10 },
+    { ref:'ELC-003', designation:'Pose prise électrique (avec câblage)', unite:'U', prixUnitaireHT:95, tva:10 },
+    { ref:'ELC-004', designation:'Pose interrupteur / va-et-vient', unite:'U', prixUnitaireHT:75, tva:10 },
+    { ref:'ELC-005', designation:'Installation VMC simple flux', unite:'forfait', prixUnitaireHT:350, tva:10 },
+    { ref:'ELC-006', designation:'Remplacement VMC existante', unite:'forfait', prixUnitaireHT:280, tva:10 },
+    { ref:'ELC-007', designation:'Pose luminaire/applique (hors fourniture)', unite:'U', prixUnitaireHT:60, tva:10 },
+    { ref:'ELC-008', designation:'Installation spot LED encastré (câblage + spot)', unite:'U', prixUnitaireHT:85, tva:10 },
+    { ref:'ELC-009', designation:'Main-d\'œuvre électricien', unite:'h', prixUnitaireHT:60, tva:20 },
+    { ref:'ELC-010', designation:'Déplacement (zone ≤ 20 km)', unite:'forfait', prixUnitaireHT:35, tva:20 },
+    { ref:'ELC-011', designation:'Fournitures et câblerie', unite:'forfait', prixUnitaireHT:0, tva:20 },
+  ],
+  peintre: [
+    { ref:'PNT-001', designation:'Peinture intérieure — murs (2 couches, fournitures comprises)', unite:'m²', prixUnitaireHT:18, tva:10 },
+    { ref:'PNT-002', designation:'Peinture plafond (2 couches, préparation comprise)', unite:'m²', prixUnitaireHT:22, tva:10 },
+    { ref:'PNT-003', designation:'Sous-couche + impression avant peinture', unite:'m²', prixUnitaireHT:9, tva:10 },
+    { ref:'PNT-004', designation:'Enduit de lissage + ponçage (finition soignée)', unite:'m²', prixUnitaireHT:25, tva:10 },
+    { ref:'PNT-005', designation:'Peinture façade / ravalement (2 couches)', unite:'m²', prixUnitaireHT:28, tva:10 },
+    { ref:'PNT-006', designation:'Pose tapisserie papier peint (fournitures exclues)', unite:'m²', prixUnitaireHT:20, tva:10 },
+    { ref:'PNT-007', designation:'Dépose tapisserie + rebouchage', unite:'m²', prixUnitaireHT:14, tva:10 },
+    { ref:'PNT-008', designation:'Peinture boiseries / huisseries (lasure ou glycéro)', unite:'m²', prixUnitaireHT:30, tva:10 },
+    { ref:'PNT-009', designation:'Protection sols et mobilier (bâches + masquage)', unite:'forfait', prixUnitaireHT:45, tva:20 },
+    { ref:'PNT-010', designation:'Nettoyage et évacuation déchets chantier', unite:'forfait', prixUnitaireHT:50, tva:20 },
+  ]
+};
+
+function loadTemplate(metier) {
+  if (!confirm(`Charger le template "${metier}" ? Le catalogue actuel sera remplacé.`)) return;
+  const items = METIER_TEMPLATES[metier].map((t, i) => ({ ...t, id: Date.now() + i }));
+  localStorage.setItem('smartdevis_catalog', JSON.stringify(items));
+  closeModal('templates-modal');
+  renderCatalog();
+  showToast(`✅ Template ${metier} chargé — ${items.length} articles`, 'success');
+}
+
+function renderCatalogPicker() {
+  const catalog = getCatalog().filter(a => a.actif);
+  const search = document.getElementById('cp-search')?.value.toLowerCase() || '';
+  const grid = document.getElementById('catalog-picker-grid');
+  if (!grid) return;
+  const filtered = search ? catalog.filter(a =>
+    [a.designation, a.description, a.categorie].join(' ').toLowerCase().includes(search)
+  ) : catalog;
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">📦</div><p>Aucun article.</p></div>';
+    return;
+  }
+  grid.innerHTML = filtered.map(a => `
+    <div class="cat-card" style="cursor:pointer" onclick="insertFromCatalog('${escHTML(a.id)}')">
+      <div class="cat-card-title">${escHTML(a.designation)}</div>
+      <div class="cat-card-desc">${escHTML(a.description||'')}</div>
+      <div class="cat-card-meta">
+        <span class="cat-card-price">${fmt(a.prixUnitaireHT)}</span>
+        <span class="cat-card-unit">${escHTML(a.unite||'')}</span>
+      </div>
+      <button class="btn btn-primary btn-sm" style="width:100%;margin-top:0.5rem">+ Insérer</button>
+    </div>
+  `).join('');
+}
+
+function insertFromCatalog(id) {
+  const a = getCatalog().find(x => x.id === id);
+  if (!a) return;
+  addLine({
+    designation: a.designation,
+    description: a.description,
+    qte: 1,
+    unite: a.unite || 'unités',
+    prixUnitaireHT: a.prixUnitaireHT || 0,
+    remise: 0,
+    remiseType: 'pct'
+  });
+  closeModal('catalog-picker-modal');
+  showToast(`Article "${a.designation}" inséré.`, 'success');
+}
+
+/* ============================================================
+   DASHBOARD
+   ============================================================ */
+function renderDashboard() {
+  const quotes = getQuotes();
+  const now = new Date();
+  const thisMonth = now.getMonth();
+  const thisYear = now.getFullYear();
+  const lastMonth = thisMonth === 0 ? 11 : thisMonth - 1;
+  const lastMonthYear = thisMonth === 0 ? thisYear - 1 : thisYear;
+
+  // CA ce mois
+  const paidThisMonth = quotes.filter(q => {
+    if (q.status !== 'paye') return false;
+    const d = new Date(q.paidAt || q.createdAt);
+    return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
+  });
+  const caThisMonth = paidThisMonth.reduce((s, q) => s + (q.calculation?.totalTTC || 0), 0);
+
+  const paidLastMonth = quotes.filter(q => {
+    if (q.status !== 'paye') return false;
+    const d = new Date(q.paidAt || q.createdAt);
+    return d.getMonth() === lastMonth && d.getFullYear() === lastMonthYear;
+  });
+  const caLastMonth = paidLastMonth.reduce((s, q) => s + (q.calculation?.totalTTC || 0), 0);
+
+  // Devis ce mois
+  const devisThisMonth = quotes.filter(q => {
+    if (q.type !== 'devis') return false;
+    const d = new Date(q.createdAt);
+    return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
+  }).length;
+
+  const devisLastMonth = quotes.filter(q => {
+    if (q.type !== 'devis') return false;
+    const d = new Date(q.createdAt);
+    return d.getMonth() === lastMonth && d.getFullYear() === lastMonthYear;
+  }).length;
+
+  // Taux conversion
+  const totalDevis = quotes.filter(q => q.type === 'devis').length;
+  const totalFactures = quotes.filter(q => q.type === 'facture').length;
+  const convRate = totalDevis > 0 ? Math.round((totalFactures / totalDevis) * 100) : 0;
+
+  // Délai moyen paiement
+  const paidWithDates = quotes.filter(q => q.status === 'paye' && q.paidAt && q.createdAt);
+  const avgDelay = paidWithDates.length > 0
+    ? Math.round(paidWithDates.reduce((s, q) => {
+        return s + (new Date(q.paidAt) - new Date(q.createdAt)) / (1000 * 60 * 60 * 24);
+      }, 0) / paidWithDates.length)
+    : null;
+
+  document.getElementById('dash-ca-mois').textContent = fmt(caThisMonth);
+  document.getElementById('dash-devis-mois').textContent = devisThisMonth;
+  document.getElementById('dash-conv').textContent = convRate + '%';
+  document.getElementById('dash-delai').textContent = avgDelay !== null ? avgDelay + ' j' : '— j';
+
+  // Variations
+  const caVar = document.getElementById('dash-ca-var');
+  if (caLastMonth > 0) {
+    const diff = ((caThisMonth - caLastMonth) / caLastMonth * 100).toFixed(1);
+    caVar.textContent = (diff >= 0 ? '▲ +' : '▼ ') + diff + '% vs mois dernier';
+    caVar.className = 'kpi-variation ' + (diff >= 0 ? 'up' : 'down');
+  } else caVar.textContent = '';
+
+  const dvVar = document.getElementById('dash-devis-var');
+  if (devisLastMonth > 0) {
+    const diff = devisThisMonth - devisLastMonth;
+    dvVar.textContent = (diff >= 0 ? '▲ +' : '▼ ') + diff + ' vs mois dernier';
+    dvVar.className = 'kpi-variation ' + (diff >= 0 ? 'up' : 'down');
+  } else dvVar.textContent = '';
+
+  renderBarChart(quotes);
+  renderPendingQuotes(quotes);
+  renderUnpaidInvoices(quotes);
+}
+
+/* ============================================================
+   SVG BAR CHART
+   ============================================================ */
+function renderBarChart(quotes) {
+  const container = document.getElementById('chart-container');
+  if (!container) return;
+
+  // Build 6 months data
+  const months = [];
+  const now = new Date();
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push({ month: d.getMonth(), year: d.getFullYear(), label: d.toLocaleDateString('fr-FR', { month: 'short' }), ca: 0 });
+  }
+
+  quotes.filter(q => q.status === 'paye').forEach(q => {
+    const d = new Date(q.paidAt || q.createdAt);
+    const m = months.find(x => x.month === d.getMonth() && x.year === d.getFullYear());
+    if (m) m.ca += q.calculation?.totalTTC || 0;
+  });
+
+  const maxCa = Math.max(...months.map(m => m.ca), 1);
+  const W = 560; const H = 200; const padL = 70; const padB = 30; const padT = 10; const padR = 20;
+  const chartW = W - padL - padR;
+  const chartH = H - padB - padT;
+  const barW = Math.floor(chartW / months.length * 0.6);
+  const barGap = Math.floor(chartW / months.length);
+
+  // Y axis labels
+  const ySteps = 4;
+  let yLines = '';
+  for (let i = 0; i <= ySteps; i++) {
+    const y = padT + chartH - (i / ySteps) * chartH;
+    const val = (maxCa * i / ySteps).toLocaleString('fr-FR', { maximumFractionDigits: 0 });
+    yLines += `<line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="var(--border)" stroke-dasharray="4,4"/>`;
+    yLines += `<text x="${padL - 6}" y="${y + 4}" text-anchor="end" font-size="10" fill="var(--text-secondary)">${val}</text>`;
+  }
+
+  // Bars
+  let bars = '';
+  months.forEach((m, i) => {
+    const barH = maxCa > 0 ? (m.ca / maxCa) * chartH : 0;
+    const x = padL + i * barGap + (barGap - barW) / 2;
+    const y = padT + chartH - barH;
+    bars += `<rect x="${x}" y="${y}" width="${barW}" height="${barH}" rx="4" fill="var(--accent)" opacity="0.85"
+      onmouseenter="showChartTooltip(event,'${m.label} ${m.year}: ${fmt(m.ca)}')"
+      onmouseleave="hideChartTooltip()"
+      style="cursor:pointer;transition:opacity 0.15s"
+      onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.85'"
+    />`;
+    bars += `<text x="${x + barW/2}" y="${H - 8}" text-anchor="middle" font-size="10" fill="var(--text-secondary)">${m.label}</text>`;
+  });
+
+  // X axis
+  const xAxis = `<line x1="${padL}" y1="${padT + chartH}" x2="${W - padR}" y2="${padT + chartH}" stroke="var(--border-light)"/>`;
+
+  container.innerHTML = `
+    <div style="position:relative">
+      <svg id="chart-svg-area" viewBox="0 0 ${W} ${H}" style="width:100%;max-height:220px">
+        ${yLines}
+        ${xAxis}
+        ${bars}
+      </svg>
+    </div>
+  `;
+}
+
+function showChartTooltip(event, text) {
+  const tooltip = document.getElementById('chart-tooltip');
+  tooltip.style.display = 'block';
+  tooltip.textContent = text;
+  const rect = event.target.closest('div').getBoundingClientRect();
+  tooltip.style.left = (event.clientX - rect.left + 10) + 'px';
+  tooltip.style.top = (event.clientY - rect.top - 30) + 'px';
+}
+function hideChartTooltip() {
+  document.getElementById('chart-tooltip').style.display = 'none';
+}
+
+/* ============================================================
+   PENDING QUOTES & UNPAID INVOICES
+   ============================================================ */
+function renderPendingQuotes(quotes) {
+  const today = todayISO();
+  const pending = quotes.filter(q => q.status === 'en_attente');
+  const tbody = document.getElementById('pending-quotes-tbody');
+  if (!pending.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:1.5rem">Aucun devis en attente.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = pending.map(q => {
+    const docDate = q.options?.docDate || q.createdAt?.split('T')[0] || today;
+    const expiry = addDays(docDate, q.options?.validiteDays || 30);
+    const daysLeft = Math.ceil((new Date(expiry) - new Date(today)) / (1000 * 60 * 60 * 24));
+    const cls = daysLeft < 0 ? 'overdue' : daysLeft < 7 ? 'warn-days' : '';
+    return `<tr>
+      <td><a href="#" onclick="openPreviewModal('${escHTML(q.id)}');return false">${escHTML(q.id)}</a></td>
+      <td>${escHTML(q.client?.nom||'')}</td>
+      <td>${fmt(q.calculation?.totalTTC||0)}</td>
+      <td>${formatDate(expiry)}</td>
+      <td class="${cls}">${daysLeft < 0 ? 'Expiré (' + Math.abs(daysLeft) + 'j)' : daysLeft + ' j'}</td>
+      <td><button class="btn btn-secondary btn-xs" onclick="openPreviewModal('${escHTML(q.id)}')">👁</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderUnpaidInvoices(quotes) {
+  const today = todayISO();
+  const cfg = getConfig();
+  const unpaid = quotes.filter(q => q.status === 'facture');
+  const tbody = document.getElementById('unpaid-invoices-tbody');
+  if (!unpaid.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:1.5rem">Aucune facture impayée.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = unpaid.map(q => {
+    const docDate = q.options?.docDate || q.createdAt?.split('T')[0] || today;
+    const echeance = addDays(docDate, cfg.paiement?.delai || 30);
+    const retard = Math.ceil((new Date(today) - new Date(echeance)) / (1000 * 60 * 60 * 24));
+    const cls = retard > 0 ? 'overdue' : '';
+    return `<tr>
+      <td><a href="#" onclick="openPreviewModal('${escHTML(q.id)}');return false">${escHTML(q.id)}</a></td>
+      <td>${escHTML(q.client?.nom||'')}</td>
+      <td>${fmt(q.calculation?.totalTTC||0)}</td>
+      <td>${formatDate(echeance)}</td>
+      <td class="${cls}">${retard > 0 ? '+' + retard + ' j' : retard + ' j'}</td>
+      <td>
+        <button class="btn btn-secondary btn-xs" onclick="relanceEmail('${escHTML(q.id)}')">📧 Relancer</button>
+        <button class="btn btn-success btn-xs" onclick="setStatusAndRefresh('${escHTML(q.id)}','paye');renderDashboard()">✓ Payé</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function relanceEmail(id) {
+  const quotes = getQuotes();
+  const q = quotes.find(x => x.id === id);
+  if (!q) return;
+  const cfg = getConfig();
+  const subject = encodeURIComponent(`Relance : Facture ${q.id} — ${cfg.company?.name || ''}`);
+  const body = encodeURIComponent(`Bonjour ${q.client.nom},\n\nNous vous rappelons que la facture n° ${q.id} d'un montant de ${fmt(q.calculation?.totalTTC||0)} est en attente de règlement.\n\nMerci de procéder au paiement dans les meilleurs délais.\n\nCordialement,\n${cfg.company?.name || ''}`);
+  window.location.href = `mailto:${q.client.email}?subject=${subject}&body=${body}`;
+}
+
+/* ============================================================
+   ONBOARDING
+   ============================================================ */
+let obCurrentStep = 1;
+
+function obNext(step) {
+  if (step === 3) {
+    const name = document.getElementById('ob-name').value.trim();
+    const email = document.getElementById('ob-email').value.trim();
+    if (!name || !email) { showToast('Nom et email requis.', 'warning'); return; }
+  }
+  for (let i = 1; i <= 3; i++) {
+    document.getElementById(`ob-step-${i}`).style.display = i === step ? 'block' : 'none';
+    document.getElementById(`ob-dot-${i}`).classList.toggle('active', i === step);
+  }
+  obCurrentStep = step;
+}
+
+function obFinish() {
+  const name = document.getElementById('ob-name').value.trim();
+  const email = document.getElementById('ob-email').value.trim();
+  if (!name || !email) { showToast('Nom et email requis.', 'warning'); obNext(2); return; }
+  const cfg = getDefaultConfig();
+  cfg.company.name = name;
+  cfg.company.statut = document.getElementById('ob-statut').value;
+  cfg.company.siret = document.getElementById('ob-siret').value.trim();
+  cfg.company.email = email;
+  cfg.pricing.tvaActive = document.getElementById('ob-tva').checked;
+  setConfig(cfg);
+  localStorage.setItem('smartdevis_onboarded', '1');
+  closeModal('onboarding-modal');
+  loadConfigUI();
+  switchTab('nouveau');
+  showToast('Bienvenue sur SmartDevis Pro !', 'success');
+}
+
+function checkOnboarding() {
+  const done = localStorage.getItem('smartdevis_onboarded');
+  const cfg = getConfig();
+  if (!done || !cfg.company?.name) {
+    openModal('onboarding-modal');
+  }
+}
+
+/* ============================================================
+   KEYBOARD SHORTCUTS
+   ============================================================ */
+document.addEventListener('keydown', e => {
+  if (e.altKey) {
+    switch(e.key.toLowerCase()) {
+      case 'n': e.preventDefault(); switchTab('nouveau'); break;
+      case 'h': e.preventDefault(); switchTab('historique'); break;
+      case 'd': e.preventDefault(); switchTab('dashboard'); break;
+      case 's': e.preventDefault(); if (currentTab === 'config') saveConfig(); break;
+    }
+  }
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-backdrop.open').forEach(m => m.classList.remove('open'));
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+    if (document.getElementById('preview-modal').classList.contains('open')) {
+      e.preventDefault();
+      printDocument();
+    }
+  }
+});
+
+/* ============================================================
+   PRINT SETUP
+   ============================================================ */
+window.addEventListener('beforeprint', () => {
+  // La visibilité est gérée par la classe print-document-active + @media print
+  // Rien à faire ici
+});
+window.addEventListener('afterprint', () => {
+  console.log('[Print] Impression terminée, nettoyage.');
+  const printArea = document.getElementById('print-area');
+  printArea.classList.remove('print-document-active');
+  printArea.innerHTML = '';
+});
+
+/* ============================================================
+   PDF DOWNLOAD
+   ============================================================ */
+async function downloadPDF(devisId) {
+  const quotes = getQuotes();
+  const q = quotes.find(x => x.id === devisId);
+  if (!q) return;
+  const cfg = getConfig();
+  const htmlContent = buildPrintDoc(q, cfg);
+
+  // Ouvre une fenêtre d'impression dédiée → PDF via Ctrl+P / Enregistrer en PDF
+  const win = window.open('', '_blank', 'width=900,height=700');
+  win.document.write(`<!DOCTYPE html><html><head>
+    <meta charset="UTF-8">
+    <title>${q.id}</title>
+    <style>
+      body { margin: 0; padding: 0; background: #fff; }
+      @media print {
+        @page { margin: 10mm 15mm; }
+        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      }
+    </style>
+  </head><body>${htmlContent}
+  <script>
+    window.onload = function() {
+      window.print();
+      setTimeout(function(){ window.close(); }, 500);
+    };
+  <\/script></body></html>`);
+  win.document.close();
+  showToast('📄 Fenêtre PDF ouverte — Enregistrez en PDF via votre navigateur', 'info');
+}
+
+/* ============================================================
+   BACKUP JSON
+   ============================================================ */
+function exportBackupJSON() {
+  const data = {
+    exportDate: new Date().toISOString(),
+    version: '3.0',
+    config: getConfig(),
+    quotes: getQuotes(),
+    clients: JSON.parse(localStorage.getItem('smartdevis_clients') || '[]'),
+    catalog: JSON.parse(localStorage.getItem('smartdevis_catalog') || '[]'),
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `smartdevis-backup-${todayISO()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✅ Backup exporté', 'success');
+  localStorage.setItem('smartdevis_last_backup', new Date().toISOString());
+}
+
+function checkBackupReminder() {
+  const last = localStorage.getItem('smartdevis_last_backup');
+  if (!last) return;
+  const daysSince = Math.floor((Date.now() - new Date(last)) / 86400000);
+  if (daysSince >= 7) {
+    showToast('💾 Backup recommandé — Dernier backup il y a ' + daysSince + ' jours', 'warning');
+  }
+}
+
+/* ============================================================
+   STORAGE USAGE CHECK
+   ============================================================ */
+function checkStorageUsage() {
+  try {
+    const used = JSON.stringify(localStorage).length;
+    const pct = Math.round((used / 5242880) * 100); // 5MB limit
+    if (pct > 80) {
+      showToast(`⚠️ Stockage à ${pct}% — Exportez un backup`, 'warning');
+    }
+  } catch(e) {}
+}
+
+/* ============================================================
+   CONVERT TO INVOICE (M1 — also adds sourceDevisId)
+   ============================================================ */
+function convertToInvoice(devisId) {
+  const quotes = getQuotes();
+  const devis = quotes.find(x => x.id === devisId);
+  if (!devis) return;
+  if (!confirm(`Créer une facture depuis le devis ${devisId} ?`)) return;
+
+  const invoiceId = generateDocumentNumber('facture');
+  const facture = JSON.parse(JSON.stringify(devis));
+  facture.sourceDevisId = devisId;
+  facture.id = invoiceId;
+  facture.type = 'facture';
+  facture.status = 'facture';
+  facture.createdAt = new Date().toISOString();
+  facture.quoteId = devisId;
+  if (facture.options) { facture.options.docDate = todayISO(); }
+
+  const origIdx = quotes.findIndex(x => x.id === devisId);
+  quotes[origIdx].status = 'facture';
+  quotes[origIdx].invoiceId = invoiceId;
+  quotes.push(facture);
+  setQuotes(quotes);
+  showToast(`✅ Facture ${invoiceId} créée`, 'success');
+  renderHistory();
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+function initApp() {
+  initTheme();
+  loadConfigUI();
+  updateNumPreview();
+
+  // Set default date for new doc
+  const docDate = document.getElementById('doc-date');
+  if (docDate) docDate.value = todayISO();
+
+  // Pre-fill acompte and validite from config
+  const cfg = getConfig();
+  if (document.getElementById('doc-validite')) document.getElementById('doc-validite').value = cfg.pricing?.validiteDevis || 30;
+  if (document.getElementById('doc-acompte')) document.getElementById('doc-acompte').value = cfg.pricing?.acomptePct || 30;
+
+  // Start draft auto-save watcher
+  ['client-nom','client-entreprise','client-siren','client-email','client-telephone','client-adresse',
+   'doc-type','doc-date','doc-date-exec','doc-validite','doc-acompte','doc-ref-commande',
+   'doc-notes-client','doc-notes-internes','doc-conditions-paiement'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', draftAutoSave);
+  });
+
+  setInterval(draftAutoSave, 30000);
+
+  setTimeout(checkOnboarding, 300);
+
+  // Check backup reminder
+  setTimeout(checkBackupReminder, 2000);
+}
+
+document.addEventListener('DOMContentLoaded', initApp);
+</script>
+</body>
+</html>
