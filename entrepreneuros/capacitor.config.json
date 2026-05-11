@@ -1,0 +1,17 @@
+{
+  "appId": "com.entrepreneuros.mobile",
+  "appName": "EntrepreneurOS",
+  "webDir": "mobile/www",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": false
+  },
+  "plugins": {
+    "Filesystem": {
+      "androidIsEncryption": true
+    }
+  }
+}

@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self'; connect-src 'self'; img-src 'self' data: file:;" />
+  <title>EntrepreneurOS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/app.css" />
+  <link rel="stylesheet" href="styles/onboarding.css" />
+  <link rel="stylesheet" href="styles/settings.css" />
+</head>
+<body>
+  <!-- Titlebar custom -->
+  <div class="titlebar">
+    <div class="titlebar-brand">
+      <img class="logo-img" src="icon.png" alt="" onerror="this.style.display='none'" />
+      <span class="brand-name">EntrepreneurOS</span>
+    </div>
+    <div class="titlebar-status">
+      <button id="usage-badge" class="theme-toggle" title="Consommation API — clique pour le détail" aria-label="Usage">$ —</button>
+      <button id="theme-toggle" class="theme-toggle" title="Basculer thème clair / sombre" aria-label="Basculer thème">🌓</button>
+      <button id="cmd-palette-btn" class="theme-toggle" title="Palette de commandes (⌘K)" aria-label="Commandes">⌘K</button>
+      <span id="conn-dot" class="conn-dot"></span>
+      <span id="conn-label" class="conn-label">— —</span>
+    </div>
+  </div>
+
+  <!-- Onboarding (overlay plein écran si nécessaire) -->
+  <div id="onboarding" class="onboarding hidden"></div>
+
+  <!-- App principale -->
+  <div id="app" class="app hidden">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <img class="sb-logo-img" src="icon.png" alt="" onerror="this.style.display='none'" />
+        <div>
+          <div class="sb-title">EntrepreneurOS</div>
+          <div class="sb-sub">v2 · 21 modules</div>
+        </div>
+      </div>
+      <nav class="sidebar-nav" id="sidebar-nav"></nav>
+      <div class="sidebar-footer">
+        <button class="sb-item" data-route="settings">
+          <span class="sb-ico">⚙</span><span>Paramètres</span>
+        </button>
+      </div>
+    </aside>
+    <main class="content" id="content"><!-- routé --></main>
+  </div>
+
+  <script src="renderer/onboarding.js"></script>
+  <script src="renderer/dashboard.js"></script>
+  <script src="renderer/settings.js"></script>
+  <script src="renderer/app.js"></script>
+</body>
+</html>
