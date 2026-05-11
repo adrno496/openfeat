@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Claude Code vs Cursor — comparatif 2026 (workflow, prix, sécurité)</title>
+  <meta name="description" content="Comparatif détaillé Claude Code vs Cursor en 2026 : workflow, prix, sub-agents, MCP servers, sécurité. Pour quels devs et quels projets choisir l'un ou l'autre.">
+  <meta name="keywords" content="claude code vs cursor, claude code comparison, cursor vs claude, ai coding assistant comparison, meilleur assistant ia code, claude code prix">
+  <link rel="canonical" href="https://formations-claude-code.fr/pages/claude-code-vs-cursor.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Claude Code vs Cursor — comparatif 2026">
+  <meta property="og:description" content="Workflow, prix, fonctionnalités : ce qui distingue les deux assistants IA leaders.">
+
+  <link rel="stylesheet" href="../assets/styles.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Claude Code vs Cursor — comparatif 2026",
+    "description": "Comparatif Claude Code et Cursor : workflow, prix, sub-agents, MCP, sécurité.",
+    "datePublished": "2026-05-10",
+    "dateModified": "2026-05-10",
+    "inLanguage": "fr-FR",
+    "author": { "@type": "Organization", "name": "Formations Claude Code FR" },
+    "publisher": { "@type": "Organization", "name": "Formations Claude Code FR" }
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://formations-claude-code.fr/" },
+      { "@type": "ListItem", "position": 2, "name": "Claude Code vs Cursor", "item": "https://formations-claude-code.fr/pages/claude-code-vs-cursor.html" }
+    ]
+  }
+  </script>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="logo">Formations Claude Code FR</a>
+    <ul class="nav-links">
+      <li><a href="../index.html#formations">Formations</a></li>
+      <li><a href="../index.html#pricing">Tarif</a></li>
+      <li><a href="../index.html#faq">FAQ</a></li>
+    </ul>
+  </div>
+</nav>
+
+<article class="article">
+  <h1>Claude Code vs Cursor — comparatif détaillé 2026</h1>
+  <p class="meta">Mis à jour mai 2026 · Lecture 9 min</p>
+
+  <p>Les deux assistants IA dominants pour les développeurs en 2026 sont Claude Code (Anthropic) et Cursor (Anysphere). Ils répondent à des besoins similaires mais avec des approches différentes. Ce comparatif factuel t'aide à choisir selon ton profil.</p>
+
+  <h2>En une phrase</h2>
+  <ul>
+    <li><strong>Claude Code</strong> — assistant CLI-first qui s'intègre à VSCode, focus sur l'agentic workflow (sub-agents, skills, MCP)</li>
+    <li><strong>Cursor</strong> — fork de VSCode optimisé IA, focus sur l'expérience éditeur (autocomplétion, chat in-file)</li>
+  </ul>
+
+  <h2>Workflow</h2>
+  <p><strong>Claude Code</strong> repose sur la commande <code>claude</code> dans le terminal et une extension VSCode légère. Tu travailles surtout en mode conversation : tu décris une tâche, Claude lit, modifie, teste. Tu valides chaque action.</p>
+
+  <p><strong>Cursor</strong> est un éditeur complet (fork de VSCode) avec autocomplétion IA inline. Tu peux invoquer un chat sur une sélection. Cursor "Composer" exécute des agents multi-fichiers similaires aux sub-agents Claude Code.</p>
+
+  <p>Si tu veux <strong>conserver ton éditeur</strong> (VSCode, vim, Helix), Claude Code s'adapte à toi. Si tu veux un éditeur <strong>fait pour l'IA</strong> dès le départ, Cursor.</p>
+
+  <h2>Prix (au moment de la rédaction)</h2>
+  <ul>
+    <li><strong>Claude Code Pro</strong> — abonnement avec plafond généreux</li>
+    <li><strong>Claude Code Max</strong> — usage intensif, plafond élargi</li>
+    <li><strong>Claude API pay-as-you-go</strong> — alternative pour usage variable</li>
+    <li><strong>Cursor Pro</strong> — abonnement mensuel autour des prix Claude Pro, inclut accès aux modèles Claude et OpenAI</li>
+  </ul>
+
+  <p>Vérifier les tarifs courants — ils évoluent. Sur usage intensif (8h/jour de coding), Claude Code Max reste typiquement compétitif vs Cursor Business.</p>
+
+  <h2>Sub-agents et parallélisation</h2>
+  <p>Claude Code propose des <strong>sub-agents personnalisés</strong> définis en markdown (<code>.claude/agents/&lt;nom&gt;.md</code>) avec frontmatter (model, tools restreints, description). Tu peux lancer plusieurs sub-agents en parallèle dans un même message.</p>
+
+  <p>Cursor a "Composer" qui exécute des tâches multi-fichiers de façon agentic mais avec moins de configurabilité fine sur les permissions et le choix de modèle par sous-tâche.</p>
+
+  <h2>Skills auto-déclenchés</h2>
+  <p>Claude Code propose des <strong>skills</strong> : modules markdown avec frontmatter optimisé pour le triggering automatique selon le contexte. Tu en construis à volonté pour tes patterns récurrents (audit RLS, génération commit, vérification CSP, etc.).</p>
+
+  <p>Cursor n'a pas d'équivalent natif aussi structuré. Tu peux configurer des "Rules" qui s'appliquent globalement.</p>
+
+  <h2>MCP servers</h2>
+  <p>Le <strong>Model Context Protocol</strong> est un standard ouvert. Claude Code en est le principal driver, mais Cursor le supporte aussi désormais. Tu peux brancher les mêmes MCP servers (ta DB Supabase, GitHub, Notion, etc.) sur les deux outils.</p>
+
+  <p>Si tu utilises beaucoup de MCPs custom : avantage léger Claude Code (écosystème plus mature, documentation officielle plus dense).</p>
+
+  <h2>Hooks et personnalisation</h2>
+  <p>Claude Code permet des <strong>hooks shell</strong> sur les événements (<code>PreToolUse</code>, <code>PostToolUse</code>, etc.) — utile pour audit log, auto-formatting, refus de commandes destructives.</p>
+
+  <p>Cursor a une approche différente, basée sur des règles globales (Cursor Rules) plutôt que des hooks événementiels.</p>
+
+  <h2>Sécurité et permissions</h2>
+  <p>Claude Code a un système <code>allow</code> / <code>deny</code> dans <code>settings.json</code> avec wildcards (<code>Bash(rg:*)</code>). Tu peux <code>deny</code> les opérations destructives au niveau projet, et le hook bloque même si l'utilisateur valide par fatigue.</p>
+
+  <p>Cursor a un système d'approbation par action mais moins fin. Pour des standards d'équipe stricts, l'approche Claude Code est plus mature.</p>
+
+  <h2>Quand choisir Claude Code</h2>
+  <ul>
+    <li>Tu veux garder VSCode (ou un autre éditeur) sans changer</li>
+    <li>Tu travailles avec une équipe et veux des standards de sécurité fins (<code>deny</code> destructeurs, hooks audit)</li>
+    <li>Tu construis des outils custom (skills, MCPs, sub-agents) pour ton workflow ou tes clients</li>
+    <li>Tu apprécies le terminal-first</li>
+  </ul>
+
+  <h2>Quand choisir Cursor</h2>
+  <ul>
+    <li>Tu veux une autocomplétion IA inline pendant que tu codes</li>
+    <li>Tu démarres ton parcours dev et veux un éditeur "tout intégré"</li>
+    <li>Tu travailles surtout en solo sans besoins de standards d'équipe poussés</li>
+    <li>Tu apprécies l'expérience éditeur unifiée</li>
+  </ul>
+
+  <h2>Les deux ?</h2>
+  <p>Pas mutuellement exclusifs. Beaucoup de devs utilisent Cursor pour l'autocomplétion inline + Claude Code pour les workflows agentic complexes. Les MCP servers et les fichiers projet (<code>CLAUDE.md</code>) restent partagés.</p>
+
+  <h2>Conclusion</h2>
+  <p>Pour un dev qui veut <strong>maîtriser un assistant en profondeur</strong>, construire des outils réutilisables, et travailler en équipe avec des standards : Claude Code est l'investissement le plus rentable en 2026.</p>
+
+  <p>Pour un dev qui veut <strong>commencer rapidement</strong> avec une expérience clé en main intégrée : Cursor.</p>
+
+  <div class="article-cta">
+    <h3>Apprends Claude Code en profondeur — 49 €</h3>
+    <p>6 formations couvrant tout : du workflow quotidien à la création de MCPs custom monétisables. Templates et exemples fonctionnels inclus.</p>
+    <a href="../index.html#pricing" class="btn btn-primary">Découvrir le pack — 49 €</a>
+  </div>
+</article>
+
+<footer>
+  <div class="container">
+    <div class="footer-bottom">
+      © 2026 Formations Claude Code FR · <a href="../index.html">Retour à l'accueil</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

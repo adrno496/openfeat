@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://formations-claude-code.fr/sitemap.xml

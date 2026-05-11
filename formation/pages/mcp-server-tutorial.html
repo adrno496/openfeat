@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tutoriel MCP server : créer un serveur MCP en Python et TypeScript (2026)</title>
+  <meta name="description" content="Tutoriel complet pour créer un MCP server (Model Context Protocol) avec Claude Code. Code Python et TypeScript, transport stdio et HTTP, validation Zod et Pydantic, déploiement Fly.io.">
+  <meta name="keywords" content="mcp server, model context protocol, mcp tutoriel, mcp python, mcp typescript, mcp claude code, créer mcp server, mcp stdio, mcp http">
+  <link rel="canonical" href="https://formations-claude-code.fr/pages/mcp-server-tutorial.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Tutoriel MCP server — Python et TypeScript">
+  <meta property="og:description" content="Construire un MCP server complet de zéro avec Claude Code.">
+
+  <link rel="stylesheet" href="../assets/styles.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Tutoriel MCP server — créer un serveur MCP en Python et TypeScript",
+    "description": "Construire un MCP server pour Claude Code. Code complet stdio + HTTP.",
+    "datePublished": "2026-05-10",
+    "dateModified": "2026-05-10",
+    "inLanguage": "fr-FR",
+    "author": { "@type": "Organization", "name": "Formations Claude Code FR" },
+    "publisher": { "@type": "Organization", "name": "Formations Claude Code FR" }
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://formations-claude-code.fr/" },
+      { "@type": "ListItem", "position": 2, "name": "Tutoriel MCP server", "item": "https://formations-claude-code.fr/pages/mcp-server-tutorial.html" }
+    ]
+  }
+  </script>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="logo">Formations Claude Code FR</a>
+    <ul class="nav-links">
+      <li><a href="../index.html#formations">Formations</a></li>
+      <li><a href="../index.html#pricing">Tarif</a></li>
+      <li><a href="../index.html#faq">FAQ</a></li>
+    </ul>
+  </div>
+</nav>
+
+<article class="article">
+  <h1>Tutoriel MCP server — Python et TypeScript pour Claude Code</h1>
+  <p class="meta">Mis à jour mai 2026 · Lecture 15 min</p>
+
+  <p>Le MCP (Model Context Protocol) est le protocole standard pour brancher Claude Code à des services externes : bases de données, APIs tierces, filesystems, services SaaS. Construire ton propre MCP server te donne un super-pouvoir : Claude Code peut alors invoquer tes fonctions custom comme s'il s'agissait d'outils natifs.</p>
+
+  <h2>Qu'est-ce qu'un MCP server ?</h2>
+  <p>Un MCP server expose 3 types d'éléments :</p>
+  <ul>
+    <li><strong>Tools</strong> — fonctions invocables (équivalent d'API endpoints)</li>
+    <li><strong>Resources</strong> — contenus lisibles (fichiers, données)</li>
+    <li><strong>Prompts</strong> — templates de prompts paramétrables</li>
+  </ul>
+
+  <p>Claude Code joue le rôle de <strong>MCP client</strong>. Quand tu construis un MCP server custom, tu étends ce que Claude Code peut faire dans ton projet.</p>
+
+  <h2>Choisir le transport : stdio ou HTTP ?</h2>
+  <p>Deux modes de communication entre Claude Code et ton MCP :</p>
+
+  <ul>
+    <li><strong>stdio</strong> : le serveur tourne en local, Claude Code l'invoque via stdin/stdout. Setup trivial, idéal pour usage perso.</li>
+    <li><strong>HTTP</strong> : le serveur est distant, communication via HTTPS. Idéal pour serveur partagé (équipe, clients, prod). Demande auth, rate limit, déploiement.</li>
+  </ul>
+
+  <p>Règle simple : commence en stdio. Passe à HTTP quand l'usage devient partagé.</p>
+
+  <h2>Tutoriel 1 : MCP server minimal en Python</h2>
+  <p>Installation du SDK :</p>
+  <pre><code>pip install mcp
+# ou avec uv (recommandé)
+uv add mcp</code></pre>
+
+  <p>Code minimal d'un serveur stdio :</p>
+  <pre><code># server.py
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP("hello")
+
+@mcp.tool()
+def say_hello(name: str = "world") -> str:
+    """Dit bonjour à quelqu'un."""
+    return f"Hello, {name}"
+
+if __name__ == "__main__":
+    mcp.run(transport="stdio")</code></pre>
+
+  <p>Configuration côté Claude Code dans <code>.claude/settings.local.json</code> :</p>
+  <pre><code>{
+  "mcpServers": {
+    "hello": {
+      "command": "python",
+      "args": ["/chemin/absolu/vers/server.py"]
+    }
+  }
+}</code></pre>
+
+  <p>Lance Claude Code, demande "Utilise le tool say_hello avec name=Axel" — il invoque automatiquement.</p>
+
+  <h2>Tutoriel 2 : MCP server production en Python avec Pydantic</h2>
+  <p>Pour un MCP qui va en production, il faut validation stricte des inputs, gestion d'erreurs structurée, et logging.</p>
+
+  <pre><code>from typing import Literal
+import json
+from pydantic import BaseModel, Field
+from mcp.server.fastmcp import FastMCP
+import httpx
+import os
+
+mcp = FastMCP("lemonsqueezy")
+API_KEY = os.environ["LEMONSQUEEZY_API_KEY"]
+
+class ListSubsInput(BaseModel):
+    status: Literal["active", "cancelled", "all"] = "active"
+    limit: int = Field(default=10, ge=1, le=50)
+
+@mcp.tool()
+async def list_subscriptions(status: str = "active", limit: int = 10) -> str:
+    """Liste les abonnements Lemonsqueezy."""
+    try:
+        params = ListSubsInput(status=status, limit=limit)
+    except ValueError as e:
+        return json.dumps({"error": "invalid_input", "details": str(e)})
+
+    async with httpx.AsyncClient(timeout=10) as client:
+        try:
+            res = await client.get(
+                "https://api.lemonsqueezy.com/v1/subscriptions",
+                headers={"Authorization": f"Bearer {API_KEY}"},
+                params={"filter[status]": params.status, "page[size]": params.limit}
+            )
+            res.raise_for_status()
+        except httpx.HTTPStatusError as e:
+            return json.dumps({"error": "api_error", "status": e.response.status_code})
+
+    data = res.json()["data"]
+    return json.dumps([{"id": s["id"], "email": s["attributes"]["user_email"]} for s in data])</code></pre>
+
+  <p>Points clés :</p>
+  <ul>
+    <li>Pydantic valide les inputs avant tout appel API</li>
+    <li>Erreurs retournées comme JSON structuré, jamais comme stack trace exposée</li>
+    <li>API key en variable d'environnement, jamais hardcodée</li>
+    <li>Limit max bornée (50) pour éviter d'épuiser le quota API</li>
+  </ul>
+
+  <h2>Tutoriel 3 : MCP server en TypeScript</h2>
+  <p>Installation :</p>
+  <pre><code>npm install @modelcontextprotocol/sdk zod
+npm install -D typescript @types/node</code></pre>
+
+  <p>Server stdio minimal :</p>
+  <pre><code>import { Server } from '@modelcontextprotocol/sdk/server/index.js'
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
+import { z } from 'zod'
+
+const Input = z.object({
+  param: z.string().min(1).max(64)
+})
+
+const server = new Server(
+  { name: 'mon-serveur', version: '1.0.0' },
+  { capabilities: { tools: {} } }
+)
+
+server.setRequestHandler('tools/list', async () => ({
+  tools: [{
+    name: 'my_tool',
+    description: 'Description claire pour le triggering',
+    inputSchema: {
+      type: 'object',
+      properties: { param: { type: 'string' } },
+      required: ['param']
+    }
+  }]
+}))
+
+server.setRequestHandler('tools/call', async (req) => {
+  const parsed = Input.parse(req.params.arguments)
+  return { content: [{ type: 'text', text: 'OK ' + parsed.param }] }
+})
+
+await server.connect(new StdioServerTransport())</code></pre>
+
+  <h2>Tutoriel 4 : MCP HTTP authentifié avec Express</h2>
+  <p>Pour partager un MCP server avec ton équipe ou tes clients, passage en HTTP avec auth Bearer et rate limiting :</p>
+
+  <pre><code>import express from 'express'
+import rateLimit from 'express-rate-limit'
+import { Server } from '@modelcontextprotocol/sdk/server/index.js'
+import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js'
+
+const TOKENS = new Set([process.env.MCP_TOKEN])
+const app = express()
+
+app.use(rateLimit({ windowMs: 60_000, max: 60 }))
+
+app.use((req, res, next) => {
+  const token = req.headers.authorization?.replace('Bearer ', '')
+  if (!token || !TOKENS.has(token)) {
+    return res.status(401).json({ error: 'unauthorized' })
+  }
+  next()
+})
+
+const mcp = new Server({ name: 'shared', version: '1.0.0' }, { capabilities: { tools: {} } })
+
+app.get('/sse', async (_req, res) => {
+  const transport = new SSEServerTransport('/messages', res)
+  await mcp.connect(transport)
+})
+
+app.listen(3000)</code></pre>
+
+  <p>Configuration côté Claude Code :</p>
+  <pre><code>{
+  "mcpServers": {
+    "shared": {
+      "url": "https://mcp.tonsite.com/sse",
+      "headers": { "Authorization": "Bearer xxx" }
+    }
+  }
+}</code></pre>
+
+  <h2>Debugger ton MCP : MCP Inspector</h2>
+  <p>L'outil officiel pour tester un MCP server en standalone :</p>
+  <pre><code>npx @modelcontextprotocol/inspector python server.py
+# ou pour TS
+npx @modelcontextprotocol/inspector node dist/server.js</code></pre>
+
+  <p>Ouvre une UI web où tu peux invoquer chaque tool avec différents inputs avant de le brancher dans Claude Code. Indispensable pour tester sans polluer ta session.</p>
+
+  <h2>Bonnes pratiques de sécurité</h2>
+  <ul>
+    <li>Validation stricte des inputs (Pydantic en Python, Zod en TS)</li>
+    <li>Aucun secret en dur dans le code (toujours <code>os.environ</code>)</li>
+    <li>Erreurs retournées structurées, jamais de stack trace au client</li>
+    <li>Rate limit côté MCP (60 req/min max par défaut)</li>
+    <li>HTTPS obligatoire en prod</li>
+    <li>Auth Bearer avec rotation token tous les 90 jours</li>
+    <li>Audit log de chaque invocation (qui, quand, quoi)</li>
+  </ul>
+
+  <h2>Distribuer ton MCP</h2>
+  <p>3 niveaux de distribution :</p>
+  <ul>
+    <li><strong>Privée</strong> : <code>~/.claude/</code> + dotfiles repo</li>
+    <li><strong>Équipe</strong> : repo Git avec <code>.claude/</code> commité + script de setup</li>
+    <li><strong>Publique</strong> : PyPI (<code>uv publish</code>) ou npm (<code>npm publish</code>) + soumission au registry MCP officiel</li>
+  </ul>
+
+  <div class="article-cta">
+    <h3>4 MCP servers fonctionnels inclus dans le pack</h3>
+    <p>Lemonsqueezy (Python + TypeScript), Supabase Helper, GitHub Issues — code complet, prêt à fork. Plus 8 modules détaillés sur la création, la sécurité, et la monétisation des MCPs.</p>
+    <a href="../index.html#pricing" class="btn btn-primary">Découvrir le pack — 49 €</a>
+  </div>
+</article>
+
+<footer>
+  <div class="container">
+    <div class="footer-bottom">
+      © 2026 Formations Claude Code FR · <a href="../index.html">Retour à l'accueil</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

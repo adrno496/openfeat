@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CLAUDE.md exemples — 5 templates par stack (React, Vanilla, Python, Astro, Monorepo)</title>
+  <meta name="description" content="Exemples concrets de CLAUDE.md projet pour 5 stacks : React+TypeScript, Vanilla JS+Supabase, Python+FastAPI, Astro, Monorepo. Templates fork-ables avec règles métier et anti-patterns.">
+  <meta name="keywords" content="claude.md exemple, claude.md template, claude.md react, claude.md python, claude.md vanilla, claude.md monorepo, configuration claude code projet">
+  <link rel="canonical" href="https://formations-claude-code.fr/pages/claude-md-exemples.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="CLAUDE.md exemples — 5 templates par stack">
+  <meta property="og:description" content="Templates fork-ables avec règles métier et conventions par stack technique.">
+
+  <link rel="stylesheet" href="../assets/styles.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "CLAUDE.md exemples — 5 templates par stack",
+    "description": "Templates CLAUDE.md prêts à l'emploi pour React, Vanilla JS, Python FastAPI, Astro, Monorepo.",
+    "datePublished": "2026-05-10",
+    "dateModified": "2026-05-10",
+    "inLanguage": "fr-FR",
+    "author": { "@type": "Organization", "name": "Formations Claude Code FR" },
+    "publisher": { "@type": "Organization", "name": "Formations Claude Code FR" }
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://formations-claude-code.fr/" },
+      { "@type": "ListItem", "position": 2, "name": "CLAUDE.md exemples", "item": "https://formations-claude-code.fr/pages/claude-md-exemples.html" }
+    ]
+  }
+  </script>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="logo">Formations Claude Code FR</a>
+    <ul class="nav-links">
+      <li><a href="../index.html#formations">Formations</a></li>
+      <li><a href="../index.html#pricing">Tarif</a></li>
+      <li><a href="../index.html#faq">FAQ</a></li>
+    </ul>
+  </div>
+</nav>
+
+<article class="article">
+  <h1>CLAUDE.md — 5 exemples concrets par stack</h1>
+  <p class="meta">Mis à jour mai 2026 · Lecture 8 min</p>
+
+  <p><code>CLAUDE.md</code> est le fichier markdown placé à la racine d'un projet, lu automatiquement par Claude Code à chaque session. Il définit les conventions, contraintes et commandes du projet — c'est ton contrat avec l'IA.</p>
+
+  <p>Les 5 exemples ci-dessous sont fork-ables. Adapte-les à ton projet. Vise toujours moins de 100 lignes : un <code>CLAUDE.md</code> court est attentivement lu, un long est survolé.</p>
+
+  <h2>1. CLAUDE.md pour Vanilla JS + Supabase</h2>
+  <pre><code># CLAUDE.md
+
+## Stack
+- Frontend : Vanilla JS (ES Modules natifs, pas de bundler)
+- Mobile : Capacitor 6 (si applicable)
+- Backend : Supabase (Postgres + Auth + Storage + Edge Functions)
+- Paiements : Lemonsqueezy (web) + RevenueCat (mobile)
+- Hébergement : Vercel + Play Store
+
+## Conventions code
+- Indentation 2 espaces, quotes simples, sans point-virgule
+- ES Modules natifs, pas de require, pas de bundler
+- Pas de framework JS sans validation explicite
+- Tests : Vitest pour utils, Playwright pour e2e
+
+## Règles métier non-négociables
+- is_premium muté UNIQUEMENT via RPC `set_premium_status`
+- Toute table publique a RLS activé
+- Aucun select('*'), toujours colonnes explicites
+- Webhooks paiements : signature vérifiée AVANT logique métier
+
+## Sécurité
+- CSP strict en prod (pas de unsafe-inline ni unsafe-eval)
+- Sanitize input via escapeHtml() ou textContent
+- Variables client : aucun secret (anon key OK, service key JAMAIS)
+
+## Trucs à ne pas faire
+- Pas de require, pas de bundler, pas de framework JS
+- Pas de select('*') Supabase
+- Pas de mutation is_premium côté client
+- Pas de innerHTML avec input utilisateur sans escapeHtml
+
+## Commandes utiles
+- `npx serve public/` — serveur local
+- `npx supabase start/stop` — Postgres local
+- `npx supabase functions deploy &lt;fn&gt; --no-verify-jwt` — webhook
+- `git push` — Vercel auto-deploy</code></pre>
+
+  <h2>2. CLAUDE.md pour React + TypeScript</h2>
+  <pre><code># CLAUDE.md
+
+## Stack
+- Frontend : React 18+ + TypeScript strict
+- Build : Vite (ou Next.js selon projet)
+- State : Zustand ou React Context (pas Redux sauf besoin spécifique)
+- Backend : à préciser selon projet
+- Tests : Vitest + Testing Library
+
+## Conventions code
+- Indentation 2 espaces, quotes simples, sans point-virgule
+- TypeScript strict, jamais `any` sans commentaire d'exception
+- Composants en PascalCase (.tsx), hooks en camelCase préfixés `use`
+- Imports : libs externes / libs internes / locaux, séparés par lignes vides
+
+## Architecture
+- src/components/ — composants réutilisables
+- src/features/&lt;feature&gt;/ — composants + hooks + services par feature
+- src/lib/ — utilitaires partagés
+- src/types/ — types TypeScript globaux
+
+## Trucs à ne pas faire
+- Pas de `any` non commenté
+- Pas de `dangerouslySetInnerHTML` avec données externes
+- Pas de prop drilling au-delà de 2 niveaux → state ou context
+- Pas de side-effect dans render (toujours useEffect)
+- Pas de secret en `.env.local` committé
+
+## Commandes utiles
+- `npm run dev`
+- `npm run build`
+- `npm run test`
+- `npm run typecheck`</code></pre>
+
+  <h2>3. CLAUDE.md pour Python + FastAPI</h2>
+  <pre><code># CLAUDE.md
+
+## Stack
+- Backend : FastAPI 0.110+
+- Python 3.11+
+- DB : SQLAlchemy 2 + Alembic (Postgres)
+- Tests : pytest + httpx async
+
+## Conventions code
+- Indentation 4 espaces
+- Type hints partout (PEP 484+)
+- f-strings, jamais `.format()` ou `%`
+- snake_case pour fonctions/variables, PascalCase pour classes
+
+## Architecture
+- app/main.py — point d'entrée
+- app/api/v1/ — routes versionnées
+- app/models/ — modèles SQLAlchemy
+- app/schemas/ — Pydantic schemas (input/output)
+- app/services/ — logique métier
+
+## Trucs à ne pas faire
+- Pas de query SQL en string concaténée (toujours paramétrée ou ORM)
+- Pas de `print()` en prod (logger structuré)
+- Pas de catch `Exception` générique sans re-raise
+- Pas de fonction async qui appelle du blocking I/O sans `to_thread`
+- Pas de secret hardcodé (toujours `os.environ` ou Pydantic Settings)
+
+## Commandes utiles
+- `uv venv` puis `source .venv/bin/activate`
+- `uv pip install -e ".[dev]"`
+- `uvicorn app.main:app --reload`
+- `pytest`
+- `alembic revision --autogenerate -m "..."`</code></pre>
+
+  <h2>4. CLAUDE.md pour Astro (blog / content)</h2>
+  <pre><code># CLAUDE.md
+
+## Stack
+- Astro 4+
+- Markdown + MDX pour contenu (src/content/)
+- Tailwind CSS
+- Déploiement : Vercel ou Cloudflare Pages
+
+## Conventions code
+- Indentation 2 espaces, quotes simples, sans point-virgule
+- Composants .astro, pas de React/Vue (sauf island justifié)
+- Slugs en kebab-case
+- Frontmatter Markdown : champs typés via Content Collection schema
+
+## Trucs à ne pas faire
+- Pas d'island JavaScript sans raison (perf SEO)
+- Pas de modification du content schema sans confirmer (régénération full)
+- Pas de framework client (React, Vue) ajouté
+- Pas d'inline-styles (Tailwind only)
+
+## Commandes utiles
+- `npm run dev` — :4321
+- `npm run build && npm run preview`
+- `npm run check` — type check Astro
+- `npm run astro -- add &lt;integration&gt;`</code></pre>
+
+  <h2>5. CLAUDE.md pour Monorepo (racine)</h2>
+  <pre><code># CLAUDE.md
+
+Conventions générales du monorepo. Chaque sous-projet a aussi son propre CLAUDE.md plus spécifique.
+
+## Structure
+mon-monorepo/
+├── apps/
+│   ├── web/          (CLAUDE.md spécifique)
+│   ├── api/          (CLAUDE.md spécifique)
+│   └── mobile/
+├── packages/
+│   ├── shared/
+│   └── ui/
+└── package.json
+
+## Outils
+- pnpm workspaces (ou npm/yarn workspaces)
+- Turborepo (ou Nx) pour orchestration
+- TypeScript strict en racine, héritage par projet
+
+## Conventions générales
+- 2 espaces, quotes simples, sans point-virgule
+- TS strict partout
+- Tests obligatoires pour chaque package
+- Commits avec scope du package : `feat(web): ...`, `fix(api): ...`
+
+## Trucs à ne pas faire
+- Pas de dépendance circulaire entre packages
+- Pas d'import depuis apps/X vers apps/Y (passer par packages/shared)
+- Pas de version désynchronisée des libs partagées
+- Pas de mutation de packages/shared sans tests à jour
+
+## Commandes utiles
+- `pnpm install` — install racine
+- `pnpm -r build` — build tous les packages
+- `pnpm --filter web dev` — lancer un seul app
+- `pnpm -r test` — tests sur tous les packages</code></pre>
+
+  <h2>Règles communes pour tout CLAUDE.md</h2>
+
+  <h3>Sections à toujours avoir</h3>
+  <ul>
+    <li><strong>Stack</strong> (5 lignes max) — situer le projet</li>
+    <li><strong>Conventions code</strong> (5 lignes max) — les vraies, pas les évidences</li>
+    <li><strong>Trucs à ne pas faire</strong> (3-5 puces) — la section la plus utile en pratique</li>
+    <li><strong>Commandes utiles</strong> (3-8 commandes) — top de ce que tu utilises souvent</li>
+  </ul>
+
+  <h3>Sections optionnelles</h3>
+  <ul>
+    <li><strong>Règles métier</strong> — ce qui n'est pas dans le code et qui doit le rester</li>
+    <li><strong>Sécurité</strong> — règles dures (pas de secret client, RLS partout, etc.)</li>
+    <li><strong>Architecture</strong> — 3 à 5 lignes max si vraiment nécessaire</li>
+  </ul>
+
+  <h3>Sections à éviter</h3>
+  <ul>
+    <li>Histoire du projet (inutile)</li>
+    <li>Setup d'install (c'est dans le README)</li>
+    <li>"Écris du bon code" et autres banalités (zéro signal actionnable)</li>
+    <li>Listes de "tout ce que mon projet fait" (Claude Code voit le code)</li>
+  </ul>
+
+  <h2>Hiérarchie de chargement</h2>
+  <p>Claude Code charge les <code>CLAUDE.md</code> dans cet ordre :</p>
+  <ol>
+    <li><code>~/.claude/CLAUDE.md</code> — global perso</li>
+    <li><code>&lt;projet&gt;/CLAUDE.md</code> — projet (commité)</li>
+    <li><code>&lt;projet&gt;/&lt;sous-dossier&gt;/CLAUDE.md</code> — rare, pour sous-projet à conventions différentes</li>
+  </ol>
+  <p>Tous sont concaténés dans le contexte. Le projet écrase la perso quand contradiction.</p>
+
+  <div class="article-cta">
+    <h3>5 templates CLAUDE.md inclus dans le pack</h3>
+    <p>Plus 6 formations détaillées sur la structuration, les anti-patterns à éviter, et l'audit régulier de tes <code>CLAUDE.md</code>.</p>
+    <a href="../index.html#pricing" class="btn btn-primary">Découvrir le pack — 49 €</a>
+  </div>
+</article>
+
+<footer>
+  <div class="container">
+    <div class="footer-bottom">
+      © 2026 Formations Claude Code FR · <a href="../index.html">Retour à l'accueil</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

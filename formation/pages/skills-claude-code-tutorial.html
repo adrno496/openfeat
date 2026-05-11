@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tutoriel Skills Claude Code — créer un skill custom auto-déclenché (2026)</title>
+  <meta name="description" content="Tutoriel complet pour créer un skill Claude Code custom : structure SKILL.md, frontmatter optimisé pour le triggering, ressources composables, distribution. Exemples fonctionnels inclus.">
+  <meta name="keywords" content="skill claude code, skill.md, frontmatter skill, claude code custom skill, créer skill claude, skill triggering, skills composables">
+  <link rel="canonical" href="https://formations-claude-code.fr/pages/skills-claude-code-tutorial.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Tutoriel Skills Claude Code — créer un skill custom">
+  <meta property="og:description" content="Construire un skill auto-déclenché qui fonctionne dès la première utilisation.">
+
+  <link rel="stylesheet" href="../assets/styles.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Tutoriel Skills Claude Code — créer un skill custom auto-déclenché",
+    "description": "Anatomie d'un SKILL.md professionnel : frontmatter, body, ressources externes, distribution.",
+    "datePublished": "2026-05-10",
+    "dateModified": "2026-05-10",
+    "inLanguage": "fr-FR",
+    "author": { "@type": "Organization", "name": "Formations Claude Code FR" },
+    "publisher": { "@type": "Organization", "name": "Formations Claude Code FR" }
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://formations-claude-code.fr/" },
+      { "@type": "ListItem", "position": 2, "name": "Tutoriel Skills", "item": "https://formations-claude-code.fr/pages/skills-claude-code-tutorial.html" }
+    ]
+  }
+  </script>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="logo">Formations Claude Code FR</a>
+    <ul class="nav-links">
+      <li><a href="../index.html#formations">Formations</a></li>
+      <li><a href="../index.html#pricing">Tarif</a></li>
+      <li><a href="../index.html#faq">FAQ</a></li>
+    </ul>
+  </div>
+</nav>
+
+<article class="article">
+  <h1>Tutoriel Skills Claude Code — créer un skill custom auto-déclenché</h1>
+  <p class="meta">Mis à jour mai 2026 · Lecture 10 min</p>
+
+  <p>Un skill Claude Code est un module markdown qui enseigne à l'assistant à exécuter une tâche spécifique. Sa caractéristique unique : il peut s'auto-déclencher quand le contexte le justifie, sans que tu le demandes explicitement. Bien conçu, un skill est un super-pouvoir permanent dans tes projets.</p>
+
+  <h2>Skill vs slash command vs sub-agent : la cartographie</h2>
+  <ul>
+    <li><strong>Skill</strong> : auto-déclenché selon le contexte (via le champ <code>description</code>). Vit dans la session courante.</li>
+    <li><strong>Slash command</strong> : invoquée explicitement par <code>/nom</code>. Vit dans la session courante.</li>
+    <li><strong>Sub-agent</strong> : invoqué explicitement, vit dans son propre contexte isolé.</li>
+  </ul>
+
+  <p>Si tu veux automatiser un comportement <strong>récurrent</strong> qui doit s'appliquer dès que la situation se présente (audit RLS sur une migration Supabase, génération de commit message après <code>git add</code>, etc.) : skill.</p>
+
+  <h2>Structure d'un skill</h2>
+  <p>Les skills se placent dans :</p>
+  <ul>
+    <li><code>~/.claude/skills/&lt;nom&gt;/SKILL.md</code> — global, perso</li>
+    <li><code>.claude/skills/&lt;nom&gt;/SKILL.md</code> — projet, commité</li>
+  </ul>
+
+  <p>Structure type d'un skill professionnel :</p>
+  <pre><code>.claude/skills/csp-auditor/
+├── SKILL.md              # Le contrat (&lt; 100 lignes)
+├── reference/
+│   └── patterns.md       # Patterns à appliquer (chargés au besoin)
+└── examples/
+    ├── good-policy.txt
+    └── bad-policy.txt</code></pre>
+
+  <h2>Le frontmatter : 80 % du résultat</h2>
+  <p>Le champ <code>description</code> dans le frontmatter YAML est <strong>critique</strong>. C'est ce que Claude Code lit pour décider si le skill s'applique au contexte courant.</p>
+
+  <p>Mauvais (trigger trop vague) :</p>
+  <pre><code>---
+name: csp-auditor
+description: Outil pour CSP
+---</code></pre>
+
+  <p>Bon (trigger précis avec mots-clés et patterns) :</p>
+  <pre><code>---
+name: csp-auditor
+description: Audite une politique CSP (Content-Security-Policy) et détecte
+  les directives dangereuses (unsafe-inline, unsafe-eval, wildcards). Trigger
+  quand l'utilisateur mentionne CSP, Content-Security-Policy, csp.config,
+  header de sécurité, ou édite un fichier *.csp ou contenant l'expression
+  Content-Security-Policy.
+---</code></pre>
+
+  <p>La règle : inclure 4 à 8 mots-clés concrets + patterns de fichier + expressions naturelles que l'utilisateur tape. Plus tu donnes de signaux, plus le triggering est précis.</p>
+
+  <h2>Le body : structurer pour la lecture rapide</h2>
+  <pre><code># CSP Auditor
+
+## Quand t'appliquer
+- Édition d'un fichier contenant une politique CSP
+- Demande explicite d'audit CSP
+
+## Méthode
+1. Identifier la chaîne CSP complète
+2. Parser les directives
+3. Signaler les anti-patterns
+4. Proposer une politique alternative si critique
+
+## Règles dures
+- unsafe-inline dans script-src → critique (XSS)
+- unsafe-eval → critique (exec arbitraire)
+- wildcard * dans script-src → critique (bypass)
+
+## Format de sortie
+Pour chaque issue :
+- ligne X-Y : description
+- Suggestion : fix concret
+
+## Cas où NE PAS appliquer
+- Fichier dans node_modules/ ou .tmp/
+- CSP en mode Report-Only marquée "draft"</code></pre>
+
+  <p>Sections numérotées, courtes, lisibles en 30 secondes. Pas de prose longue.</p>
+
+  <h2>Tester le triggering</h2>
+  <p>Avant de publier un skill, écris une suite de prompts de test et mesure le ratio de déclenchement.</p>
+
+  <p>Exemple de tests pour <code>csp-auditor</code> :</p>
+  <ul>
+    <li>"Audit la CSP de ce site" → doit trigger ✓</li>
+    <li>"Lis ce fichier csp.config" → doit trigger ✓</li>
+    <li>"Vérifie le header Content-Security-Policy" → doit trigger ✓</li>
+    <li>"Crée une fonction de validation" → ne doit PAS trigger ✓</li>
+    <li>"Décris ce projet" → ne doit PAS trigger ✓</li>
+  </ul>
+
+  <p>Vise 4/5 sur les "OUI" et 0/5 sur les "NON". Si moins, retravaille la <code>description</code>.</p>
+
+  <h2>Skills composables avec ressources externes</h2>
+  <p>Un skill complexe sans ressources externes devient un mur de markdown de 200+ lignes, inmaintenable. La solution : <strong>composer</strong>.</p>
+
+  <p>Dans <code>SKILL.md</code> :</p>
+  <pre><code>## Méthode
+Pour chaque table à auditer :
+1. Vérifier l'application du Pattern: user_owns_row (voir reference/patterns.md)
+2. Si le pattern n'est pas appliqué, signaler.</code></pre>
+
+  <p>Dans <code>reference/patterns.md</code> :</p>
+  <pre><code># Patterns RLS du projet
+
+## Pattern: user_owns_row
+
+```sql
+ENABLE RLS;
+CREATE POLICY "owner_select" FOR SELECT USING (auth.uid() = user_id);
+...
+```</code></pre>
+
+  <p>Claude Code charge la ressource externe à la demande, pas avant. Économie de contexte massive.</p>
+
+  <h2>Distribuer ton skill</h2>
+  <ul>
+    <li><strong>Privé (perso)</strong> : <code>~/.claude/skills/&lt;nom&gt;/</code>, dans tes dotfiles</li>
+    <li><strong>Équipe</strong> : <code>.claude/skills/&lt;nom&gt;/</code> commité dans le repo projet</li>
+    <li><strong>Public</strong> : repo GitHub avec README + LICENSE, install via <code>git clone</code></li>
+  </ul>
+
+  <h2>Erreurs fréquentes</h2>
+  <ul>
+    <li><strong>Description trop vague</strong> → trigger raté</li>
+    <li><strong>Description trop large</strong> → trigger partout, pollution contexte</li>
+    <li><strong>Body de 300 lignes</strong> → c'est un sub-agent qu'il te faut</li>
+    <li><strong>Pas de "Cas où NE PAS appliquer"</strong> → faux positifs</li>
+    <li><strong>Ressources externes pas référencées dans le body</strong> → Claude Code ne les lit jamais</li>
+  </ul>
+
+  <h2>Exemple complet : skill <code>commit-conventional</code></h2>
+  <pre><code>---
+name: commit-conventional
+description: Génère un commit message au format Conventional Commits depuis le diff staged.
+  Trigger quand l'utilisateur demande "génère un commit", "commit message",
+  "écris-moi un commit", après git add ou git diff --staged.
+---
+
+# Commit Conventional
+
+## Méthode
+1. Lire git diff --staged
+2. Identifier le type (feat, fix, refactor, etc.)
+3. Identifier le scope
+4. Rédiger description courte impérative
+
+## Règles dures
+- Format : type(scope): description
+- Max 72 caractères
+- Pas de point final
+- Impératif présent ("add" pas "added")
+
+## Format de sortie
+Affiche uniquement le message, sans explication, sans guillemets.
+
+## Cas où NE PAS appliquer
+- Si rien n'est staged → demander de stager
+- Si l'utilisateur demande explicitement un autre format</code></pre>
+
+  <div class="article-cta">
+    <h3>4 skills prêts à l'emploi inclus dans le pack</h3>
+    <p>CSP Auditor, Supabase RLS Checker, Commit Conventional, Pre-Deploy Check — frontmatter optimisé, déjà testés. Plus 8 modules sur la conception, le triggering optimal, et la monétisation des skills.</p>
+    <a href="../index.html#pricing" class="btn btn-primary">Découvrir le pack — 49 €</a>
+  </div>
+</article>
+
+<footer>
+  <div class="container">
+    <div class="footer-bottom">
+      © 2026 Formations Claude Code FR · <a href="../index.html">Retour à l'accueil</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sub-agents Claude Code — créer des agents personnalisés (tutoriel 2026)</title>
+  <meta name="description" content="Tutoriel complet sur les sub-agents Claude Code : création d'agents custom, isolation de contexte, parallélisation de tâches. Code et exemples réels (explorer, code-reviewer, security-auditor).">
+  <meta name="keywords" content="sub-agent claude code, claude code agent, créer agent custom, claude code parallelisation, isolation contexte, code reviewer agent">
+  <link rel="canonical" href="https://formations-claude-code.fr/pages/sub-agents-claude-code.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Sub-agents Claude Code — créer des agents personnalisés">
+  <meta property="og:description" content="Maîtriser les sub-agents pour isoler tes tâches et paralléliser tes recherches.">
+
+  <link rel="stylesheet" href="../assets/styles.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Sub-agents Claude Code — créer des agents personnalisés",
+    "description": "Tutoriel sub-agents : isolation, parallélisation, exemples explorer + code-reviewer.",
+    "datePublished": "2026-05-10",
+    "dateModified": "2026-05-10",
+    "inLanguage": "fr-FR",
+    "author": { "@type": "Organization", "name": "Formations Claude Code FR" },
+    "publisher": { "@type": "Organization", "name": "Formations Claude Code FR" }
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://formations-claude-code.fr/" },
+      { "@type": "ListItem", "position": 2, "name": "Sub-agents", "item": "https://formations-claude-code.fr/pages/sub-agents-claude-code.html" }
+    ]
+  }
+  </script>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="logo">Formations Claude Code FR</a>
+    <ul class="nav-links">
+      <li><a href="../index.html#formations">Formations</a></li>
+      <li><a href="../index.html#pricing">Tarif</a></li>
+      <li><a href="../index.html#faq">FAQ</a></li>
+    </ul>
+  </div>
+</nav>
+
+<article class="article">
+  <h1>Sub-agents Claude Code — créer des agents personnalisés (tutoriel)</h1>
+  <p class="meta">Mis à jour mai 2026 · Lecture 11 min</p>
+
+  <p>Un sub-agent Claude Code est un sous-processus qui vit dans son propre contexte, avec sa propre identité et ses propres permissions. Il sert à isoler une tâche longue ou risquée du contexte principal, à paralléliser plusieurs investigations, ou à spécialiser certains rôles avec des permissions restreintes.</p>
+
+  <h2>Pourquoi utiliser un sub-agent</h2>
+  <p>3 cas où un sub-agent est meilleur qu'une session principale qui s'étire :</p>
+
+  <ul>
+    <li><strong>Isolation</strong> — tu refactor 10 fichiers, tu ne veux pas polluer ta session principale avec 50 lectures de code</li>
+    <li><strong>Parallélisation</strong> — tu explores 3 hypothèses pour un bug, 3 sub-agents en parallèle gagnent du temps</li>
+    <li><strong>Spécialisation</strong> — un sub-agent <code>code-reviewer</code> a accès uniquement à <code>Read, Bash, Grep</code> (pas d'écriture)</li>
+  </ul>
+
+  <h2>Anatomie d'un sub-agent custom</h2>
+  <p>Les sub-agents personnalisés se définissent dans :</p>
+  <ul>
+    <li><code>~/.claude/agents/&lt;nom&gt;.md</code> — global, perso</li>
+    <li><code>.claude/agents/&lt;nom&gt;.md</code> — projet, commité</li>
+  </ul>
+
+  <p>Frontmatter YAML obligatoire :</p>
+  <pre><code>---
+name: code-reviewer
+description: Review du code modifié sur la branche courante. Cherche bugs, failles, duplications.
+model: claude-sonnet-4-6
+tools: Read, Bash, Grep
+---
+
+Tu es un reviewer de code expérimenté. Quand on t'invoque :
+
+1. Identifier les fichiers modifiés via `git diff main`
+2. Lire chaque fichier en intégralité
+3. Pour chaque, signaler :
+   - bugs potentiels (null pointer, race condition, off-by-one)
+   - failles de sécurité (XSS, SQL injection, secrets en dur)
+   - duplications de code
+   - patterns incohérents avec le reste du projet
+
+Ne pas modifier le code. Juste rapporter.</code></pre>
+
+  <p>Champs critiques du frontmatter :</p>
+  <ul>
+    <li><code>name</code> — identifiant invocable</li>
+    <li><code>description</code> — ce que fait l'agent (utilisée pour le triggering)</li>
+    <li><code>model</code> — modèle utilisé (sonnet/opus/haiku, indépendant de la session principale)</li>
+    <li><code>tools</code> — whitelist explicite des outils accessibles</li>
+  </ul>
+
+  <h2>Choix du modèle par sub-agent</h2>
+  <p>Une optimisation puissante : utiliser un modèle moins cher pour les sub-agents qui n'ont pas besoin de raisonnement avancé.</p>
+
+  <ul>
+    <li><strong>Haiku</strong> — sub-agent <code>explorer</code> (recherche dans codebase, traitement de texte)</li>
+    <li><strong>Sonnet</strong> — sub-agent <code>code-reviewer</code> ou <code>security-auditor</code> (équilibre)</li>
+    <li><strong>Opus</strong> — sub-agent qui doit raisonner sur architecture ou stratégie</li>
+  </ul>
+
+  <p>Économie typique : un sub-agent <code>explorer</code> en Haiku coûte ~5x moins qu'en Opus pour une qualité équivalente sur sa tâche spécifique.</p>
+
+  <h2>3 sub-agents prêts à l'emploi</h2>
+
+  <h3>1. <code>explorer</code> — recherche read-only</h3>
+  <pre><code>---
+name: explorer
+description: Recherche read-only dans la codebase. Renvoie chemins, lignes, et extraits pertinents.
+model: claude-haiku-4-5-20251001
+tools: Read, Grep, Glob, Bash
+---
+
+Tu es un agent de recherche read-only. Tu n'écris jamais.
+
+Pour chaque demande :
+1. Glob ou Grep pour localiser
+2. Lis les fichiers pertinents en partie ciblée (pas tout le fichier)
+3. Rapporte sous format :
+   - chemin/du/fichier.ext:ligne
+   - 3 lignes de contexte
+   - Pertinence : forte / moyenne / faible</code></pre>
+
+  <h3>2. <code>code-reviewer</code> — review de PR</h3>
+  <p>Vu plus haut. Modèle Sonnet, tools <code>Read, Bash, Grep</code>.</p>
+
+  <h3>3. <code>security-auditor</code> — audit OWASP</h3>
+  <pre><code>---
+name: security-auditor
+description: Audit de sécurité focalisé OWASP top 10 sur fichiers de la branche.
+model: claude-sonnet-4-6
+tools: Read, Grep, Bash
+---
+
+Tu es un auditeur de sécurité focalisé sur les vulnérabilités courantes.
+
+Vérifier les patterns :
+- Injections (SQL, command, NoSQL)
+- XSS (innerHTML, dangerouslySetInnerHTML)
+- Secrets (sk_live_, service_role, api_key)
+- Auth/Autorisation (endpoints sans check)
+- CSRF / clickjacking</code></pre>
+
+  <h2>Communication parent → sub-agent</h2>
+  <p>L'agent parent invoque un sub-agent avec un prompt complet (puisque le sub-agent ne voit pas le contexte parent).</p>
+
+  <blockquote>"Lance un sub-agent code-reviewer pour reviewer la branche feat/auth. Il doit me rapporter en moins de 200 mots."</blockquote>
+
+  <p>Le sub-agent reçoit son prompt + sa définition (frontmatter + body), exécute, retourne un message au parent. Pas de chaînage : un sub-agent ne peut pas appeler d'autres sub-agents.</p>
+
+  <h2>Parallélisation</h2>
+  <p>Tu peux lancer plusieurs sub-agents en parallèle dans le même message :</p>
+
+  <blockquote>"Lance en parallèle :<br>
+  - sub-agent explorer : où est défini le composant UserProfile ?<br>
+  - sub-agent explorer : quels endpoints REST utilisent UserProfile ?<br>
+  - sub-agent explorer : quels tests couvrent UserProfile ?<br><br>
+  Synthétise les 3 réponses."</blockquote>
+
+  <p>Trois investigations en parallèle, gain de temps net (~3x sur le wall-clock).</p>
+
+  <h2>Limites et pièges</h2>
+  <ul>
+    <li><strong>Le sub-agent ne sait rien du parent</strong> — tu dois lui réécrire le contexte nécessaire</li>
+    <li><strong>Consommation tokens</strong> — chaque sub-agent = nouvelle conversation = nouveau contexte chargé</li>
+    <li><strong>Pas de chaînage</strong> — sub-agent → sub-agent impossible, à orchestrer côté parent</li>
+    <li><strong>Permissions silencieuses</strong> — si un sub-agent veut un tool qu'il n'a pas dans <code>tools</code>, il échoue silencieusement</li>
+    <li><strong>Sur-utilisation</strong> — pour des tâches courtes (&lt; 5 min), la session principale suffit, le sub-agent ajoute de l'overhead</li>
+  </ul>
+
+  <h2>Quand préférer slash command, skill ou sub-agent</h2>
+  <ul>
+    <li><strong>Slash command</strong> : workflow rapide, invocation explicite, dans la session courante</li>
+    <li><strong>Skill</strong> : auto-déclenché par contexte, vit dans la session courante</li>
+    <li><strong>Sub-agent</strong> : tâche longue / risquée, contexte isolé, permissions restreintes</li>
+  </ul>
+
+  <div class="article-cta">
+    <h3>3 sub-agents prêts dans le pack + 13 modules de la formation Mastery FR</h3>
+    <p>explorer, code-reviewer, security-auditor — fork-ables. Plus le module 04 de F1 qui détaille la conception, la parallélisation, et les limites des sub-agents.</p>
+    <a href="../index.html#pricing" class="btn btn-primary">Découvrir le pack — 49 €</a>
+  </div>
+</article>
+
+<footer>
+  <div class="container">
+    <div class="footer-bottom">
+      © 2026 Formations Claude Code FR · <a href="../index.html">Retour à l'accueil</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

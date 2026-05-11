@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guide Claude Code en français — installation, configuration, prompting (2026)</title>
+  <meta name="description" content="Guide complet Claude Code en français : installation CLI et VSCode, configuration CLAUDE.md, settings.json, sub-agents, skills, MCP servers. Tutoriel pas à pas pour devs francophones.">
+  <meta name="keywords" content="claude code français, claude code tutoriel, claude code installation, claude code config, claude code vscode, claude code cli, claude.md exemple, claude code guide">
+  <link rel="canonical" href="https://formations-claude-code.fr/pages/guide-claude-code-francais.html">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Guide Claude Code en français — installation et configuration complète">
+  <meta property="og:description" content="Tout pour démarrer avec Claude Code en français : install, config, prompting, sécurité.">
+  <meta property="og:url" content="https://formations-claude-code.fr/pages/guide-claude-code-francais.html">
+
+  <link rel="stylesheet" href="../assets/styles.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Guide Claude Code en français — installation, configuration, prompting",
+    "description": "Guide complet Claude Code en français : installation, configuration, sub-agents, skills, MCP servers.",
+    "datePublished": "2026-05-10",
+    "dateModified": "2026-05-10",
+    "inLanguage": "fr-FR",
+    "author": { "@type": "Organization", "name": "Formations Claude Code FR" },
+    "publisher": { "@type": "Organization", "name": "Formations Claude Code FR" }
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://formations-claude-code.fr/" },
+      { "@type": "ListItem", "position": 2, "name": "Guide Claude Code FR", "item": "https://formations-claude-code.fr/pages/guide-claude-code-francais.html" }
+    ]
+  }
+  </script>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="logo">Formations Claude Code FR</a>
+    <ul class="nav-links">
+      <li><a href="../index.html#formations">Formations</a></li>
+      <li><a href="../index.html#pricing">Tarif</a></li>
+      <li><a href="../index.html#faq">FAQ</a></li>
+    </ul>
+  </div>
+</nav>
+
+<article class="article">
+  <h1>Guide Claude Code en français — installation, configuration et premier flow</h1>
+  <p class="meta">Mis à jour mai 2026 · Lecture 12 min</p>
+
+  <p>Claude Code est l'assistant de développement officiel d'Anthropic. Il s'utilise dans le terminal (CLI), dans VSCode (extension), ou en navigateur (claude.ai/code). Ce guide en français couvre l'installation pas à pas, la configuration projet, et le premier workflow utile pour un développeur francophone.</p>
+
+  <h2>1. Installation de Claude Code (CLI)</h2>
+  <p>Pré-requis : Node.js 18 ou plus, Git installé, un compte Anthropic actif (Pro ou Max recommandé pour usage intensif).</p>
+
+  <pre><code>npm install -g @anthropic-ai/claude-code
+claude --version</code></pre>
+
+  <p>Premier lancement dans un projet :</p>
+  <pre><code>cd ~/projects/mon-projet
+claude</code></pre>
+
+  <p>Au premier appel, Claude Code ouvre une page d'authentification OAuth dans ton navigateur. Tes credentials sont stockées dans <code>~/.claude/</code>.</p>
+
+  <h2>2. Installation de l'extension VSCode</h2>
+  <p>Marketplace VSCode → recherche "Claude Code" (officiel Anthropic) → Install. Le raccourci par défaut pour invoquer l'assistant est <code>Cmd+Esc</code> (macOS) ou <code>Ctrl+Esc</code> (Linux/Windows). L'extension reprend automatiquement les credentials de la CLI.</p>
+
+  <h2>3. Configurer ton premier <code>CLAUDE.md</code> projet</h2>
+  <p><code>CLAUDE.md</code> est un fichier markdown placé à la racine de ton projet. Claude Code le lit automatiquement à chaque session pour comprendre les conventions et contraintes du projet. Tiens-toi à 80 lignes maximum — plus c'est court, plus c'est lu attentivement.</p>
+
+  <p>Exemple type pour un projet Vanilla JS + Supabase :</p>
+  <pre><code># CLAUDE.md
+
+## Stack
+- Frontend : Vanilla JS (ES Modules natifs, pas de bundler)
+- Backend : Supabase (Postgres + Auth + Edge Functions)
+
+## Conventions code
+- Indentation 2 espaces, quotes simples, sans point-virgule
+- Pas de framework JS ajouté sans validation
+
+## Trucs à ne pas faire
+- Pas de select('*') Supabase, toujours colonnes explicites
+- is_premium muté uniquement via RPC server-side
+- Pas de innerHTML avec input utilisateur sans escapeHtml
+
+## Commandes utiles
+- npm run dev
+- npx supabase migration new &lt;nom&gt;</code></pre>
+
+  <h2>4. Configurer les permissions (<code>settings.json</code>)</h2>
+  <p>Place ton fichier de permissions dans <code>.claude/settings.json</code> (projet, commité en équipe) ou <code>~/.claude/settings.json</code> (global, perso).</p>
+
+  <pre><code>{
+  "model": "claude-opus-4-7",
+  "permissions": {
+    "allow": [
+      "Bash(git status)",
+      "Bash(git diff)",
+      "Bash(npm test)",
+      "Read", "Edit", "Write"
+    ],
+    "deny": [
+      "Bash(git push --force*)",
+      "Bash(git reset --hard*)",
+      "Bash(rm -rf /*)"
+    ]
+  }
+}</code></pre>
+
+  <p>Les commandes du <code>allow</code> sont auto-acceptées sans demande de confirmation. Le <code>deny</code> bloque même si tu autorises par erreur — c'est ta filet de sécurité contre les opérations destructives.</p>
+
+  <h2>5. Premier flow : décrire un projet</h2>
+  <p>Lance <code>claude</code> dans un projet et demande :</p>
+  <blockquote>"Lis README.md et donne-moi un résumé de l'architecture du projet en 5 points."</blockquote>
+
+  <p>Claude Code lit ton README, explore les fichiers nécessaires si besoin, et te répond. Tu n'as pas à lui dire où chercher — il sait. C'est le test parfait pour valider ton install.</p>
+
+  <h2>6. Le squelette de prompt qui marche 9 fois sur 10</h2>
+  <p>Un bon prompt n'est pas long, il est <strong>structuré</strong> en 4 sections :</p>
+
+  <pre><code>Contexte: tel fichier fait X. On veut Y.
+Objectif: ajouter / modifier / extraire Z.
+Contraintes:
+- ne pas toucher à A
+- pas de nouvelle dépendance
+Format de sortie: diff sur le seul fichier concerné.</code></pre>
+
+  <p>4 sections, chacune en 1 à 3 phrases. Total : 4 à 12 lignes. Tu obtiens un résultat exploitable dès la première ou deuxième tentative.</p>
+
+  <h2>7. Le protocole de debug à 5 points</h2>
+  <p>90 % des échecs Claude Code sur un bug viennent du même problème : info manquante. Donne ces 5 éléments dès le premier prompt :</p>
+
+  <ol>
+    <li><strong>Stack trace complète</strong> (jamais tronquée)</li>
+    <li><strong>Repro steps</strong> précis</li>
+    <li><strong>Comportement attendu</strong></li>
+    <li><strong>Comportement observé</strong></li>
+    <li><strong>Ton hypothèse</strong> (même fausse)</li>
+  </ol>
+
+  <p>Avec ces 5 éléments, Claude Code va droit au but. Sans, il devine et il échoue plusieurs fois.</p>
+
+  <h2>8. Gérer le contexte (<code>/clear</code> vs <code>/compact</code> vs sessions courtes)</h2>
+  <p>Le "contexte" est la mémoire de session de Claude Code. Plus elle est longue, plus chaque tour est cher et moins la qualité est bonne.</p>
+
+  <ul>
+    <li><strong>Sessions courtes</strong> (recommandé) : 1 tâche = 1 session. Tu fermes en finissant. Tu rouvres pour la suivante.</li>
+    <li><strong><code>/compact</code></strong> : résume la conversation et libère du contexte sans perdre l'essentiel.</li>
+    <li><strong><code>/clear</code></strong> : reset complet, destructif. Pour quand la conversation dérive vraiment.</li>
+  </ul>
+
+  <h2>9. Les 5 commandes Git que tu ne dois JAMAIS laisser en autonomie</h2>
+  <p>Même si tu utilises Claude Code en mode <code>auto-accept</code>, ces commandes doivent toujours être manuelles :</p>
+  <ul>
+    <li><code>git push --force</code> (réécrit l'historique distant)</li>
+    <li><code>git reset --hard</code> (perd les changements locaux)</li>
+    <li><code>git branch -D</code> (supprime une branche)</li>
+    <li><code>git rebase</code> (peut casser l'historique)</li>
+    <li><code>rm -rf</code> (suppression destructive)</li>
+  </ul>
+  <p>Configure ces interdictions dans la section <code>deny</code> de ton <code>settings.json</code> — le hook bloque même si tu acceptes par fatigue.</p>
+
+  <h2>10. Aller plus loin</h2>
+  <p>Une fois ces fondamentaux maîtrisés, les sujets avancés à creuser :</p>
+  <ul>
+    <li><strong>Sub-agents</strong> : sous-processus Claude Code à contexte isolé pour tâches longues ou risquées</li>
+    <li><strong>Skills</strong> : modules réutilisables qui s'auto-déclenchent selon le contexte</li>
+    <li><strong>MCP servers</strong> : brancher Claude Code à des services externes (DB, APIs, GitHub)</li>
+    <li><strong>Hooks</strong> : intercepter les événements (PreToolUse, PostToolUse) pour audit ou validation</li>
+  </ul>
+
+  <p>Chacun de ces sujets est couvert en détail dans la formation <a href="../index.html#formations">Claude Code Mastery FR</a> incluse dans le pack à 49 €.</p>
+
+  <div class="article-cta">
+    <h3>Va au-delà de ce guide</h3>
+    <p>Les 6 formations couvrent toute la surface Claude Code : workflow, sub-agents, skills, MCPs, sécurité, optimisation des coûts. Téléchargement immédiat.</p>
+    <a href="../index.html#pricing" class="btn btn-primary">Découvrir le pack — 49 €</a>
+  </div>
+</article>
+
+<footer>
+  <div class="container">
+    <div class="footer-bottom">
+      © 2026 Formations Claude Code FR · <a href="../index.html">Retour à l'accueil</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
