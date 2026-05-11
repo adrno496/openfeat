@@ -1,0 +1,13 @@
+{
+  "name": "AI Arena",
+  "short_name": "AI Arena",
+  "description": "Fais s'affronter deux intelligences artificielles",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d0d0d",
+  "theme_color": "#ff4444",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

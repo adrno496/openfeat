@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#08090c">
-<meta name="description" content="Openfeat — Hub regroupant 11 apps IA/web : analyse financière, tracker running, montage vidéo, marketing, génération CGV, suite entrepreneur, audit landing, devis, formation Claude Code.">
+<meta name="description" content="Openfeat — Hub regroupant 19 apps IA/web : analyse financière, tracker running, montage vidéo, marketing, génération CGV, suite entrepreneur, audit landing, devis, formation Claude Code, AI Arena, Crypto Tycoon, FinMot, Geopolitik, World State Simulator, HL Trader, The Judge, Prophet.">
 <meta name="robots" content="index,follow">
-<title>Openfeat — 11 apps web</title>
+<title>Openfeat — 19 apps web</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
@@ -188,6 +188,14 @@
   .card[data-app="audit"]    { --card-grad: linear-gradient(135deg,#0d3a36,#000); --icon-bg: rgba(10,132,120,0.18); --icon-fg: #2ecdb6; }
   .card[data-app="devis"]    { --card-grad: linear-gradient(135deg,#1f1840,#000); --icon-bg: rgba(108,99,255,0.16); --icon-fg: #8d85ff; }
   .card[data-app="formation"]{ --card-grad: linear-gradient(135deg,#3a1d0d,#000); --icon-bg: rgba(255,150,90,0.16); --icon-fg: #ff965a; }
+  .card[data-app="ai-arena"] { --card-grad: linear-gradient(135deg,#3d0d12,#000); --icon-bg: rgba(255,68,68,0.16); --icon-fg: #ff6868; }
+  .card[data-app="crypto"]   { --card-grad: linear-gradient(135deg,#3d2e08,#000); --icon-bg: rgba(247,196,72,0.16); --icon-fg: #f7c448; }
+  .card[data-app="finmot"]   { --card-grad: linear-gradient(135deg,#0d2438,#000); --icon-bg: rgba(96,165,250,0.16); --icon-fg: #60a5fa; }
+  .card[data-app="geopol"]   { --card-grad: linear-gradient(135deg,#1e0d3d,#000); --icon-bg: rgba(167,139,250,0.16); --icon-fg: #a78bfa; }
+  .card[data-app="regne"]    { --card-grad: linear-gradient(135deg,#2a1808,#000); --icon-bg: rgba(208,151,76,0.16); --icon-fg: #d0974c; }
+  .card[data-app="trader"]   { --card-grad: linear-gradient(135deg,#082828,#000); --icon-bg: rgba(72,201,176,0.16); --icon-fg: #48c9b0; }
+  .card[data-app="judge"]    { --card-grad: linear-gradient(135deg,#2c1f0c,#000); --icon-bg: rgba(232,192,124,0.16); --icon-fg: #e8c07c; }
+  .card[data-app="prophet"]  { --card-grad: linear-gradient(135deg,#08283d,#000); --icon-bg: rgba(56,189,248,0.16); --icon-fg: #38bdf8; }
 
   footer {
     margin-top: 64px;
@@ -210,10 +218,10 @@
     <div class="brand-row">
       <div class="brand-logo">O</div>
       <div class="brand-name">Openfeat</div>
-      <div class="brand-tag">v1.2 · 11 apps</div>
+      <div class="brand-tag">v1.3 · 19 apps</div>
     </div>
-    <h1 class="title">Onze apps web<br>en <em>un seul endroit</em>.</h1>
-    <p class="subtitle">Hub regroupant les apps construites — finance, sport, vidéo, marketing, juridique, entrepreneuriat, screenshots, sites web, audit conversion, devis, formation. Toutes accessibles directement depuis ce site.</p>
+    <h1 class="title">Dix-neuf apps web<br>en <em>un seul endroit</em>.</h1>
+    <p class="subtitle">Hub regroupant les apps construites — finance, sport, vidéo, marketing, juridique, entrepreneuriat, screenshots, sites web, audit conversion, devis, formation, jeux IA, simulateurs, trading. Toutes accessibles directement depuis ce site.</p>
   </header>
 
   <main class="grid">
@@ -336,6 +344,94 @@
       <div class="card-footer">
         <div class="card-tags"><span class="tag">49 €</span><span class="tag">ZIP</span></div>
         <span class="card-cta">Voir →</span>
+      </div>
+    </a>
+
+    <a class="card" href="./ai-arena/dist/" data-app="ai-arena">
+      <div class="card-icon">⚔</div>
+      <p class="card-meta">JEU · IA vs IA · PWA</p>
+      <h2 class="card-title">AI Arena</h2>
+      <p class="card-desc">Fais s'affronter deux intelligences artificielles. 29 modes — débat, donjon, interrogatoire, pitch, recette, oracle, trash talk. OpenRouter BYOK.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">BYOK</span><span class="tag">PWA</span></div>
+        <span class="card-cta">Ouvrir →</span>
+      </div>
+    </a>
+
+    <a class="card" href="./cryptotycoon/www/" data-app="crypto">
+      <div class="card-icon">₿</div>
+      <p class="card-meta">JEU · CRYPTO · SIMULATEUR</p>
+      <h2 class="card-title">Crypto Trader Tycoon</h2>
+      <p class="card-desc">Simulateur de trading crypto. Bots, événements de marché, progression. Idle-game façon tycoon, 100% offline.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">offline</span><span class="tag">idle</span></div>
+        <span class="card-cta">Ouvrir →</span>
+      </div>
+    </a>
+
+    <a class="card" href="./finmot/www/" data-app="finmot">
+      <div class="card-icon">▦</div>
+      <p class="card-meta">JEU · WORDLE · FINANCE</p>
+      <h2 class="card-title">FinMot</h2>
+      <p class="card-desc">Le mot du jour — vocabulaire de la finance, des marchés et de la macroéconomie. Un puzzle quotidien façon Wordle, en français.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">FR</span><span class="tag">daily</span></div>
+        <span class="card-cta">Jouer →</span>
+      </div>
+    </a>
+
+    <a class="card" href="./geopolitik/www/" data-app="geopol">
+      <div class="card-icon">◉</div>
+      <p class="card-meta">JEU · STRATÉGIE · NATION</p>
+      <h2 class="card-title">Geopolitik</h2>
+      <p class="card-desc">Diriger un pays. Dominer le siècle. Simulateur de géopolitique tycoon — économie, diplomatie, militaire, événements mondiaux.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">tycoon</span><span class="tag">offline</span></div>
+        <span class="card-cta">Ouvrir →</span>
+      </div>
+    </a>
+
+    <a class="card" href="./regne/www/" data-app="regne">
+      <div class="card-icon">♛</div>
+      <p class="card-meta">JEU · IA · GOUVERNANCE</p>
+      <h2 class="card-title">World State Simulator</h2>
+      <p class="card-desc">Régnez sur une nation, écrivez son histoire. Simulation géopolitique multi-genre avec narrateur IA — chaque partie est unique.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">IA</span><span class="tag">BYOK</span></div>
+        <span class="card-cta">Régner →</span>
+      </div>
+    </a>
+
+    <a class="card" href="./trader/www/" data-app="trader">
+      <div class="card-icon">⇌</div>
+      <p class="card-meta">TRADING · HYPERLIQUID · BOT</p>
+      <h2 class="card-title">HL Trader</h2>
+      <p class="card-desc">Bot de trading multi-stratégies pour Hyperliquid (perps avec levier). Exécution 100% client-side dans la WebView, aucune clé envoyée à un serveur.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">client-side</span><span class="tag">perps</span></div>
+        <span class="card-cta">Ouvrir →</span>
+      </div>
+    </a>
+
+    <a class="card" href="./proces/www/" data-app="judge">
+      <div class="card-icon">§</div>
+      <p class="card-meta">JEU · JUSTICE · LOCAL</p>
+      <h2 class="card-title">The Judge</h2>
+      <p class="card-desc">Court game réaliste : verdicts, plaidoiries, codex juridique. Tu joues le juge — 100% local, sans compte.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">local</span><span class="tag">FR</span></div>
+        <span class="card-cta">Juger →</span>
+      </div>
+    </a>
+
+    <a class="card" href="./prophet/www/" data-app="prophet">
+      <div class="card-icon">◈</div>
+      <p class="card-meta">PRÉDICTIONS · FANTASY · CLASSEMENT</p>
+      <h2 class="card-title">Pulse Predict</h2>
+      <p class="card-desc">Le marché de prédictions virtuel mondial. 1000 € offerts, levier 10x, classement global. Polymarket-fantasy sans risque.</p>
+      <div class="card-footer">
+        <div class="card-tags"><span class="tag">fantasy</span><span class="tag">10x</span></div>
+        <span class="card-cta">Prédire →</span>
       </div>
     </a>
 

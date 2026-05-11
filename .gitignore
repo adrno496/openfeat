@@ -9,6 +9,12 @@ dist/
 build/
 *.log
 
+# Whitelist web-served build outputs (must come after dist/)
+!formation/dist/
+!formation/dist/**
+!ai-arena/dist/
+!ai-arena/dist/**
+
 # IDEs
 .idea/
 .vscode/
