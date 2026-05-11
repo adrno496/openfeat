@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0b0d">
+  <meta name="description" content="FinMot — Le mot du jour. Vocabulaire de la finance, des marchés et de la macroéconomie.">
+  <title>FinMot</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- ============================================================
+       HEADER
+       ============================================================ -->
+  <header class="header">
+    <div class="header-left">
+      <button class="icon-btn" id="btn-rules" aria-label="Règles">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="brand">
+      <div class="brand-title">Fin<em>Mot</em></div>
+      <div class="brand-day" id="header-day">#1</div>
+    </div>
+    <div class="header-right">
+      <button class="icon-btn" id="btn-stats" aria-label="Statistiques">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10"></line>
+          <line x1="12" y1="20" x2="12" y2="4"></line>
+          <line x1="6" y1="20" x2="6" y2="14"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       MAIN GAME AREA
+       ============================================================ -->
+  <main class="main">
+    <div class="board-wrap">
+      <div class="board" id="board"></div>
+    </div>
+
+    <div class="keyboard" id="keyboard"></div>
+  </main>
+
+  <!-- ============================================================
+       TOAST
+       ============================================================ -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ============================================================
+       MODAL : RULES
+       ============================================================ -->
+  <div class="modal-backdrop" id="rules-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" data-i18n="rulesTitle">Comment jouer</h2>
+        <button class="modal-close" data-close-modal="rules-modal" aria-label="Fermer">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="rules-content">
+          <p data-i18n="rulesIntro">Devinez le mot du jour en 6 essais.</p>
+          <p data-i18n="rulesPoint1">Chaque essai doit être un mot de 5 lettres.</p>
+          <p data-i18n="rulesPoint2">Les couleurs indiquent si vous vous rapprochez :</p>
+
+          <div class="rules-examples">
+            <div class="rules-example">
+              <div class="example-tiles">
+                <div class="example-tile correct">B</div>
+                <div class="example-tile">O</div>
+                <div class="example-tile">U</div>
+                <div class="example-tile">R</div>
+                <div class="example-tile">S</div>
+              </div>
+              <div class="rules-example-text" data-i18n="rulesGreen">La lettre est à la bonne place.</div>
+            </div>
+
+            <div class="rules-example">
+              <div class="example-tiles">
+                <div class="example-tile">A</div>
+                <div class="example-tile present">C</div>
+                <div class="example-tile">T</div>
+                <div class="example-tile">I</div>
+                <div class="example-tile">F</div>
+              </div>
+              <div class="rules-example-text" data-i18n="rulesYellow">La lettre est dans le mot mais mal placée.</div>
+            </div>
+
+            <div class="rules-example">
+              <div class="example-tiles">
+                <div class="example-tile">D</div>
+                <div class="example-tile">E</div>
+                <div class="example-tile absent">T</div>
+                <div class="example-tile">T</div>
+                <div class="example-tile">E</div>
+              </div>
+              <div class="rules-example-text" data-i18n="rulesGray">La lettre n'est pas dans le mot.</div>
+            </div>
+          </div>
+
+          <div class="rules-theme" data-i18n="rulesTheme">
+            Tous les mots sont issus du vocabulaire de la finance, des marchés, de la macroéconomie ou de la géopolitique.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL : STATS
+       ============================================================ -->
+  <div class="modal-backdrop" id="stats-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" data-i18n="statsTitle">Statistiques</h2>
+        <button class="modal-close" data-close-modal="stats-modal" aria-label="Fermer">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="stats-grid">
+          <div class="stat-cell">
+            <div class="stat-value" id="stat-played">0</div>
+            <div class="stat-label" data-i18n="played">Parties</div>
+          </div>
+          <div class="stat-cell">
+            <div class="stat-value" id="stat-winrate">0</div>
+            <div class="stat-label" data-i18n="winRate">% Réussite</div>
+          </div>
+          <div class="stat-cell">
+            <div class="stat-value" id="stat-current">0</div>
+            <div class="stat-label" data-i18n="currentStreak">Série en cours</div>
+          </div>
+          <div class="stat-cell">
+            <div class="stat-value" id="stat-max">0</div>
+            <div class="stat-label" data-i18n="maxStreak">Meilleure série</div>
+          </div>
+        </div>
+
+        <div class="stats-section-title" data-i18n="distribution">Répartition des essais</div>
+        <div class="distribution" id="stat-distribution"></div>
+
+        <button class="btn-primary" id="btn-share-stats">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+          </svg>
+          <span data-i18n="share">Partager</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL : RESULT
+       ============================================================ -->
+  <div class="modal-backdrop" id="result-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" style="visibility: hidden;">Result</h2>
+        <button class="modal-close" data-close-modal="result-modal" aria-label="Fermer">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="result-title win" id="result-title">Bravo !</div>
+        <p class="result-subtitle" id="result-subtitle"></p>
+
+        <div class="result-word-card">
+          <div class="result-word" id="result-word"></div>
+          <div class="result-category" id="result-category"></div>
+          <div class="result-definition" id="result-definition"></div>
+        </div>
+
+        <div class="result-countdown" id="result-countdown"></div>
+
+        <button class="btn-primary" id="btn-share">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+          </svg>
+          <span data-i18n="share">Partager</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SCRIPTS
+       ============================================================ -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

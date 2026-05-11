@@ -1,0 +1,17 @@
+{
+  "appId": "app.smartlife.regne",
+  "appName": "WWS",
+  "webDir": "www",
+  "server": { "androidScheme": "https" },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1500,
+      "backgroundColor": "#0d0a06",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#0d0a06"
+    }
+  }
+}

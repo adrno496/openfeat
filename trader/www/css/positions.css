@@ -1,0 +1,104 @@
+/* Positions screen */
+#screen-positions .body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tabs {
+  display: flex;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+}
+.tab {
+  flex: 1;
+  padding: 10px;
+  background: none;
+  border: none;
+  color: var(--text2);
+  font-family: inherit;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.empty-state {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+/* Position card */
+.pos-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--muted);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.pos-card.long { border-left-color: var(--green); }
+.pos-card.short { border-left-color: var(--red); }
+
+.pos-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.pos-coin {
+  font-family: var(--font-display);
+  font-size: 18px;
+  letter-spacing: 3px;
+  color: var(--accent);
+}
+.pos-lev {
+  font-size: 10px;
+  color: var(--yellow);
+  border: 1px solid var(--yellow);
+  padding: 2px 6px;
+  letter-spacing: 1px;
+}
+
+.pos-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.pos-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.pos-cell .label { font-size: 9px; }
+.pos-cell .value { font-size: 12px; color: var(--text); }
+.pos-cell .value.green { color: var(--green); }
+.pos-cell .value.red { color: var(--red); }
+.pos-cell .value.yellow { color: var(--yellow); }
+
+.pos-actions { display: flex; gap: 8px; }
+.pos-actions .btn { flex: 1; padding: 8px; font-size: 10px; }
+
+/* History row */
+.hist-row {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+  display: grid;
+  grid-template-columns: 50px 60px 1fr 80px;
+  gap: 8px;
+  align-items: center;
+  font-size: 11px;
+}
+.hist-row .coin { font-family: var(--font-display); letter-spacing: 2px; color: var(--accent); }
+.hist-row .dir { font-size: 10px; letter-spacing: 1.5px; }
+.hist-row .dir.long { color: var(--green); }
+.hist-row .dir.short { color: var(--red); }
+.hist-row .time { color: var(--muted); font-size: 10px; text-align: right; }
+.hist-row .price { color: var(--text); }

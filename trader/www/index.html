@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#080C10">
+  <title>HL TRADER</title>
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/setup.css">
+  <link rel="stylesheet" href="css/positions.css">
+  <link rel="stylesheet" href="css/signals.css">
+  <link rel="stylesheet" href="css/settings.css">
+
+  <!-- CDN libs (no bundler) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.9.0/ethers.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/msgpack-lite@0.1.26/dist/msgpack.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <div class="scanlines"></div>
+
+  <!-- Screens -->
+  <div id="screen-setup" class="screen"></div>
+  <div id="screen-dashboard" class="screen"></div>
+  <div id="screen-positions" class="screen"></div>
+  <div id="screen-signals" class="screen"></div>
+  <div id="screen-settings" class="screen"></div>
+
+  <!-- Bottom Nav -->
+  <nav id="bottom-nav" class="bottom-nav hidden">
+    <button class="nav-btn active" data-screen="dashboard" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M3 13l9-9 9 9"/><path d="M5 11v9h14v-9"/>
+      </svg>
+      <span>Dashboard</span>
+    </button>
+    <button class="nav-btn" data-screen="positions" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+        <rect x="3" y="6" width="18" height="13" rx="1"/><path d="M3 10h18M9 6V4h6v2"/>
+      </svg>
+      <span>Positions</span>
+    </button>
+    <button class="nav-btn" data-screen="signals" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M3 17l4-4 4 3 7-8"/><path d="M14 8h4v4"/>
+      </svg>
+      <span>Signaux</span>
+    </button>
+    <button class="nav-btn" data-screen="settings" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+        <circle cx="12" cy="12" r="3"/><path d="M19 12c0 .7-.1 1.4-.3 2l2 1.6-2 3.4-2.4-1a7 7 0 0 1-3.5 2L12.5 22h-1l-.3-2a7 7 0 0 1-3.5-2l-2.4 1-2-3.4 2-1.6c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2l-2-1.6 2-3.4 2.4 1a7 7 0 0 1 3.5-2L11.5 2h1l.3 2a7 7 0 0 1 3.5 2l2.4-1 2 3.4-2 1.6c.2.6.3 1.3.3 2z"/>
+      </svg>
+      <span>Réglages</span>
+    </button>
+  </nav>
+
+  <!-- Toast container -->
+  <div id="toast-container"></div>
+
+  <!-- App -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

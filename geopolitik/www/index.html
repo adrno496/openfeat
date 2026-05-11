@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0b0d">
+  <meta name="description" content="Geopolitik — Diriger un pays. Dominer le siècle.">
+  <title>Geopolitik</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- ============================================================
+       HEADER
+       ============================================================ -->
+  <header class="header">
+    <div class="header-top">
+      <div class="brand">
+        <span class="brand-prefix">G</span><span class="brand-suffix">·POLITIK</span>
+      </div>
+      <button id="btn-reset" class="header-action" aria-label="Reset">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+          <polyline points="1 4 1 10 7 10"></polyline>
+          <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div class="country-block">
+      <div class="country-row">
+        <div class="country-name" id="country-name">République de…</div>
+        <div class="game-date" id="game-date">Jan 2026</div>
+      </div>
+      <div class="country-row">
+        <div class="tier-badge" id="tier-badge">Petit pays</div>
+        <div class="doctrine-badge" id="doctrine-badge">📜 Démocratie</div>
+      </div>
+    </div>
+
+    <div class="influence-block">
+      <div class="influence-label">INFLUENCE MONDIALE</div>
+      <div class="influence-row">
+        <div class="influence-value" id="influence-value">100</div>
+        <div class="influence-delta" id="influence-delta"></div>
+      </div>
+      <div class="tier-progress">
+        <div class="tier-progress-bar" id="tier-progress-bar"></div>
+      </div>
+      <div class="tier-progress-label" id="tier-progress-label">100 → 100 (Régional)</div>
+    </div>
+
+    <div class="kpi-block">
+      <div class="kpi">
+        <div class="kpi-label">Trésor</div>
+        <div class="kpi-value" id="treasury-value">50M$</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Stabilité</div>
+        <div class="kpi-value positive" id="stability-value">80</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Tension</div>
+        <div class="kpi-value neutral" id="tension-value">30</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Event banner -->
+  <div class="event-banner" id="event-banner"></div>
+
+  <!-- Notifications -->
+  <div class="notifs" id="notifs"></div>
+
+  <!-- ============================================================
+       TABS
+       ============================================================ -->
+  <nav class="tabs">
+    <button class="tab active" id="tab-nation">🏛 Nation</button>
+    <button class="tab" id="tab-world">🌐 Monde</button>
+    <button class="tab" id="tab-doctrine">📜 Doctrine</button>
+    <button class="tab" id="tab-events">📰 News</button>
+    <button class="tab" id="tab-achievements">🏆</button>
+  </nav>
+
+  <!-- ============================================================
+       MAIN
+       ============================================================ -->
+  <main class="main">
+
+    <!-- PANEL : NATION -->
+    <section class="panel active" id="panel-nation">
+      <div class="panel-intro">
+        <h2 class="panel-title">Allocation budgétaire</h2>
+        <p class="panel-desc">Répartissez votre budget mensuel entre les 5 piliers. La somme reste à 100%.</p>
+      </div>
+
+      <div class="sector-list" id="sector-list"></div>
+
+      <div class="chart-block">
+        <div class="chart-header">
+          <div class="chart-title">Influence dans le temps</div>
+          <div class="chart-hint">Ligne pointillée or = prochain palier</div>
+        </div>
+        <canvas id="chart-canvas" class="chart-canvas"></canvas>
+      </div>
+    </section>
+
+    <!-- PANEL : WORLD -->
+    <section class="panel" id="panel-world">
+      <div class="panel-intro">
+        <h2 class="panel-title">Puissances mondiales</h2>
+        <p class="panel-desc">Tapez sur une puissance pour engager une action diplomatique.</p>
+      </div>
+      <div class="power-list" id="power-list"></div>
+    </section>
+
+    <!-- PANEL : DOCTRINE -->
+    <section class="panel" id="panel-doctrine">
+      <div class="panel-intro">
+        <h2 class="panel-title">Doctrines</h2>
+        <p class="panel-desc">Le mode de gouvernance détermine vos forces et faiblesses. Changer coûte de la stabilité.</p>
+      </div>
+      <div class="doctrine-list" id="doctrine-list"></div>
+    </section>
+
+    <!-- PANEL : EVENTS -->
+    <section class="panel" id="panel-events">
+      <div class="panel-intro">
+        <h2 class="panel-title">Événements actifs</h2>
+      </div>
+      <div class="active-events" id="active-events"></div>
+      <div class="panel-intro" style="margin-top: 24px;">
+        <h2 class="panel-title">Historique</h2>
+      </div>
+      <div class="events-history" id="events-history"></div>
+    </section>
+
+    <!-- PANEL : ACHIEVEMENTS -->
+    <section class="panel" id="panel-achievements">
+      <div class="panel-intro">
+        <h2 class="panel-title">Trophées</h2>
+        <p class="panel-desc">Récompenses budgétaires pour les milestones atteints.</p>
+      </div>
+      <div class="achievement-list" id="achievement-list"></div>
+    </section>
+
+  </main>
+
+  <!-- ============================================================
+       MODAL : ONBOARDING
+       ============================================================ -->
+  <div class="modal-backdrop" id="onboarding-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Bienvenue, dirigeant.</h2>
+        <button class="modal-close" data-close-modal="onboarding-modal" aria-label="Fermer">×</button>
+      </div>
+      <div class="modal-body onboarding-body">
+        <div class="onb-country">Vous prenez la tête de la <strong id="onb-country-name">République</strong>.</div>
+
+        <div class="onb-step">
+          <div class="onb-icon">🏛</div>
+          <div class="onb-text">
+            <strong>Allouez votre budget</strong> entre 5 piliers : Économie, Militaire, Tech, Diplomatie, Société. Chaque mois apporte des résultats.
+          </div>
+        </div>
+        <div class="onb-step">
+          <div class="onb-icon">📜</div>
+          <div class="onb-text">
+            <strong>Choisissez une doctrine</strong>. Démocratie, Autocratie, Technocratie… chacune a ses avantages.
+          </div>
+        </div>
+        <div class="onb-step">
+          <div class="onb-icon">🤝</div>
+          <div class="onb-text">
+            <strong>Bâtissez des alliances</strong> avec USA, Chine, EU, Russie, Inde. Ou faites-vous des ennemis.
+          </div>
+        </div>
+        <div class="onb-step">
+          <div class="onb-icon">📰</div>
+          <div class="onb-text">
+            <strong>Réagissez aux événements mondiaux</strong>. Crises, guerres, percées techno : 15+ événements peuvent bouleverser votre stratégie.
+          </div>
+        </div>
+        <div class="onb-step">
+          <div class="onb-icon">🌐</div>
+          <div class="onb-text">
+            <strong>Objectif</strong> : devenir Hégémon mondial. Atteindre 2500 d'influence. Le siècle est à vous.
+          </div>
+        </div>
+        <button class="btn btn-confirm" data-close-modal="onboarding-modal">Prendre le pouvoir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL : OFFLINE
+       ============================================================ -->
+  <div class="modal-backdrop" id="offline-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">⏱ Temps écoulé</h2>
+        <button class="modal-close" data-close-modal="offline-modal" aria-label="Fermer">×</button>
+      </div>
+      <div class="modal-body offline-body">
+        <p>Pendant votre absence (<span id="offline-hours">0</span>h), votre nation a continué à vivre.</p>
+        <div class="offline-delta positive" id="offline-delta">+0</div>
+        <p class="offline-note">Variation d'influence • Date actuelle : <span id="offline-date">Jan 2026</span></p>
+        <button class="btn btn-confirm" data-close-modal="offline-modal">Continuer le règne</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL : DIPLOMACY
+       ============================================================ -->
+  <div class="modal-backdrop" id="diplomacy-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="diplomacy-title">Diplomatie</h2>
+        <button class="modal-close" data-close-modal="diplomacy-modal" aria-label="Fermer">×</button>
+      </div>
+      <div class="modal-body" id="diplomacy-body"></div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

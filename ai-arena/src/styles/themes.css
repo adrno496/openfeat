@@ -1,0 +1,9 @@
+/* Provider color hints */
+.pb-anthropic { background: #d4a373; color: #2c1810; }
+.pb-openai { background: #10a37f; color: white; }
+.pb-openrouter { background: #6366f1; color: white; }
+.pb-google { background: #4285f4; color: white; }
+.pb-mistral { background: #ff7000; color: white; }
+.pb-cerebras { background: #ff5722; color: white; }
+.pb-github { background: #24292e; color: white; }
+.pb-huggingface { background: #ffd21e; color: #1a1a1a; }

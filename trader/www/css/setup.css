@@ -1,0 +1,208 @@
+/* Setup wizard */
+#screen-setup {
+  padding: 0;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.setup-shell {
+  width: 100%;
+  max-width: 480px;
+  padding: 32px 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.setup-logo {
+  font-family: var(--font-display);
+  font-size: 38px;
+  letter-spacing: 8px;
+  color: var(--accent);
+  text-align: center;
+  text-shadow: 0 0 24px rgba(0, 212, 255, 0.6);
+}
+.setup-logo span { color: var(--text2); }
+
+.setup-tagline {
+  text-align: center;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text2);
+  margin-top: -8px;
+  margin-bottom: 8px;
+}
+
+.steps {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.step-dot {
+  width: 24px;
+  height: 3px;
+  background: var(--border);
+}
+.step-dot.active { background: var(--accent); }
+.step-dot.done { background: var(--green); }
+
+.setup-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 22px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.setup-card h2 {
+  font-family: var(--font-display);
+  letter-spacing: 4px;
+  color: var(--accent);
+  font-size: 18px;
+}
+
+.setup-card p {
+  font-size: 11px;
+  color: var(--text2);
+  line-height: 1.6;
+}
+
+.choice-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.choice-btn {
+  padding: 22px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  transition: all 0.18s;
+}
+.choice-btn:hover, .choice-btn.selected {
+  border-color: var(--accent);
+  background: rgba(0, 212, 255, 0.05);
+}
+.choice-btn .title {
+  font-family: var(--font-display);
+  letter-spacing: 2px;
+  font-size: 14px;
+  color: var(--accent);
+}
+.choice-btn .desc {
+  font-size: 10px;
+  color: var(--text2);
+  line-height: 1.4;
+}
+
+.pk-display {
+  background: var(--bg);
+  border: 1px solid var(--accent2);
+  padding: 12px;
+  font-size: 11px;
+  word-break: break-all;
+  color: var(--text);
+  position: relative;
+}
+
+.pk-warning {
+  background: rgba(255, 107, 53, 0.10);
+  border: 1px solid var(--accent2);
+  color: var(--accent2);
+  padding: 10px 12px;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.network-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.network-pick {
+  padding: 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.network-pick.selected {
+  border-color: var(--accent);
+  background: rgba(0, 212, 255, 0.05);
+}
+.network-pick .title {
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 3px;
+}
+.network-pick.testnet .title { color: var(--accent2); }
+.network-pick.mainnet .title { color: var(--green); }
+.network-pick .desc {
+  font-size: 9px;
+  color: var(--text2);
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+.faucet-link {
+  display: block;
+  text-align: center;
+  padding: 10px;
+  background: var(--bg);
+  border: 1px dashed var(--accent2);
+  color: var(--accent2);
+  font-size: 11px;
+  letter-spacing: 1px;
+  margin-top: 8px;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--text2);
+  line-height: 1.5;
+  cursor: pointer;
+}
+.checkbox-row input { margin-top: 2px; accent-color: var(--accent); }
+
+.test-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 24px 0;
+}
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.test-status .msg {
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text2);
+}
+.test-status.success .msg { color: var(--green); }
+.test-status.error .msg { color: var(--red); }
+
+.action-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+.action-row .btn { flex: 1; }

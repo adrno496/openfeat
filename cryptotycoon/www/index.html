@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0b0d">
+  <meta name="description" content="Crypto Trader Tycoon — Simulateur de trading crypto. Bots, événements de marché, progression.">
+  <title>Crypto Trader Tycoon</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- ============================================================
+       HEADER : Portfolio + Tier + Regime
+       ============================================================ -->
+  <header class="header">
+    <div class="header-top">
+      <div class="brand">
+        <span class="brand-prefix">CT</span><span class="brand-suffix">·TYCOON</span>
+      </div>
+      <button id="btn-reset" class="header-action" aria-label="Reset">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+          <polyline points="1 4 1 10 7 10"></polyline>
+          <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div class="portfolio-block">
+      <div class="portfolio-value-row">
+        <div class="portfolio-value" id="portfolio-value">$100.00</div>
+        <div class="regime-badge regime-choppy" id="regime-badge">Choppy</div>
+      </div>
+      <div class="portfolio-meta-row">
+        <div class="portfolio-cash" id="portfolio-cash">Cash: $100.00</div>
+        <div class="pnl positive" id="portfolio-pnl">▲ $0.00 (+0.00%)</div>
+      </div>
+    </div>
+
+    <div class="tier-block">
+      <div class="tier-row">
+        <div class="tier-badge" id="tier-badge">Retail • Tier 0</div>
+        <div class="tier-progress-label" id="tier-progress-label">$100 → $1K (Bronze)</div>
+      </div>
+      <div class="tier-progress">
+        <div class="tier-progress-bar" id="tier-progress-bar"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Event banner (transient) -->
+  <div class="event-banner" id="event-banner"></div>
+
+  <!-- Notifications stack -->
+  <div class="notifs" id="notifs"></div>
+
+  <!-- ============================================================
+       TABS
+       ============================================================ -->
+  <nav class="tabs">
+    <button class="tab active" id="tab-market">📊 Marché</button>
+    <button class="tab" id="tab-bots">🤖 Bots</button>
+    <button class="tab" id="tab-achievements">🏆 Trophées</button>
+  </nav>
+
+  <!-- ============================================================
+       MAIN PANELS
+       ============================================================ -->
+  <main class="main">
+
+    <!-- PANEL : MARKET -->
+    <section class="panel active" id="panel-market">
+
+      <div class="asset-list" id="asset-list"></div>
+
+      <div class="chart-block">
+        <div class="chart-header">
+          <div class="chart-title">
+            <div class="chart-symbol" id="chart-symbol">₿ Bitcoin • BTC</div>
+            <div class="chart-meta-row">
+              <span class="chart-price" id="chart-price">$65,000</span>
+              <span class="chart-change positive" id="chart-change">+0.00%</span>
+            </div>
+          </div>
+        </div>
+        <canvas id="chart-canvas" class="chart-canvas"></canvas>
+        <div class="chart-holding" id="chart-holding">
+          <span class="holding-empty">Aucune position</span>
+        </div>
+        <div class="trade-actions">
+          <button id="btn-buy" class="btn btn-buy">
+            <span class="btn-label">ACHETER</span>
+          </button>
+          <button id="btn-sell" class="btn btn-sell" disabled>
+            <span class="btn-label">VENDRE</span>
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- PANEL : BOTS -->
+    <section class="panel" id="panel-bots">
+      <div class="panel-intro">
+        <h2 class="panel-title">Trading bots</h2>
+        <p class="panel-desc">Automatisez votre trading. Chaque bot fonctionne 24/7, même offline (jusqu'à 12h).</p>
+      </div>
+      <div class="bot-list" id="bot-list"></div>
+    </section>
+
+    <!-- PANEL : ACHIEVEMENTS -->
+    <section class="panel" id="panel-achievements">
+      <div class="panel-intro">
+        <h2 class="panel-title">Trophées</h2>
+        <p class="panel-desc">Récompenses cash pour les milestones franchis.</p>
+      </div>
+      <div class="achievement-list" id="achievement-list"></div>
+    </section>
+
+  </main>
+
+  <!-- ============================================================
+       MODAL : TRADE
+       ============================================================ -->
+  <div class="modal-backdrop" id="trade-modal">
+    <div class="modal trade-modal">
+      <div class="modal-header">
+        <h2 class="modal-title trade-title-buy" id="trade-modal-title">Acheter</h2>
+        <button class="modal-close" data-close-modal="trade-modal" aria-label="Fermer">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="trade-subtitle" id="trade-modal-subtitle">Cash disponible: $100</div>
+
+        <div class="trade-input-block">
+          <label class="trade-label">Montant USD</label>
+          <div class="trade-amount-wrap">
+            <span class="trade-amount-prefix">$</span>
+            <input type="number" id="trade-amount" class="trade-amount" min="0" step="0.01" value="50.00">
+          </div>
+        </div>
+
+        <input type="range" id="trade-slider" class="trade-slider" min="0" max="100" value="50" step="0.1">
+
+        <div class="trade-presets" id="trade-presets"></div>
+
+        <div class="trade-units" id="trade-units">≈ 0 BTC</div>
+
+        <button id="trade-confirm" class="btn btn-confirm">Confirmer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL : OFFLINE GAINS
+       ============================================================ -->
+  <div class="modal-backdrop" id="offline-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">⏱ Bon retour</h2>
+        <button class="modal-close" data-close-modal="offline-modal" aria-label="Fermer">×</button>
+      </div>
+      <div class="modal-body offline-body">
+        <p class="offline-intro">Pendant votre absence (<span id="offline-time">0</span>h), le marché et vos bots ont continué à tourner.</p>
+        <div class="offline-gain positive" id="offline-gain">+$0.00</div>
+        <p class="offline-note">Variation totale du portefeuille.</p>
+        <button class="btn btn-confirm" data-close-modal="offline-modal">Continuer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL : ONBOARDING
+       ============================================================ -->
+  <div class="modal-backdrop" id="onboarding-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Bienvenue, trader.</h2>
+        <button class="modal-close" data-close-modal="onboarding-modal" aria-label="Fermer">×</button>
+      </div>
+      <div class="modal-body onboarding-body">
+        <div class="onboard-step">
+          <div class="onboard-icon">💵</div>
+          <div class="onboard-text">
+            <strong>$100 de capital</strong> pour démarrer. Faites-en grossir un empire.
+          </div>
+        </div>
+        <div class="onboard-step">
+          <div class="onboard-icon">📈</div>
+          <div class="onboard-text">
+            <strong>Tradez les cryptos</strong> à la hausse comme à la baisse. Le marché alterne entre Bull, Bear, Choppy, Euphoria et Capitulation.
+          </div>
+        </div>
+        <div class="onboard-step">
+          <div class="onboard-icon">🤖</div>
+          <div class="onboard-text">
+            <strong>Achetez des bots</strong> pour automatiser. DCA, Momentum, Grid, AI Alpha, Arbitrage — débloqués progressivement.
+          </div>
+        </div>
+        <div class="onboard-step">
+          <div class="onboard-icon">📰</div>
+          <div class="onboard-text">
+            <strong>Réagissez aux news</strong>. Halvings, ETF, krachs, FOMO retail : adaptez votre exposition.
+          </div>
+        </div>
+        <div class="onboard-step">
+          <div class="onboard-icon">🌙</div>
+          <div class="onboard-text">
+            <strong>Le marché ne dort jamais</strong>. Vos bots tournent en offline jusqu'à 12h. Reviens régulièrement encaisser.
+          </div>
+        </div>
+        <button class="btn btn-confirm" data-close-modal="onboarding-modal">Commencer à trader</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

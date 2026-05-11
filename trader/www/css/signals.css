@@ -1,0 +1,115 @@
+/* Signals screen */
+#screen-signals .body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.coin-tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.coin-tabs::-webkit-scrollbar { display: none; }
+.coin-tab {
+  flex: 0 0 auto;
+  padding: 8px 18px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  font-family: var(--font-display);
+  letter-spacing: 3px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.coin-tab.active {
+  background: rgba(0, 212, 255, 0.08);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.consensus-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.consensus-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.consensus-price {
+  font-family: var(--font-display);
+  font-size: 26px;
+  letter-spacing: 2px;
+  color: var(--text);
+}
+
+.scores-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.score-line {
+  display: grid;
+  grid-template-columns: 50px 1fr 50px;
+  align-items: center;
+  gap: 8px;
+}
+.score-line .lbl { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; }
+.score-line .lbl.long { color: var(--green); }
+.score-line .lbl.short { color: var(--red); }
+.score-line .val { font-size: 11px; text-align: right; color: var(--text); }
+
+/* Strategy rows */
+.strat-list { display: flex; flex-direction: column; gap: 8px; }
+.strat-row {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.strat-row .head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.strat-name {
+  font-family: var(--font-display);
+  letter-spacing: 2px;
+  font-size: 13px;
+  color: var(--accent);
+}
+.strat-conf-row {
+  display: grid;
+  grid-template-columns: 1fr 50px;
+  gap: 8px;
+  align-items: center;
+}
+.strat-conf-row .pct {
+  font-size: 10px;
+  text-align: right;
+  color: var(--text);
+}
+.strat-reason {
+  font-size: 10px;
+  color: var(--text2);
+  line-height: 1.5;
+}
+.strat-meta {
+  font-size: 10px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+}
+
+.signal-time {
+  text-align: center;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 4px;
+}

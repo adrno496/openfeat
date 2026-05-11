@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <radialGradient id="bgGlow" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#3d6dd9" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#0a0b0d" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="globeGrad" cx="35%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#5d8de8"/>
+      <stop offset="60%" stop-color="#3d6dd9"/>
+      <stop offset="100%" stop-color="#1d3a7a"/>
+    </radialGradient>
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d4a843"/>
+      <stop offset="100%" stop-color="#e8be58"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="12" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1024" height="1024" fill="#0a0b0d"/>
+  <rect width="1024" height="1024" fill="url(#bgGlow)"/>
+
+  <!-- Subtle grid (geopolitical map vibes) -->
+  <g stroke="#25282e" stroke-width="1" opacity="0.4">
+    <line x1="0" y1="280" x2="1024" y2="280"/>
+    <line x1="0" y1="512" x2="1024" y2="512"/>
+    <line x1="0" y1="744" x2="1024" y2="744"/>
+    <line x1="280" y1="0" x2="280" y2="1024"/>
+    <line x1="512" y1="0" x2="512" y2="1024"/>
+    <line x1="744" y1="0" x2="744" y2="1024"/>
+  </g>
+
+  <!-- Outer orbital ring (gold) -->
+  <ellipse cx="512" cy="512" rx="380" ry="120"
+           fill="none"
+           stroke="url(#ringGrad)"
+           stroke-width="6"
+           opacity="0.7"
+           transform="rotate(-25 512 512)"/>
+
+  <!-- Globe -->
+  <g filter="url(#glow)">
+    <circle cx="512" cy="512" r="280" fill="url(#globeGrad)"/>
+  </g>
+
+  <!-- Latitude lines on globe -->
+  <g stroke="#a3c1f5" stroke-width="2" fill="none" opacity="0.4">
+    <ellipse cx="512" cy="512" rx="280" ry="60"/>
+    <ellipse cx="512" cy="512" rx="280" ry="140"/>
+    <ellipse cx="512" cy="512" rx="280" ry="220"/>
+  </g>
+
+  <!-- Longitude lines on globe -->
+  <g stroke="#a3c1f5" stroke-width="2" fill="none" opacity="0.4">
+    <ellipse cx="512" cy="512" rx="60" ry="280"/>
+    <ellipse cx="512" cy="512" rx="140" ry="280"/>
+    <ellipse cx="512" cy="512" rx="220" ry="280"/>
+  </g>
+
+  <!-- Continents stylized (abstract shapes) -->
+  <g fill="#0a2a5a" opacity="0.85">
+    <!-- "America" -->
+    <path d="M 380 410
+             Q 360 460, 380 520
+             Q 400 580, 420 620
+             Q 440 600, 430 540
+             Q 420 470, 400 420
+             Z"/>
+    <!-- "Europe/Africa" -->
+    <path d="M 510 380
+             Q 540 400, 560 450
+             Q 580 510, 570 580
+             Q 550 620, 530 600
+             Q 510 560, 500 510
+             Q 495 450, 510 400
+             Z"/>
+    <!-- "Asia" -->
+    <path d="M 600 400
+             Q 650 420, 670 480
+             Q 660 540, 630 560
+             Q 610 540, 600 490
+             Z"/>
+  </g>
+
+  <!-- Highlight (top-left) -->
+  <ellipse cx="430" cy="420" rx="80" ry="50" fill="#ffffff" opacity="0.10"/>
+
+  <!-- Pin marker (gold star = capital / hegemon) -->
+  <g transform="translate(620, 360)">
+    <circle r="28" fill="#d4a843" filter="url(#glow)"/>
+    <circle r="18" fill="#e8be58"/>
+    <text y="9" text-anchor="middle"
+          font-family="Georgia, serif"
+          font-style="italic"
+          font-weight="700"
+          font-size="32"
+          fill="#0a0b0d">G</text>
+  </g>
+
+  <!-- Bottom label -->
+  <text x="512" y="930"
+        text-anchor="middle"
+        font-family="ui-monospace, 'SF Mono', monospace"
+        font-weight="700"
+        font-size="34"
+        fill="#8a8b8f"
+        letter-spacing="14">G·POLITIK</text>
+
+  <!-- Top right tier marker -->
+  <text x="120" y="180"
+        font-family="Georgia, serif"
+        font-style="italic"
+        font-weight="700"
+        font-size="44"
+        fill="#d4a843">Hégémon</text>
+</svg>

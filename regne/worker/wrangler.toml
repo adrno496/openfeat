@@ -1,0 +1,10 @@
+name = "worldstate-proxy"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+
+[[kv_namespaces]]
+binding = "QUOTA"
+id = "f4907015099a41fc9dc5193ce80ce6bc"
+
+[vars]
+DAILY_QUOTA = "100"

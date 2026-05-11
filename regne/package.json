@@ -1,0 +1,27 @@
+{
+  "name": "regne",
+  "version": "1.1.0",
+  "description": "World State Simulator — Simulation géopolitique multi-genre. Régnez sur une nation, l'histoire est unique à chaque partie.",
+  "main": "www/index.html",
+  "type": "module",
+  "scripts": {
+    "test": "node test.mjs",
+    "check": "node --check www/js/app.js && node --check www/js/storage.js && node --check www/js/game-engine.js && node --check www/js/ai-narrator.js && node --check www/js/ai-client.js && node --check www/js/format.js && node --check www/js/ui-setup.js && node --check www/js/ui-game.js && node --check www/js/ui-consequence.js && node --check www/js/ui-gameover.js && node --check www/js/ui-history.js && node --check www/js/ui-settings.js",
+    "serve": "npx serve www/",
+    "build:android": "npx cap sync android",
+    "open:android": "npx cap open android"
+  },
+  "keywords": ["capacitor", "game", "ai", "governance", "vanilla-js"],
+  "author": "Smart Life",
+  "license": "MIT",
+  "dependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/cli": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
+    "@capacitor/splash-screen": "^8.0.0",
+    "@capacitor/status-bar": "^8.0.0"
+  },
+  "devDependencies": {
+    "serve": "^14.2.0"
+  }
+}
